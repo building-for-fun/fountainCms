@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {FEATURES_TEXT, SETUP_STEPS_TEXT, ACCENT_COLOR} from './../helper/constant';
 
-const LandingPage: React.FC = () => (
+type Content = {
+  id: string;
+  title: string;
+  body: string;
+  createdAt: string;
+};
+
+const LandingPage: React.FC = () => {
+  const [contents, setContents] = useState<Content[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetch('http://localhost:4000/api/content')
+      .then(res => res.json())
+      .then(data => {
+        setContents(data);
+        setLoading(false);
+      });
+  }, []);
+  
+  return (
   <div
     style={{
       fontFamily: 'Inter, sans-serif',
@@ -116,5 +136,6 @@ const LandingPage: React.FC = () => (
     </div>
   </div>
 );
+}
 
 export default LandingPage;

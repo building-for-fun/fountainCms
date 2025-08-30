@@ -2,11 +2,71 @@ import express from 'express';
 import cors from 'cors';
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Vite default port
+    credentials: true,
+}));
 app.use(express.json());
 
 // Example content storage (in-memory)
-let contents: any[] = [];
+let contents: any[] = [
+  {
+    id: 'FEATURES_TEXT',
+    value: [
+      'API-first content management',
+      'JAMstack ready integration',
+      'Flexible content types',
+      'RESTful endpoints',
+      'Open-source & extensible',
+    ],
+  },
+  {
+    id: 'SETUP_STEPS_TEXT',
+    value: [
+      'Clone the repo: git clone https://github.com/your-org/headless-cms.git',
+      'Install dependencies: npm install',
+      'Start the server: npm run dev',
+      'Access API at http://localhost:3000/api/content',
+    ],
+  },
+  {
+    id: 'ACCENT_COLOR',
+    value: '#6366f1',
+  },
+  {
+    id: 'GETTING_STARTED',
+    value: `Headless CMS lets you manage content via APIs for JAMstack and modern web apps.`,
+  },
+  {
+    id: 'INSTALLATION_STEPS',
+    value: [
+      'Clone the repo: git clone https://github.com/your-org/headless-cms.git',
+      'Install dependencies: npm install',
+      'Start the server: npm run dev',
+      'Access API at http://localhost:3000/api/content',
+    ],
+  },
+  {
+    id: 'API_REFERENCES',
+    value: [
+      {
+        method: 'GET',
+        endpoint: '/api/content',
+        description: 'List all content items',
+      },
+      {
+        method: 'GET',
+        endpoint: '/api/content/:id',
+        description: 'Get a single content item by ID',
+      },
+      {
+        method: 'POST',
+        endpoint: '/api/content',
+        description: 'Create a new content item',
+      },
+    ],
+  },
+];
 
 // Get all content
 app.get('/api/content', (req, res) => {
