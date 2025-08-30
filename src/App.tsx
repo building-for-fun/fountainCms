@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Documentation from './pages/Documenation';
 
 export default function App() {
-      return (
+  return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
