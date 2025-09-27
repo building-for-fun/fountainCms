@@ -1,11 +1,11 @@
-# Headless CMS Monorepo
+# FountainCMS Monorepo
 
-This repository is organized as a monorepo for the Headless CMS ecosystem, containing both frontend (React) and backend (Node.js/Express) codebases.
+This repository is organized as a monorepo for the FountainCMS ecosystem, containing both frontend (React) and backend (Node.js/Express) codebases.
 
 ## Structure
 
 ```
-headless-cms/
+fountaincms/
 ├── frontend/      # React + Vite frontend app
 │   ├── src/
 │   ├── public/
@@ -54,5 +54,7 @@ npm run dev
 - Each package (frontend, backend) manages its own dependencies and scripts.
 
 ---
+
+GitHub: https://github.com/building-for-fun/fountainCms
 
 Feel free to add more details as your project evolves.

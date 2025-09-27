@@ -7,7 +7,7 @@ export const FEATURES_TEXT = [
 ];
 
 export const SETUP_STEPS_TEXT = [
-  'Clone the repo: git clone https://github.com/your-org/headless-cms.git',
+  'Clone the repo: git clone https://github.com/building-for-fun/fountainCms',
   'Install dependencies: npm install',
   'Start the server: npm run dev',
   'Access API at http://localhost:3000/api/content',
@@ -16,11 +16,11 @@ export const SETUP_STEPS_TEXT = [
 export const PRIMARY_COLOR = '#6366f1';
 
 export const GETTING_STARTED = `
-Headless CMS lets you manage content via APIs for JAMstack and modern web apps.
+FountainCMS lets you manage content via APIs for JAMstack and modern web apps.
 `;
 
 export const INSTALLATION_STEPS = [
-  'Clone the repo: git clone https://github.com/your-org/headless-cms.git',
+  'Clone the repo: git clone https://github.com/building-for-fun/fountainCms',
   'Install dependencies: npm install',
   'Start the server: npm run dev',
   'Access API at http://localhost:3000/api/content',

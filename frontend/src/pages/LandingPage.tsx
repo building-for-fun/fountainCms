@@ -60,7 +60,7 @@ const LandingPage: React.FC = () => {
             letterSpacing: '-1px',
           }}
         >
-          Headless CMS
+          FountainCMS
         </h1>
         <p style={{ fontSize: '1.25rem', color: '#334155', marginBottom: '2rem' }}>
           A modern, API-driven content management system for JAMstack and beyond.

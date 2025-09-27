@@ -1,6 +1,11 @@
 {
-  "name": "headless-cms",
+  "name": "fountaincms",
   "version": "1.0.0",
+  "description": "Monorepo for FountainCMS ecosystem (frontend and backend)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/building-for-fun/fountainCms"
+  },
   "private": true,
   "workspaces": [
     "frontend",
@@ -10,7 +15,6 @@
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run dev --workspace=backend"
   },
-  "description": "Monorepo for Headless CMS ecosystem (frontend and backend)",
   "keywords": [],
   "author": "",
   "license": "ISC"

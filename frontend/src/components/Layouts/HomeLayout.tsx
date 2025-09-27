@@ -7,7 +7,7 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, sans-serif', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
     {/* Header */}
     <header style={{ background: PRIMARY_COLOR, color: '#fff', padding: '1.5rem 0', textAlign: 'center', fontWeight: 700, fontSize: '2rem', letterSpacing: '-1px' }}>
-      Headless CMS
+      FountainCMS
     </header>
     {/* Navigation */}
     <nav style={{ background: '#fff', boxShadow: '0 2px 8px rgba(99,102,241,0.08)', padding: '0.75rem 0', display: 'flex', justifyContent: 'center', gap: '2rem' }}>
@@ -20,7 +20,7 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     </main>
     {/* Footer */}
     <footer style={{ background: PRIMARY_COLOR, color: '#fff', textAlign: 'center', padding: '1rem 0', fontSize: '1rem', marginTop: 'auto' }}>
-      &copy; {new Date().getFullYear()} Headless CMS. All rights reserved.
+      &copy; {new Date().getFullYear()} FountainCMS. All rights reserved.
     </footer>
   </div>
 );
