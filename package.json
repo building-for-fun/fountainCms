@@ -14,9 +14,10 @@
   "scripts": {
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run dev --workspace=backend",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "test:frontend": "npm run test --workspace=frontend",
     "test:backend": "npm run test --workspace=backend",
-    "test": "npm run test:frontend && npm run test:backend",
+    "test": "concurrently \"npm run test:frontend\" \"npm run test:backend\"",
     "prepare": "husky || true"
   },
   "keywords": [],
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.0.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "concurrently": "^9.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.1"
   }

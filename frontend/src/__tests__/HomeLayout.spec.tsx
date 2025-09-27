@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import HomeLayout from './HomeLayout';
+import HomeLayout from '../components/Layouts/HomeLayout';
 
 describe('HomeLayout', () => {
   it('should be defined', () => {
