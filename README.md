@@ -49,6 +49,18 @@ cd backend
 npm run dev
 ```
 
+## Git Commit Message Template
+
+To help you write consistent commit messages, a template is provided in `.gitmessage` following the Conventional Commits standard.
+
+### Set up the default commit message template:
+
+```sh
+git config --local commit.template .gitmessage
+```
+
+This will prompt you with the template when you run `git commit`.
+
 ## Notes
 - All shared configuration (linting, formatting, etc.) should be placed at the root.
 - Each package (frontend, backend) manages its own dependencies and scripts.

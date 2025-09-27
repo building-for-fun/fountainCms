@@ -1,0 +1,10 @@
+feat(ui): add new button style
+
+# <type>[optional scope]: <description>
+#
+# Examples:
+#   feat(ui): add new button style
+#   fix(api): handle null values
+#   chore: update dependencies
+#
+# Types: feat, fix, docs, style, refactor, perf, test, chore, build, ci, revert
