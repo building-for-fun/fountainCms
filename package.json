@@ -13,9 +13,26 @@
   ],
   "scripts": {
     "dev:frontend": "npm run dev --workspace=frontend",
-    "dev:backend": "npm run dev --workspace=backend"
+    "dev:backend": "npm run dev --workspace=backend",
+    "prepare": "husky || true"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^20.0.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.1"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{js,jsx,ts,tsx}": [
+      "npm run lint --workspace=frontend",
+      "npm run format --workspace=frontend"
+    ],
+    "backend/src/**/*.{js,jsx,ts,tsx}": [
+      "npm run lint --workspace=backend",
+      "npm run format --workspace=backend"
+    ]
+  }
 }

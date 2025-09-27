@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Validate commit message using commitlint
+npx --no -- commitlint --edit "$1"
+
+# Ensure commit message is not empty and not the default template
+if ! grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(\([a-zA-Z0-9_-]+\))?: .{1,}' "$1"; then
+  echo "\033[31mERROR: Commit message does not match Conventional Commits format.\033[0m"
+  exit 1
+fi
+
+# Check if the commit message is still the default template (first line)
+default_template="feat(ui): add new button style"
+first_line=$(head -n 1 "$1")
+if [ "$first_line" = "$default_template" ]; then
+  echo "\033[31mERROR: Commit message is still the default template. Please edit your commit message.\033[0m"
+  exit 1
+fi
+
