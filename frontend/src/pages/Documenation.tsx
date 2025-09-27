@@ -1,9 +1,11 @@
 import React from 'react';
 import { GETTING_STARTED, INSTALLATION_STEPS, API_REFERENCES } from './../helper/constant';
+import HomeLayout from '../components/Layouts/HomeLayout';
 
 const accent = '#6366f1';
 
 const Documentation: React.FC = () => (
+  <HomeLayout>
   <div
     style={{
       maxWidth: 700,
@@ -59,6 +61,7 @@ const Documentation: React.FC = () => (
       </tbody>
     </table>
   </div>
+  </HomeLayout>
 );
 
 export default Documentation;

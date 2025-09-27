@@ -8,7 +8,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Example content storage (in-memory)
+
 const contents: Record<string, any> = {
   FEATURES_TEXT: [
     'API-first content management',

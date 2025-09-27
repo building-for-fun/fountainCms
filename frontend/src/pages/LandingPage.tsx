@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PRIMARY_COLOR } from './../helper/constant';
+import HomeLayout from '../components/Layouts/HomeLayout';
 
 type Content = {
   id: string;
@@ -31,6 +32,7 @@ const LandingPage: React.FC = () => {
   }, []);
 
   return (
+    <HomeLayout>
     <div
       style={{
         fontFamily: 'Inter, sans-serif',
@@ -129,6 +131,7 @@ const LandingPage: React.FC = () => {
         )}
       </div>
     </div>
+    </HomeLayout>
   );
 };
 
