@@ -8,6 +8,7 @@ This repository is organized as a monorepo for the FountainCMS ecosystem, contai
 fountaincms/
 ├── frontend/      # React + Vite frontend app
 │   ├── src/
+│   │   └── app.css
 │   ├── public/
 │   ├── vite.config.ts
 │   ├── index.html
@@ -15,9 +16,19 @@ fountaincms/
 │   └── tsconfig.json
 ├── backend/        # Node.js/Express backend
 │   ├── src/
+│   │   └── __tests__/
 │   ├── package.json
-│   └── tsconfig.json
+│   ├── tsconfig.json
+│   ├── jest.config.js
+│   └── swagger (API docs at /api-docs)
 ├── package.json   # Monorepo root (workspaces)
+├── .gitmessage    # Conventional Commits template
+├── .husky/        # Git hooks (commit-msg, pre-commit)
+├── lint-staged.config.js
+├── commitlint.config.js
+├── SECURITY.md
+├── CONTRIBUTING.md
+├── .github/       # Issue/PR templates, workflows
 └── README.md
 ```
 
@@ -35,19 +46,32 @@ npm install
 ```
 This will install dependencies for both frontend and backend using npm workspaces.
 
-### Running the Frontend
+### Running the whole project (frontend + backend)
 
-```
-cd frontend
+```sh
 npm run dev
 ```
+This will start both the frontend and backend in parallel using `concurrently`.
 
-### Running the Backend
+### Running the Frontend only
 
 ```
-cd backend
-npm run dev
+npm run dev:frontend
 ```
+
+### Running the Backend only
+
+```
+npm run dev:backend
+```
+
+### API Documentation (Swagger)
+
+Once the backend is running, visit:
+```
+http://localhost:4000/api-docs
+```
+for interactive API docs.
 
 ## Git Commit Message Template
 
@@ -60,6 +84,18 @@ git config --local commit.template .gitmessage
 ```
 
 This will prompt you with the template when you run `git commit`.
+
+## Linting, Formatting, and Testing
+- Linting and formatting are enforced via Husky and lint-staged for both frontend and backend.
+- Run all tests for both frontend and backend:
+  ```sh
+  npm test
+  ```
+- Pre-commit hooks will block commits if linting, formatting, or tests fail.
+
+## Contributing & Security
+- See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+- See [SECURITY.md](./SECURITY.md) for security policy and reporting vulnerabilities.
 
 ## Notes
 - All shared configuration (linting, formatting, etc.) should be placed at the root.
