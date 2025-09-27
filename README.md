@@ -1,4 +1,4 @@
-# FountainCMS Monorepo
+# <img src="assets/logo.png" alt="FountainCMS Logo" width="48" height="48" style="vertical-align:middle;"> FountainCMS Monorepo
 
 This repository is organized as a monorepo for the FountainCMS ecosystem, containing both frontend (React) and backend (Node.js/Express) codebases.
 
@@ -29,13 +29,14 @@ fountaincms/
 ├── SECURITY.md
 ├── CONTRIBUTING.md
 ├── .github/       # Issue/PR templates, workflows
+├── .nvmrc         # Node.js version for development (v22.13.1)
 └── README.md
 ```
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18+ recommended)
+- Node.js (**v22.13.1** required, see `.nvmrc`)
 - npm (v7+ recommended for workspaces)
 
 ### Install dependencies
