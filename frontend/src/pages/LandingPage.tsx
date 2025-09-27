@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { PRIMARY_COLOR } from './../helper/constant';
+import { PRIMARY_COLOR } from '../helper/constant';
 import HomeLayout from '../components/Layouts/HomeLayout';
 
 type Content = {
