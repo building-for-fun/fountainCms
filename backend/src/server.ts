@@ -2,12 +2,13 @@ import express from 'express';
 import cors from 'cors';
 
 const app = express();
-app.use(cors({
+app.use(
+  cors({
     origin: 'http://localhost:5173', // Vite default port
     credentials: true,
-}));
+  })
+);
 app.use(express.json());
-
 
 const contents: Record<string, any> = {
   FEATURES_TEXT: [
@@ -75,6 +76,10 @@ app.post('/api/content', (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`FountainCMS backend running on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`FountainCMS backend running on port ${PORT}`);
+  });
+}
+
+export default app;
