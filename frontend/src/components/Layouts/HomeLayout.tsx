@@ -44,6 +44,9 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       <Link to="/docs" style={{ color: PRIMARY_COLOR, textDecoration: 'none', fontWeight: 600 }}>
         Documentation
       </Link>
+      <Link to="/login" style={{ color: PRIMARY_COLOR, textDecoration: 'none', fontWeight: 600 }}>
+        Login
+      </Link>
     </nav>
     <main style={{ flex: 1, padding: '2rem 0' }}>{children}</main>
     <footer
