@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react';
 
 export const Footer = () => {
   return (
-     <footer
+    <footer
       style={{
         background: 'var(--color-primary)',
         color: 'var(--color-surface)',
@@ -14,5 +14,5 @@ export const Footer = () => {
     >
       &copy; {new Date().getFullYear()} FountainCMS. All rights reserved.
     </footer>
-  )
-}
+  );
+};
