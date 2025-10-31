@@ -3,9 +3,9 @@ import AdminLayout from '../components/Layouts/AdminLayout';
 
 const AdminProfilePage = () => (
   <AdminLayout>
-    <div>
-      <h1>Content Types</h1>
-      <p>This is a placeholder for the Content Types management page.</p>
+    <div style={{ padding: '2rem' }}>
+      <h1>Profile</h1>
+      <p>This is a placeholder for the Admin Profile page.</p>
     </div>
   </AdminLayout>
 );
