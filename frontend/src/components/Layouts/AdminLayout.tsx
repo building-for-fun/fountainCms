@@ -4,6 +4,13 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 const adminNavItems = [
   { to: '/admin', icon: '🛠️', label: 'Dashboard' },
   { to: '/admin/users', icon: '👥', label: 'Users' },
+  { to: '/admin/content-types', icon: '📦', label: 'Content Types' },
+  { to: '/admin/entries', icon: '📝', label: 'Entries' },
+  { to: '/admin/media', icon: '🖼️', label: 'Media' },
+  { to: '/admin/settings', icon: '⚙️', label: 'Settings' },
+  { to: '/admin/roles', icon: '🔑', label: 'Roles' },
+  { to: '/admin/logs', icon: '📜', label: 'Logs' },
+  { to: '/admin/profile', icon: '🙍‍♂️', label: 'Profile' },
   // Add more admin routes here as needed
 ];
 
