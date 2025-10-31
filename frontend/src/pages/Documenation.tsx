@@ -1,6 +1,6 @@
 import React from 'react';
 import { GETTING_STARTED, INSTALLATION_STEPS, API_REFERENCES } from './../helper/constant';
-import HomeLayout from '../components/Layouts/HomeLayout';
+import HomeLayout from '../components/Layouts/HomeLayout/HomeLayout';
 
 const accent = '#6366f1';
 

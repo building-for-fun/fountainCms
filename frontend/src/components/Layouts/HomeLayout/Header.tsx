@@ -1,21 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { PrimaryButton } from '../PrimaryButton';
-import ThemeToggle from '../ThemeToggle';
+import React from 'react'
+import { Link } from 'react-router-dom'
+import ThemeToggle from '../../ThemeToggle'
+import { PrimaryButton } from '../../PrimaryButton'
 
-const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div
-    style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      fontFamily: 'Inter, sans-serif',
-      background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-primary-light) 100%)',
-      color: 'var(--color-text)',
-    }}
-  >
-    {/* Header */}
-    <header
+export const Header = () => {
+  return (
+    <>
+     <header
       style={{
         background: 'var(--color-primary)',
         color: 'var(--color-surface)',
@@ -62,20 +53,6 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
         <PrimaryButton>Get Started</PrimaryButton>
       </div>
     </nav>
-    <main style={{ flex: 1, padding: '2rem 0' }}>{children}</main>
-    <footer
-      style={{
-        background: 'var(--color-primary)',
-        color: 'var(--color-surface)',
-        textAlign: 'center',
-        padding: '1rem 0',
-        fontSize: '1rem',
-        marginTop: 'auto',
-      }}
-    >
-      &copy; {new Date().getFullYear()} FountainCMS. All rights reserved.
-    </footer>
-  </div>
-);
-
-export default HomeLayout;
+    </>
+  )
+}
