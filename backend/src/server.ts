@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
 import contentRouter from './routes/content';
 import userRouter from './routes/user';
+import rolesRouter from './routes/roles';
 
 const app = express();
 app.use(
@@ -26,7 +27,7 @@ const swaggerDefinition = {
 
 const swaggerOptions = {
   swaggerDefinition,
-  apis: [__filename, __dirname + '/routes/content.ts', __dirname + '/routes/user.ts'],
+  apis: [__filename, __dirname + '/routes/content.ts', __dirname + '/routes/user.ts', __dirname + '/routes/roles.ts'],
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
@@ -34,6 +35,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/content', contentRouter);
 app.use('/api/user', userRouter);
+app.use('/api/roles', rolesRouter);
 
 const PORT = process.env.PORT || 4000;
 if (require.main === module) {
