@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Documentation from './pages/Documenation';
 import AdminPage from './pages/AdminPage';
 import AdminUserListPage from './pages/AdminUserListPage';
+import AdminUserDetailPage from './pages/AdminUserDetailPage';
 import LoginPage from './pages/LoginPage';
 import { FountainThemeProvider } from './theme/ThemeProvider';
 import AdminContentTypesPage from './pages/AdminContentTypesPage';
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/admin">
             <Route index element={<AdminPage />} />
             <Route path="users" element={<AdminUserListPage />} />
+            <Route path="users/:id" element={<AdminUserDetailPage />} />
             <Route path="content-types" element={<AdminContentTypesPage />} />
             <Route path="entries" element={<AdminEntriesPage />} />
             <Route path="media" element={<AdminMediaPage />} />
