@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 
 const adminNavItems = [
   { to: '/admin', icon: '🛠️', label: 'Dashboard' },
@@ -9,6 +9,13 @@ const adminNavItems = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear authentication state here if needed
+    navigate('/login');
+  };
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <nav
@@ -27,31 +34,57 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           zIndex: 100,
         }}
       >
-        {adminNavItems.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            title={item.label}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 48,
-              height: 48,
-              margin: '0.5rem 0',
-              borderRadius: 12,
-              background: location.pathname === item.to ? '#6366f1' : 'transparent',
-              color: location.pathname === item.to ? '#fff' : '#6366f1',
-              fontSize: 24,
-              textDecoration: 'none',
-              transition: 'background 0.2s, color 0.2s',
-            }}
-          >
-            <span>{item.icon}</span>
-            <span style={{ fontSize: 10, marginTop: 2 }}>{item.label}</span>
-          </Link>
-        ))}
+        <div style={{ flex: 1, width: '100%' }}>
+          {adminNavItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              title={item.label}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 48,
+                height: 48,
+                margin: '0.5rem 0',
+                borderRadius: 12,
+                background: location.pathname === item.to ? '#6366f1' : 'transparent',
+                color: location.pathname === item.to ? '#fff' : '#6366f1',
+                fontSize: 24,
+                textDecoration: 'none',
+                transition: 'background 0.2s, color 0.2s',
+              }}
+            >
+              <span>{item.icon}</span>
+              <span style={{ fontSize: 10, marginTop: 2 }}>{item.label}</span>
+            </Link>
+          ))}
+        </div>
+        <button
+          onClick={handleLogout}
+          title="Logout"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 48,
+            height: 48,
+            margin: '0.5rem 0',
+            borderRadius: 12,
+            background: 'transparent',
+            color: '#ef4444',
+            fontSize: 24,
+            border: 'none',
+            cursor: 'pointer',
+            outline: 'none',
+            transition: 'background 0.2s, color 0.2s',
+          }}
+        >
+          <span>🚪</span>
+          <span style={{ fontSize: 10, marginTop: 2 }}>Logout</span>
+        </button>
       </nav>
       <div style={{ flex: 1, marginLeft: 64 }}>{children}</div>
     </div>
