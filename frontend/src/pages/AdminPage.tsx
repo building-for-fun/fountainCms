@@ -3,7 +3,15 @@ import AdminLayout from '../components/Layouts/AdminLayout';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
-function StatCard({ title, value, children }: { title: string; value: string; children?: React.ReactNode }) {
+function StatCard({
+  title,
+  value,
+  children,
+}: {
+  title: string;
+  value: string;
+  children?: React.ReactNode;
+}) {
   return (
     <div
       style={{
@@ -63,7 +71,10 @@ export default function AdminPage() {
       .finally(() => setLoadingUsers(false));
   }, []);
 
-  const sparkDataUsers = useMemo(() => [2, 3, 4, 5, usersCount ?? 5, (usersCount ?? 5) + 1, usersCount ?? 5], [usersCount]);
+  const sparkDataUsers = useMemo(
+    () => [2, 3, 4, 5, usersCount ?? 5, (usersCount ?? 5) + 1, usersCount ?? 5],
+    [usersCount]
+  );
   const sparkDataImages = [80, 90, 100, 110, 120, 130, imagesSizeMB];
   const sparkDataStorage = [8, 9, 10, 11, 11.5, 12, storageUsedGB];
 
@@ -79,11 +90,16 @@ export default function AdminPage() {
       <div style={{ padding: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 style={{ margin: 0 }}>Admin Dashboard</h1>
-          <div style={{ color: 'var(--color-text-muted)' }}>{lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}</div>
+          <div style={{ color: 'var(--color-text-muted)' }}>
+            {lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: 16, marginTop: 20, flexWrap: 'wrap' }}>
-          <StatCard title="Users" value={loadingUsers ? 'Loading…' : usersCount?.toString() ?? '-'}>
+          <StatCard
+            title="Users"
+            value={loadingUsers ? 'Loading…' : (usersCount?.toString() ?? '-')}
+          >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Sparkline data={sparkDataUsers} />
               <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>active</div>
@@ -93,7 +109,9 @@ export default function AdminPage() {
           <StatCard title="Images (MB)" value={`${imagesSizeMB} MB`}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Sparkline data={sparkDataImages} color="var(--color-accent)" />
-              <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>images total size</div>
+              <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+                images total size
+              </div>
             </div>
           </StatCard>
 
@@ -107,13 +125,24 @@ export default function AdminPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
               onClick={handleRefreshStorage}
-              style={{ padding: '8px 12px', borderRadius: 8, background: 'var(--color-primary)', color: 'var(--color-surface)', border: 'none' }}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 8,
+                background: 'var(--color-primary)',
+                color: 'var(--color-surface)',
+                border: 'none',
+              }}
             >
               Refresh stats
             </button>
             <button
               onClick={() => window.location.reload()}
-              style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid var(--color-border)', background: 'transparent' }}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 8,
+                border: '1px solid var(--color-border)',
+                background: 'transparent',
+              }}
             >
               Reload
             </button>
@@ -123,25 +152,57 @@ export default function AdminPage() {
         <section style={{ marginTop: 28 }}>
           <h2 style={{ marginBottom: 12 }}>Activity</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div style={{ background: 'var(--color-surface)', padding: 12, borderRadius: 12, boxShadow: 'var(--shadow-sm)' }}>
+            <div
+              style={{
+                background: 'var(--color-surface)',
+                padding: 12,
+                borderRadius: 12,
+                boxShadow: 'var(--shadow-sm)',
+              }}
+            >
               <h3 style={{ marginTop: 0 }}>Recent users</h3>
-              <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Shows latest user signups (mocked).</p>
+              <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
+                Shows latest user signups (mocked).
+              </p>
               <ul style={{ marginTop: 8 }}>
                 <li>user-a@example.com</li>
                 <li>user-b@example.com</li>
                 <li>user-c@example.com</li>
               </ul>
             </div>
-            <div style={{ background: 'var(--color-surface)', padding: 12, borderRadius: 12, boxShadow: 'var(--shadow-sm)' }}>
+            <div
+              style={{
+                background: 'var(--color-surface)',
+                padding: 12,
+                borderRadius: 12,
+                boxShadow: 'var(--shadow-sm)',
+              }}
+            >
               <h3 style={{ marginTop: 0 }}>Storage breakdown</h3>
-              <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Images, backups and other files</p>
+              <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
+                Images, backups and other files
+              </p>
               <div style={{ marginTop: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>Images</span>
                   <span>{Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)}%</span>
                 </div>
-                <div style={{ height: 8, background: 'var(--color-border)', borderRadius: 8, overflow: 'hidden', marginTop: 6 }}>
-                  <div style={{ width: `${Math.min(100, Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100))}%`, height: '100%', background: 'var(--color-primary)' }} />
+                <div
+                  style={{
+                    height: 8,
+                    background: 'var(--color-border)',
+                    borderRadius: 8,
+                    overflow: 'hidden',
+                    marginTop: 6,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${Math.min(100, Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100))}%`,
+                      height: '100%',
+                      background: 'var(--color-primary)',
+                    }}
+                  />
                 </div>
               </div>
             </div>

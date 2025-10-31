@@ -13,10 +13,10 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       color: 'var(--color-text)',
     }}
   >
-   <Header/>
-   
+    <Header />
+
     <main style={{ flex: 1, padding: '2rem 0' }}>{children}</main>
-   <Footer/>
+    <Footer />
   </div>
 );
 
