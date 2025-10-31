@@ -28,8 +28,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <nav
         style={{
           width: 64,
-          background: '#fff',
-          borderRight: '1px solid #e5e7eb',
+          background: 'var(--color-surface)',
+          borderRight: '1px solid var(--color-border)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -56,8 +56,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 height: 48,
                 margin: '0.5rem 0',
                 borderRadius: 12,
-                background: location.pathname === item.to ? '#6366f1' : 'transparent',
-                color: location.pathname === item.to ? '#fff' : '#6366f1',
+                background: location.pathname === item.to ? 'var(--color-primary)' : 'transparent',
+                color:
+                  location.pathname === item.to ? 'var(--color-surface)' : 'var(--color-primary)',
                 fontSize: 24,
                 textDecoration: 'none',
                 transition: 'background 0.2s, color 0.2s',
@@ -81,7 +82,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             margin: '0.5rem 0',
             borderRadius: 12,
             background: 'transparent',
-            color: '#ef4444',
+            color: 'var(--color-error)',
             fontSize: 24,
             border: 'none',
             cursor: 'pointer',
@@ -93,7 +94,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span style={{ fontSize: 10, marginTop: 2 }}>Logout</span>
         </button>
       </nav>
-      <div style={{ flex: 1, marginLeft: 64 }}>{children}</div>
+      <div
+        style={{
+          flex: 1,
+          marginLeft: 64,
+          background: 'var(--color-bg)',
+          color: 'var(--color-text)',
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }

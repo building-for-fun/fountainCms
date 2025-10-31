@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-const PRIMARY_COLOR = '#6366f1';
+import { PrimaryButton } from '../PrimaryButton';
+import ThemeToggle from '../ThemeToggle';
 
 const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
@@ -10,14 +10,15 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'Inter, sans-serif',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)',
+      background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-primary-light) 100%)',
+      color: 'var(--color-text)',
     }}
   >
     {/* Header */}
     <header
       style={{
-        background: PRIMARY_COLOR,
-        color: '#fff',
+        background: 'var(--color-primary)',
+        color: 'var(--color-surface)',
         padding: '1.5rem 0',
         textAlign: 'center',
         fontWeight: 700,
@@ -30,29 +31,42 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     {/* Navigation */}
     <nav
       style={{
-        background: '#fff',
-        boxShadow: '0 2px 8px rgba(99,102,241,0.08)',
+        background: 'var(--color-surface)',
+        boxShadow: 'var(--shadow-sm)',
         padding: '0.75rem 0',
         display: 'flex',
         justifyContent: 'center',
         gap: '2rem',
       }}
     >
-      <Link to="/" style={{ color: PRIMARY_COLOR, textDecoration: 'none', fontWeight: 600 }}>
+      <Link
+        to="/"
+        style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}
+      >
         Home
       </Link>
-      <Link to="/docs" style={{ color: PRIMARY_COLOR, textDecoration: 'none', fontWeight: 600 }}>
+      <Link
+        to="/docs"
+        style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}
+      >
         Documentation
       </Link>
-      <Link to="/login" style={{ color: PRIMARY_COLOR, textDecoration: 'none', fontWeight: 600 }}>
+      <Link
+        to="/login"
+        style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}
+      >
         Login
       </Link>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <ThemeToggle />
+        <PrimaryButton>Get Started</PrimaryButton>
+      </div>
     </nav>
     <main style={{ flex: 1, padding: '2rem 0' }}>{children}</main>
     <footer
       style={{
-        background: PRIMARY_COLOR,
-        color: '#fff',
+        background: 'var(--color-primary)',
+        color: 'var(--color-surface)',
         textAlign: 'center',
         padding: '1rem 0',
         fontSize: '1rem',
