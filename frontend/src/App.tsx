@@ -11,6 +11,9 @@ import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminRolesPage from './pages/AdminRolesPage';
 import AdminLogsPage from './pages/AdminLogsPage';
 import AdminProfilePage from './pages/AdminProfilePage';
+import NotFoundPage from './pages/NotFoundPage';
+import InternalServerErrorPage from './pages/InternalServerErrorPage';
+import UnauthorizedPage from './pages/UnauthorizedPage';
 
 export default function App() {
   return (
@@ -30,6 +33,10 @@ export default function App() {
         </Route>
         <Route path="/" element={<LandingPage />} />
         <Route path="/docs" element={<Documentation />} />
+        {/* Error Handling Routes */}
+        <Route path="/401" element={<UnauthorizedPage />} />
+        <Route path="/500" element={<InternalServerErrorPage />} />
+        <Route path="*" element={<NotFoundPage />} />
         {/* Add more non-admin routes here */}
       </Routes>
     </BrowserRouter>
