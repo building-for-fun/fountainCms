@@ -1,6 +1,6 @@
 # <img src="assets/logo.png" alt="FountainCMS Logo" width="48" height="48" style="vertical-align:middle;"> FountainCMS Monorepo
 
-This repository is organized as a monorepo for the FountainCMS ecosystem, containing both frontend (React) and backend (Node.js/Express) codebases.
+This repository is organized as a monorepo for the FountainCMS ecosystem, containing both frontend (React) and backend (NestJS) codebases.
 
 ## Structure
 
@@ -8,19 +8,22 @@ This repository is organized as a monorepo for the FountainCMS ecosystem, contai
 fountaincms/
 ├── frontend/      # React + Vite frontend app
 │   ├── src/
-│   │   └── app.css
 │   ├── public/
 │   ├── vite.config.ts
 │   ├── index.html
 │   ├── package.json
 │   └── tsconfig.json
-├── backend/        # Node.js/Express backend
+├── backend/       # NestJS backend (TypeScript)
 │   ├── src/
-│   │   └── __tests__/
+│   │   ├── content/
+│   │   ├── roles/
+│   │   ├── user/
+│   │   └── ...
+│   ├── test/
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── jest.config.js
-│   └── swagger (API docs at /api-docs)
+│   └── README.md
 ├── package.json   # Monorepo root (workspaces)
 ├── .gitmessage    # Conventional Commits template
 ├── .husky/        # Git hooks (commit-msg, pre-commit)
@@ -56,13 +59,13 @@ This will start both the frontend and backend in parallel using `concurrently`.
 
 ### Running the Frontend only
 
-```
+```sh
 npm run dev:frontend
 ```
 
 ### Running the Backend only
 
-```
+```sh
 npm run dev:backend
 ```
 
@@ -70,9 +73,9 @@ npm run dev:backend
 
 Once the backend is running, visit:
 ```
-http://localhost:4000/api-docs
+http://localhost:3000/api-docs
 ```
-for interactive API docs.
+for interactive API docs (NestJS Swagger).
 
 ## Git Commit Message Template
 
