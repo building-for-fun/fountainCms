@@ -97,6 +97,30 @@ This will prompt you with the template when you run `git commit`.
   ```
 - Pre-commit hooks will block commits if linting, formatting, or tests fail.
 
+## Release Management & Changelog
+
+This project uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+### Tagging a Release
+1. Update `CHANGELOG.md` with changes for the new version.
+2. Commit your changes:
+   ```sh
+   git add CHANGELOG.md
+   git commit -m "chore(release): update changelog for vX.Y.Z"
+   ```
+3. Tag the release:
+   ```sh
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+4. Push your branch and tags:
+   ```sh
+   git push --follow-tags
+   ```
+
+### Example Changelog Entry
+See [CHANGELOG.md](./CHANGELOG.md) for the latest changes and release history.
+
 ## Contributing & Security
 - See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 - See [SECURITY.md](./SECURITY.md) for security policy and reporting vulnerabilities.
