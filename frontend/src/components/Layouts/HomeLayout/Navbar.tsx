@@ -6,9 +6,8 @@ import ThemeToggle from '../../ThemeToggle';
 export const Navbar = () => {
   return (
     <nav
+      className=" bg-transparent text-white"
       style={{
-        background: 'var(--color-surface)',
-        boxShadow: 'var(--shadow-sm)',
         padding: '0.75rem 0',
         display: 'flex',
         justifyContent: 'center',
@@ -18,13 +17,13 @@ export const Navbar = () => {
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
         <Link
           to="/"
-          style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}
+          className=" text-lg hover:scale-95 transition-all duration-300 flex justify-center items-center ease-in-out bg-gradient-to-br h-[42px] from-cyan-700 via-cyan-600 to-purple-200 text-white px-5 py-1 rounded-lg cursor-pointer"
         >
           Home
         </Link>
         <Link
           to="/docs"
-          style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}
+          className=" text-lg hover:scale-95 transition-all duration-300 flex justify-center items-center ease-in-out bg-gradient-to-br h-[42px] from-cyan-700 via-cyan-600 to-purple-200 text-white px-5 py-1 rounded-lg cursor-pointer"
         >
           Documentation
         </Link>

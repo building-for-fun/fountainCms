@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeLayout from '../components/Layouts/HomeLayout/HomeLayout';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('admin@example.com');
-  const [password, setPassword] = useState('password');
+  const [username, setUsername] = useState<string>('admin@example.com');
+  const [password, setPassword] = useState<string>('password');
   const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
@@ -18,17 +18,21 @@ export default function LoginPage() {
 
   return (
     <HomeLayout>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center  ">
         <div
-          className="bg-white rounded-lg shadow-lg p-10 flex flex-col items-center w-full max-w-md"
+          className="bg-white rounded-2xl p-10 flex flex-col items-center w-full max-w-md bg-neutral-100/10"
           style={{ width: '40%', minWidth: '350px' }}
         >
-          <h2 className="text-3xl font-bold mb-8 text-[#f59e42]">Sign In</h2>
-          <form onSubmit={handleLogin} className="w-full space-y-8">
+          <div className=" w-full flex flex-col items-center text-center">
+            <h3 className=" text-2xl md:text-xl mb-2 font-semibold ">
+              {"Let's"} get you signed in
+            </h3>
+          </div>
+          <form onSubmit={handleLogin} className="w-full space-y-8 ">
             <div style={{ marginBottom: '20px' }}>
               <label
                 htmlFor="username"
-                className="block mb-4 text-base font-medium text-[#1e293b]"
+                className="block mb-4 text-base font-medium text-white"
                 style={{ marginBottom: '7px' }}
               >
                 Email address
@@ -40,13 +44,13 @@ export default function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full rounded-lg bg-white px-5 py-3 text-base border border-[#f59e42] text-[#1e293b] placeholder-[#f59e42] focus:outline-none focus:ring-2 focus:ring-[#1e293b] focus:ring-offset-2 focus:ring-offset-[#f59e42]"
+                className=" w-full h-12 bg-slate-900/50 text-white rounded-lg px-3 py-1 placeholder:text-neutral-200  "
               />
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label
                 htmlFor="password"
-                className="block mb-2 text-base font-medium text-[#1e293b]"
+                className="block mb-2 text-base font-medium text-white"
                 style={{ marginBottom: '7px' }}
               >
                 Password
@@ -56,14 +60,14 @@ export default function LoginPage() {
                 type="password"
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 required
-                className="w-full rounded-lg bg-white px-5 py-3 text-base border border-[#f59e42] text-[#1e293b] placeholder-[#f59e42] focus:outline-none focus:ring-2 focus:ring-[#1e293b] focus:ring-offset-2 focus:ring-offset-[#f59e42]"
+                className=" w-full h-12 bg-slate-900/50 text-white rounded-lg px-3 py-1 placeholder:text-neutral-200  "
               />
             </div>
             <button
               type="submit"
-              className="w-full rounded-lg bg-[#f59e42] py-3 text-lg font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1e293b] focus:ring-offset-2 focus:ring-offset-[#f59e42] text-white"
+              className=" w-full h-12 hover:bg-white hover:text-black cursor-pointer transition-all duration-200 ease-in-out hover:scale-95 bg-cyan-600 text-white rounded-lg flex justify-center items-center "
             >
               Sign In
             </button>

@@ -8,9 +8,8 @@ export const Header = () => {
   return (
     <>
       <header
+        className=" bg-blue-950 text-white"
         style={{
-          background: 'var(--color-primary)',
-          color: 'var(--color-surface)',
           padding: '1.5rem 0',
           textAlign: 'center',
           fontWeight: 700,
