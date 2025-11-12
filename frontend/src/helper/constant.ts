@@ -10,7 +10,7 @@ export const SETUP_STEPS_TEXT = [
   'Clone the repo: git clone https://github.com/building-for-fun/fountainCms',
   'Install dependencies: npm install',
   'Start the server: npm run dev',
-  'Access API at http://localhost:3000/api/content',
+  'Access API at http://localhost:4000/api/content',
 ];
 
 export const PRIMARY_COLOR = '#6366f1';
@@ -23,7 +23,7 @@ export const INSTALLATION_STEPS = [
   'Clone the repo: git clone https://github.com/building-for-fun/fountainCms',
   'Install dependencies: npm install',
   'Start the server: npm run dev',
-  'Access API at http://localhost:3000/api/content',
+  'Access API at http://localhost:4000/api/content',
 ];
 
 export const API_REFERENCES = [

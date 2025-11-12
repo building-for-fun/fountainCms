@@ -24,6 +24,11 @@ $ cd fountainCms/frontend
 $ npm install
 ```
 
+# Copy `.env.sample` to `.env`
+```bash
+cp .env.sample .env
+```
+
 ### Development
 ```bash
 # Start the development server

@@ -26,7 +26,7 @@ export class ContentService {
       'Clone the repo: git clone https://github.com/building-for-fun/fountainCms',
       'Install dependencies: npm install',
       'Start the server: npm run dev',
-      'Access API at http://localhost:3000/api/content',
+      'Access API at http://localhost:4000/api/content',
     ],
     ACCENT_COLOR: '#6366f1',
     GETTING_STARTED:
@@ -35,7 +35,7 @@ export class ContentService {
       'Clone the repo: git clone https://github.com/building-for-fun/fountainCms',
       'Install dependencies: npm install',
       'Start the server: npm run dev',
-      'Access API at http://localhost:3000/api/content',
+      'Access API at http://localhost:4000/api/content',
     ],
     API_REFERENCES: [
       {

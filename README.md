@@ -69,11 +69,11 @@ npm run dev:frontend
 npm run dev:backend
 ```
 
-### API Documentation (Swagger)
+### API Documentation (Swagger) (Available after task completion [#20](https://github.com/building-for-fun/fountainCms/issues/20))
 
 Once the backend is running, visit:
 ```
-http://localhost:3000/api-docs
+http://localhost:4000/api-docs
 ```
 for interactive API docs (NestJS Swagger).
 

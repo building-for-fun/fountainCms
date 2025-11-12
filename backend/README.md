@@ -24,11 +24,16 @@ $ cd fountainCms/backend
 $ npm install
 ```
 
+# Copy `.env.sample` to `.env`
+```bash
+cp .env.sample .env
+```
+
 ### Development
 ```bash
 # Start the development server
 $ npm run start:dev
-# The API will be available at http://localhost:3000
+# The API will be available at http://localhost:4000
 ```
 
 ### Production

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { PRIMARY_COLOR } from '../helper/constant';
 import HomeLayout from '../components/Layouts/HomeLayout/HomeLayout';
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
 type Content = {
   id: string;
   title: string;
@@ -23,7 +25,7 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/content')
+    fetch(`${apiBaseUrl}/api/content`)
       .then((res) => res.json())
       .then((data) => {
         setContents(data);

@@ -1,4 +1,6 @@
+
 ### Get Home Content
+
 GET localhost:4000/api/content
 
 ### Get Users List
