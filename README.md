@@ -125,9 +125,31 @@ See [CHANGELOG.md](./CHANGELOG.md) for the latest changes and release history.
 - See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 - See [SECURITY.md](./SECURITY.md) for security policy and reporting vulnerabilities.
 
-## Notes
-- All shared configuration (linting, formatting, etc.) should be placed at the root.
-- Each package (frontend, backend) manages its own dependencies and scripts.
+## Community & Announcements
+
+### 🚀 Migration Complete!
+FountainCMS backend has been successfully migrated from Node.js/Express to NestJS for improved scalability, modularity, and type safety.
+
+- All API endpoints are now powered by NestJS.
+- Documentation and developer experience have been enhanced.
+- Release management and changelog are now in place for transparency.
+
+### 🤝 Get Involved!
+We welcome contributors of all experience levels:
+- Help us build new features and integrations
+- Report and fix bugs
+- Improve documentation and developer experience
+- Review and test code
+
+**How to join:**
+- Check [GitHub Issues](https://github.com/building-for-fun/fountainCms/issues) for open tasks and feature requests
+- Start or join discussions in [GitHub Discussions](https://github.com/building-for-fun/fountainCms/discussions)
+- Submit pull requests for improvements
+
+**Connect with us:**
+- Star the repo to show your support
+- Share feedback and ideas
+- Join our open source journey!
 
 ---
 
