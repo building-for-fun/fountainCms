@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:17
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - fountain_pgdata:/var/lib/postgresql/data
+
+volumes:
+  fountain_pgdata:
