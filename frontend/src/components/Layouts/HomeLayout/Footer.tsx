@@ -4,11 +4,13 @@ export const Footer = () => {
   return (
     <footer
       style={{
-        background: 'var(--color-primary)',
-        color: 'var(--color-surface)',
+        background: 'none',
+        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+        color: 'var(--color-text)',
+        opacity: 0.7,
         textAlign: 'center',
-        padding: '1rem 0',
-        fontSize: '1rem',
+        padding: '2rem 0',
+        fontSize: '0.9rem',
         marginTop: 'auto',
       }}
     >

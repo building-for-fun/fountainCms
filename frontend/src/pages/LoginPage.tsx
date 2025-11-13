@@ -16,21 +16,75 @@ export default function LoginPage() {
     }
   };
 
+  const formInputLabelStyle: React.CSSProperties = {
+    display: 'block',
+    marginBottom: '0.5rem',
+    fontSize: '0.9rem',
+    fontWeight: 500,
+    color: 'var(--color-text)',
+    opacity: 0.8,
+  };
+
+  const formInputStyle: React.CSSProperties = {
+    background: 'rgba(255, 255, 255, 0.2)',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    borderRadius: '8px',
+    width: '100%',
+    padding: '0.85rem 1rem',
+    fontSize: '1rem',
+    color: 'var(--color-text)',
+    outline: 'none',
+    boxSizing: 'border-box',
+    transition: 'all 0.3s ease',
+  };
+
   return (
     <HomeLayout>
-      <div className="flex items-center justify-center">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem 1rem',
+        }}
+      >
         <div
-          className="bg-white rounded-lg shadow-lg p-10 flex flex-col items-center w-full max-w-md"
-          style={{ width: '40%', minWidth: '350px' }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(15px)',
+            borderRadius: '16px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2)',
+            padding: '2.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: '420px',
+            minWidth: '320px',
+          }}
         >
-          <h2 className="text-3xl font-bold mb-8 text-[#f59e42]">Sign In</h2>
-          <form onSubmit={handleLogin} className="w-full space-y-8">
-            <div style={{ marginBottom: '20px' }}>
-              <label
-                htmlFor="username"
-                className="block mb-4 text-base font-medium text-[#1e293b]"
-                style={{ marginBottom: '7px' }}
-              >
+          <h2
+            style={{
+              fontSize: '2.25rem',
+              fontWeight: 700,
+              marginBottom: '2rem',
+              color: 'var(--color-primary)',
+            }}
+          >
+            Sign In
+          </h2>
+          <form
+            onSubmit={handleLogin}
+            style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+            }}
+          >
+            <div>
+              <label htmlFor="username" style={formInputLabelStyle}>
                 Email address
               </label>
               <input
@@ -40,15 +94,12 @@ export default function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full rounded-lg bg-white px-5 py-3 text-base border border-[#f59e42] text-[#1e293b] placeholder-[#f59e42] focus:outline-none focus:ring-2 focus:ring-[#1e293b] focus:ring-offset-2 focus:ring-offset-[#f59e42]"
+                style={formInputStyle}
+                className="glass-input"
               />
             </div>
-            <div style={{ marginBottom: '20px' }}>
-              <label
-                htmlFor="password"
-                className="block mb-2 text-base font-medium text-[#1e293b]"
-                style={{ marginBottom: '7px' }}
-              >
+            <div>
+              <label htmlFor="password" style={formInputLabelStyle}>
                 Password
               </label>
               <input
@@ -58,20 +109,44 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full rounded-lg bg-white px-5 py-3 text-base border border-[#f59e42] text-[#1e293b] placeholder-[#f59e42] focus:outline-none focus:ring-2 focus:ring-[#1e293b] focus:ring-offset-2 focus:ring-offset-[#f59e42]"
+                style={formInputStyle}
+                className="glass-input"
               />
             </div>
             <button
               type="submit"
-              className="w-full rounded-lg bg-[#f59e42] py-3 text-lg font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1e293b] focus:ring-offset-2 focus:ring-offset-[#f59e42] text-white"
+              className="primary-button-animated"
+              style={{
+                width: '100%',
+                borderRadius: '8px',
+                background: 'var(--color-primary)',
+                padding: '0.85rem',
+                fontSize: '1rem',
+                fontWeight: 600,
+                color: 'var(--color-surface)',
+                border: 'none',
+                cursor: 'pointer',
+              }}
             >
               Sign In
             </button>
           </form>
-          <div className="mt-6 bg-black/40 px-4 py-2 rounded text-sm text-center space-y-1 select-none w-full">
-            <p className="text-indigo-200">Login Info</p>
-            <p className="text-indigo-100">admin@example.com</p>
-            <p className="text-indigo-100">password</p>
+          <div
+            style={{
+              marginTop: '1.5rem',
+              background: 'rgba(var(--color-primary-rgb), 0.1)',
+              padding: '1rem',
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+              textAlign: 'center',
+              width: '100%',
+              boxSizing: 'border-box',
+              color: 'var(--color-primary)',
+            }}
+          >
+            <p style={{ fontWeight: 600, opacity: 0.9 }}>Login Info</p>
+            <p style={{ opacity: 0.7 }}>admin@example.com</p>
+            <p style={{ opacity: 0.7 }}>password</p>
           </div>
         </div>
       </div>
