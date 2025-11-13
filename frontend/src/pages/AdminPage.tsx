@@ -95,34 +95,24 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 16, marginTop: 20, flexWrap: 'wrap' }}>
-          <StatCard
-            title="Users"
-            value={loadingUsers ? 'Loading…' : (usersCount?.toString() ?? '-')}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginTop: 20,
+            width: '100%',
+          }}
+        >
+          {/* Top-right buttons */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 8,
+              marginBottom: 16,
+              flexWrap: 'wrap',
+            }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Sparkline data={sparkDataUsers} />
-              <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>active</div>
-            </div>
-          </StatCard>
-
-          <StatCard title="Images (MB)" value={`${imagesSizeMB} MB`}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Sparkline data={sparkDataImages} color="var(--color-accent)" />
-              <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
-                images total size
-              </div>
-            </div>
-          </StatCard>
-
-          <StatCard title="Storage (GB)" value={`${storageUsedGB} GB`}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Sparkline data={sparkDataStorage} color="var(--color-warning)" />
-              <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>used</div>
-            </div>
-          </StatCard>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
               onClick={handleRefreshStorage}
               style={{
@@ -147,49 +137,151 @@ export default function AdminPage() {
               Reload
             </button>
           </div>
+
+          {/* Stats grid */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              gap: 16,
+              width: '100%',
+            }}
+          >
+            <div style={{ flex: '1 1 30%', minWidth: 280 }}>
+              <StatCard
+                title="Users"
+                value={loadingUsers ? 'Loading…' : (usersCount?.toString() ?? '-')}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Sparkline data={sparkDataUsers} />
+                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>active</div>
+                </div>
+              </StatCard>
+            </div>
+
+            <div style={{ flex: '1 1 30%', minWidth: 280 }}>
+              <StatCard title="Images (MB)" value={`${imagesSizeMB} MB`}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Sparkline data={sparkDataImages} color="var(--color-accent)" />
+                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+                    images total size
+                  </div>
+                </div>
+              </StatCard>
+            </div>
+
+            <div style={{ flex: '1 1 30%', minWidth: 280 }}>
+              <StatCard title="Storage (GB)" value={`${storageUsedGB} GB`}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Sparkline data={sparkDataStorage} color="var(--color-warning)" />
+                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>used</div>
+                </div>
+              </StatCard>
+            </div>
+          </div>
         </div>
 
-        <section style={{ marginTop: 28 }}>
-          <h2 style={{ marginBottom: 12 }}>Activity</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <section style={{ marginTop: 32, width: '100%' }}>
+          <h2
+            style={{
+              marginBottom: 16,
+              fontSize: 20,
+              fontWeight: 600,
+              color: 'var(--color-text)',
+              borderBottom: '1px solid var(--color-border)',
+              paddingBottom: 4,
+            }}
+          >
+            Activity
+          </h2>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: 16,
+            }}
+          >
+            {/* Recent Users Card */}
             <div
               style={{
                 background: 'var(--color-surface)',
-                padding: 12,
+                padding: 16,
                 borderRadius: 12,
                 boxShadow: 'var(--shadow-sm)',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
               }}
             >
-              <h3 style={{ marginTop: 0 }}>Recent users</h3>
-              <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
-                Shows latest user signups (mocked).
+              <h3 style={{ margin: 0, fontSize: 16 }}>Recent Users</h3>
+              <p style={{ margin: '4px 0 12px', color: 'var(--color-text-muted)', fontSize: 14 }}>
+                Latest user signups (mocked)
               </p>
-              <ul style={{ marginTop: 8 }}>
+              <ul style={{ margin: 0, paddingLeft: 16, color: 'var(--color-text)' }}>
                 <li>user-a@example.com</li>
                 <li>user-b@example.com</li>
                 <li>user-c@example.com</li>
               </ul>
             </div>
+
+            {/* Storage Breakdown Card */}
             <div
               style={{
                 background: 'var(--color-surface)',
-                padding: 12,
+                padding: 16,
                 borderRadius: 12,
                 boxShadow: 'var(--shadow-sm)',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
               }}
             >
-              <h3 style={{ marginTop: 0 }}>Storage breakdown</h3>
-              <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
-                Images, backups and other files
+              <h3 style={{ margin: 0, fontSize: 16 }}>Storage Breakdown</h3>
+              <p style={{ margin: '4px 0 12px', color: 'var(--color-text-muted)', fontSize: 14 }}>
+                Images, backups, and other files
               </p>
+
               <div style={{ marginTop: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
                   <span>Images</span>
                   <span>{Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)}%</span>
                 </div>
+
                 <div
                   style={{
-                    height: 8,
+                    height: 10,
                     background: 'var(--color-border)',
                     borderRadius: 8,
                     overflow: 'hidden',
@@ -198,9 +290,13 @@ export default function AdminPage() {
                 >
                   <div
                     style={{
-                      width: `${Math.min(100, Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100))}%`,
+                      width: `${Math.min(
+                        100,
+                        Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)
+                      )}%`,
                       height: '100%',
                       background: 'var(--color-primary)',
+                      transition: 'width 0.3s ease',
                     }}
                   />
                 </div>

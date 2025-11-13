@@ -27,48 +27,98 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <nav
         style={{
-          width: 64,
+          width: 80,
           background: 'var(--color-surface)',
           borderRight: '1px solid var(--color-border)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          justifyContent: 'space-between',
           padding: '1rem 0',
           minHeight: '100vh',
           position: 'fixed',
           left: 0,
           top: 0,
           zIndex: 100,
+          boxShadow: '0 0 10px rgba(0,0,0,0.05)',
         }}
       >
-        <div style={{ flex: 1, width: '100%' }}>
-          {adminNavItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              title={item.label}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 48,
-                height: 48,
-                margin: '0.5rem 0',
-                borderRadius: 12,
-                background: location.pathname === item.to ? 'var(--color-primary)' : 'transparent',
-                color:
-                  location.pathname === item.to ? 'var(--color-surface)' : 'var(--color-primary)',
-                fontSize: 24,
-                textDecoration: 'none',
-                transition: 'background 0.2s, color 0.2s',
-              }}
-            >
-              <span>{item.icon}</span>
-              <span style={{ fontSize: 10, marginTop: 2 }}>{item.label}</span>
-            </Link>
-          ))}
+        {/* Logo or brand section */}
+        <div style={{ marginBottom: '1rem' }}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: 'var(--color-primary)',
+              color: 'var(--color-surface)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              fontSize: 18,
+            }}
+          >
+            A
+          </div>
         </div>
+
+        {/* Navigation items */}
+        <div
+          style={{
+            flex: 1,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          {adminNavItems.map((item) => {
+            const isActive = location.pathname === item.to;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                title={item.label}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 66,
+                  height: 56,
+                  margin: '0.5rem 0',
+                  borderRadius: 16,
+                  background: isActive ? 'var(--color-primary)' : 'transparent',
+                  color: isActive ? 'var(--color-surface)' : 'var(--color-text-muted)',
+                  fontSize: 24,
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'var(--color-hover)';
+                    e.currentTarget.style.color = 'var(--color-primary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-text-muted)';
+                  }
+                }}
+              >
+                <span style={{ lineHeight: 1 }}>{item.icon}</span>
+                <span style={{ fontSize: 11, marginTop: 3, textAlign: 'center' }}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Logout button */}
         <button
           onClick={handleLogout}
           title="Logout"
@@ -77,27 +127,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 48,
-            height: 48,
-            margin: '0.5rem 0',
-            borderRadius: 12,
+            width: 56,
+            height: 56,
+            marginBottom: '1rem',
+            borderRadius: 16,
             background: 'transparent',
             color: 'var(--color-error)',
-            fontSize: 24,
+            fontSize: 22,
             border: 'none',
             cursor: 'pointer',
             outline: 'none',
-            transition: 'background 0.2s, color 0.2s',
+            transition: 'all 0.25s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255,0,0,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
           }}
         >
           <span>🚪</span>
-          <span style={{ fontSize: 10, marginTop: 2 }}>Logout</span>
+          <span style={{ fontSize: 11, marginTop: 3 }}>Logout</span>
         </button>
       </nav>
+
       <div
         style={{
           flex: 1,
-          marginLeft: 64,
+          marginLeft: 80,
           background: 'var(--color-bg)',
           color: 'var(--color-text)',
         }}
