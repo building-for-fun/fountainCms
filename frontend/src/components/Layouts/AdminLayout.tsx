@@ -85,7 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: 56,
+                  width: 66,
                   height: 56,
                   margin: '0.5rem 0',
                   borderRadius: 16,
@@ -110,7 +110,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 }}
               >
                 <span style={{ lineHeight: 1 }}>{item.icon}</span>
-                <span style={{ fontSize: 11, marginTop: 3 }}>{item.label}</span>
+                <span style={{ fontSize: 11, marginTop: 3, textAlign: 'center' }}>
+                  {item.label}
+                </span>
               </Link>
             );
           })}
@@ -152,7 +154,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div
         style={{
           flex: 1,
-          marginLeft: 64,
+          marginLeft: 80,
           background: 'var(--color-bg)',
           color: 'var(--color-text)',
         }}
