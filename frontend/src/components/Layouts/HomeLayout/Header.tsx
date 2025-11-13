@@ -1,7 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import ThemeToggle from '../../ThemeToggle';
-import { PrimaryButton } from '../../PrimaryButton';
 import { Navbar } from './Navbar';
 
 export const Header = () => {
@@ -9,16 +6,21 @@ export const Header = () => {
     <>
       <header
         style={{
-          background: 'var(--color-primary)',
-          color: 'var(--color-surface)',
-          padding: '1.5rem 0',
+          background: 'none',
+          padding: '0rem 0',
           textAlign: 'center',
-          fontWeight: 700,
-          fontSize: '2rem',
-          letterSpacing: '-1px',
         }}
       >
-        FountainCMS
+        <h1
+          style={{
+            color: 'var(--color-primary)',
+            fontWeight: 700,
+            fontSize: '2rem',
+            letterSpacing: '-1px',
+          }}
+        >
+          FountainCMS
+        </h1>
       </header>
       <Navbar />
     </>
