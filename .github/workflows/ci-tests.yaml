@@ -1,0 +1,56 @@
+name: Monorepo Tests
+
+on:
+  pull_request: 
+    branches: [main, develop, "feature/**"]
+  push:
+    branches: [main, develop, "feature/**"]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      # ---------- Install monorepo root (if needed) ----------
+      - name: Install root dependencies
+        run: npm install
+
+      # ---------- BACKEND TESTS WITH COVERAGE ----------
+      - name: Install backend deps
+        run: npm install --workspace=backend
+
+      - name: Run backend tests with coverage
+        run: npm run test:cov --workspace=backend
+
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage
+          if-no-files-found: ignore
+
+      # ---------- FRONTEND TESTS WITH COVERAGE ----------
+      - name: Install frontend deps
+        run: npm install --workspace=frontend
+
+      - name: Run frontend tests with coverage
+        run: npm test --workspace=frontend -- --coverage
+
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+          if-no-files-found: ignore
