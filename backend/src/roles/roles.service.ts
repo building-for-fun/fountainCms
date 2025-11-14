@@ -1,12 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-export interface RoleDetails {
-  id: string;
-  name: string;
-  description?: string;
-  permissions?: string[];
-}
-
+import { RoleDetails } from './role-details.model';
 @Injectable()
 export class RolesService {
   private roles: RoleDetails[] = [

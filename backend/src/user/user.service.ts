@@ -2,18 +2,18 @@ import { Injectable } from '@nestjs/common';
 
 export interface UserDetails {
   id: string;
-  bookmark: unknown;
+  bookmark: object | null;
   user: string;
-  role: unknown;
+  role: string | null;
   collection: string;
-  search: unknown;
+  search: object | null;
   layout: string;
-  layout_query: unknown;
-  layout_options: unknown;
-  refresh_interval: unknown;
-  filter: unknown;
+  layout_query: object;
+  layout_options: object;
+  refresh_interval: number | null;
+  filter: object | null;
   icon: string;
-  color: unknown;
+  color: string | null;
 }
 
 @Injectable()
