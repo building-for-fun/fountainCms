@@ -181,5 +181,7 @@ Feel free to add more details as your project evolves.
  <h3>Thank you for contributing to our repository</h3>
 
 <p><a href="https://github.com/building-for-fun/RepoStore/contributors">
+
+<p><a href="https://github.com/building-for-fun/fountainCMS/contributors">
   <img src="https://contributors-img.web.app/image?repo=building-for-fun/fountainCMS" />
 </a></p>
