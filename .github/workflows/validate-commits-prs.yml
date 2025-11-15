@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-      - "*"
+      - '*'
 
 jobs:
   validate-commits:
@@ -30,7 +30,7 @@ jobs:
         with:
           types: feat,fix,docs,style,refactor,perf,test,chore,build,ci,revert
           requireScope: false
-          subjectPattern: ".+"
+          subjectPattern: '.+'
           wip: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

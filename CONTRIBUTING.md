@@ -34,4 +34,3 @@ Thank you for your interest in contributing to FountainCMS! We welcome all kinds
 If you have questions, open an issue or start a discussion in the repository.
 
 Thank you for helping make FountainCMS better!
-

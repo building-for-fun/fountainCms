@@ -1,6 +1,6 @@
-name: "Bug Report"
-description: "Report a reproducible bug or regression."
-title: "[Bug] <short description>"
+name: 'Bug Report'
+description: 'Report a reproducible bug or regression.'
+title: '[Bug] <short description>'
 labels: [bug]
 body:
   - type: markdown
@@ -10,57 +10,56 @@ body:
   - type: input
     id: summary
     attributes:
-      label: "Bug Summary"
-      description: "A clear and concise description of what the bug is."
-      placeholder: "The app crashes when..."
+      label: 'Bug Summary'
+      description: 'A clear and concise description of what the bug is.'
+      placeholder: 'The app crashes when...'
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
-      label: "Steps to Reproduce"
-      description: "How can we reproduce the bug? Please provide step-by-step instructions."
+      label: 'Steps to Reproduce'
+      description: 'How can we reproduce the bug? Please provide step-by-step instructions.'
       placeholder: "1. Go to ...\n2. Click on ...\n3. See error"
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: "Expected Behavior"
-      description: "What did you expect to happen?"
-      placeholder: "It should ..."
+      label: 'Expected Behavior'
+      description: 'What did you expect to happen?'
+      placeholder: 'It should ...'
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
-      label: "Actual Behavior"
-      description: "What actually happened?"
-      placeholder: "Instead, it ..."
+      label: 'Actual Behavior'
+      description: 'What actually happened?'
+      placeholder: 'Instead, it ...'
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: "FountainCMS Version"
-      description: "Which version are you using? (e.g., 1.0.0)"
-      placeholder: "1.0.0"
+      label: 'FountainCMS Version'
+      description: 'Which version are you using? (e.g., 1.0.0)'
+      placeholder: '1.0.0'
     validations:
       required: true
   - type: textarea
     id: environment
     attributes:
-      label: "Environment"
-      description: "OS, browser, Node.js version, database, etc."
-      placeholder: "macOS 14, Node.js 18, Chrome 120, PostgreSQL 15, ..."
+      label: 'Environment'
+      description: 'OS, browser, Node.js version, database, etc.'
+      placeholder: 'macOS 14, Node.js 18, Chrome 120, PostgreSQL 15, ...'
     validations:
       required: false
   - type: textarea
     id: logs
     attributes:
-      label: "Relevant Logs or Screenshots"
-      description: "Paste any error logs or add screenshots to help explain your problem."
-      placeholder: "Paste logs or drag-and-drop screenshots here."
+      label: 'Relevant Logs or Screenshots'
+      description: 'Paste any error logs or add screenshots to help explain your problem.'
+      placeholder: 'Paste logs or drag-and-drop screenshots here.'
     validations:
       required: false
-

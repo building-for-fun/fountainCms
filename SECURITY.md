@@ -19,4 +19,3 @@ If you discover a security vulnerability in FountainCMS, please report it respon
 - If the vulnerability is accepted, we will coordinate a fix and disclosure timeline with you. If declined, we will provide a clear explanation.
 
 Thank you for helping keep FountainCMS and its users safe!
-
