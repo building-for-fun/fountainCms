@@ -183,5 +183,5 @@ Feel free to add more details as your project evolves.
 
 
 <p><a href="https://github.com/building-for-fun/fountainCMS/contributors">
-  <img src="https://contributors-img.web.app/image?repo=building-for-fun/fountainCMS" />
+  <img src="https://contrib.rocks/image?repo=building-for-fun/fountainCms" />
 </a></p>
