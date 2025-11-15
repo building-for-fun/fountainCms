@@ -6,3 +6,8 @@ GET localhost:4000/api/content
 ### Get Users List
 
 GET http://localhost:4000/api/user
+
+
+#### swagger ui
+
+Swagger UI URL: http://localhost:4000/api

@@ -1,9 +1,9 @@
 ---
-name: "✨ Good First Issue"
-about: "Beginner-friendly task to help contributors get started"
-title: "[GFI] <short title>"
-labels: ["good first issue", "help wanted"]
-assignees: ""
+name: '✨ Good First Issue'
+about: 'Beginner-friendly task to help contributors get started'
+title: '[GFI] <short title>'
+labels: ['good first issue', 'help wanted']
+assignees: ''
 ---
 
 ## 🧩 Summary

@@ -31,12 +31,7 @@ module.exports = [
         version: 'detect',
       },
     },
-    ignores: [
-      'node_modules/',
-      'dist/',
-      'build/',
-      '**/*.d.ts',
-    ],
+    ignores: ['node_modules/', 'dist/', 'build/', '**/*.d.ts'],
     rules: {
       'react/react-in-jsx-scope': 'off',
       // Add more custom rules here if needed
