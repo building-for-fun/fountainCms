@@ -9,12 +9,12 @@ Fixes # (issue)
 
 ## Type of Change
 
-  [ ] Bug fix
+- [ ] Bug fix
 - [ ] New feature
-  [ ] Breaking change
+- [ ] Breaking change
 - [ ] Documentation update
-  [ ] Refactor
-  [ ] Other (please describe):
+- [ ] Refactor
+- [ ] Other (please describe):
 
 ## Checklist
 
