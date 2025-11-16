@@ -2,27 +2,9 @@
 
 ## Description
 
-<!-- This PR integrates Swagger API documentation into the FountainCMS backend (NestJS).
+<!-- Please include a summary of the change and which issue is fixed. Also include relevant motivation and context. -->
 
-### Changes Made:
-
-- Added `@nestjs/swagger` and `swagger-ui-express` dependencies to `backend/package.json`
-- Configured Swagger UI at `/api` endpoint with comprehensive API documentation
-- Created DTO files for robust schema documentation:
-  - `ContentDto`, `ContentItemDto`, `ContentListDto` in `content-details.model.ts`
-  - `RoleDetails` in `role-details.model.ts`
-  - `UserDetailsDto` in `user-details.model.ts`
-- Updated all three controllers with Swagger decorators (`@ApiOperation`, `@ApiResponse`, `@ApiParam`, `@ApiBody`, `@ApiTags`)
-- All endpoints are now visible and testable through the interactive Swagger UI
-
-### Benefits:
-
-- Improved developer onboarding with interactive API documentation
-- Clear API contracts and data schemas
-- Simplified manual API testing without external tools
-- Auto-updated documentation that stays synchronized with code changes -->
-
-## Fixes #20
+Fixes # (issue)
 
 
 ## Type of Change
