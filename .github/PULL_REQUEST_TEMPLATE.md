@@ -1,12 +1,11 @@
 # Pull Request
 
-Thank you for contributing to FountainCMS! Please fill out this template to help us review your PR efficiently.
-
 ## Description
 
 <!-- Please include a summary of the change and which issue is fixed. Also include relevant motivation and context. -->
 
 Fixes # (issue)
+
 
 ## Type of Change
 
@@ -30,9 +29,7 @@ Fixes # (issue)
 
 ## Screenshots (if applicable)
 
-<!-- Add screenshots to help explain your changes. -->
 
 ## Additional Context
 
 <!-- Add any other context about the PR here. -->
-

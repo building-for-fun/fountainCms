@@ -175,13 +175,13 @@ GitHub: https://github.com/building-for-fun/fountainCms
 
 Feel free to add more details as your project evolves.
 
-
 <hr>
 <h2 align = "center">Our Contributors ❤️</h2>
 <div align = "center">
  <h3>Thank you for contributing to our repository</h3>
 
-
 <p><a href="https://github.com/building-for-fun/RepoStore/contributors">
-  <img src="https://contributors-img.web.app/image?repo=building-for-fun/fountainCMS" />
+
+<p><a href="https://github.com/building-for-fun/fountainCMS/contributors">
+  <img src="https://contrib.rocks/image?repo=building-for-fun/fountainCms" />
 </a></p>
