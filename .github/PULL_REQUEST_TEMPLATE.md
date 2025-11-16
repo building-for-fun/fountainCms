@@ -1,46 +1,60 @@
 # Pull Request
 
-Thank you for contributing to FountainCMS! Please fill out this template to help us review your PR efficiently.
-
 ## Description
 
-This PR integrates Swagger API documentation into the FountainCMS backend (NestJS).
+<!-- This PR integrates Swagger API documentation into the FountainCMS backend (NestJS).
 
-Added @nestjs/swagger and configured Swagger UI at /api/docs
+### Changes Made:
 
-Defined and annotated DTO files (ContentDto, ContentItemDto, and ContentListDto) for robust schema documentation
+- Added `@nestjs/swagger` and `swagger-ui-express` dependencies to `backend/package.json`
+- Configured Swagger UI at `/api` endpoint with comprehensive API documentation
+- Created DTO files for robust schema documentation:
+  - `ContentDto`, `ContentItemDto`, `ContentListDto` in `content-details.model.ts`
+  - `RoleDetails` in `role-details.model.ts`
+  - `UserDetailsDto` in `user-details.model.ts`
+- Updated all three controllers with Swagger decorators (`@ApiOperation`, `@ApiResponse`, `@ApiParam`, `@ApiBody`, `@ApiTags`)
+- All endpoints are now visible and testable through the interactive Swagger UI
 
-Updated the content controller , user controller , roles controller with comprehensive Swagger decorators (@ApiOperation, @ApiResponse, etc.)
+### Benefits:
 
-All current endpoints (GET /api/content, GET /api/content/:key, POST /api/content) are visible and testable within the documentation interface
+- Improved developer onboarding with interactive API documentation
+- Clear API contracts and data schemas
+- Simplified manual API testing without external tools
+- Auto-updated documentation that stays synchronized with code changes -->
 
-This change improves onboarding for developers, ensures API contract clarity, and simplifies manual testing.
+## Fixes #20
 
-Fixes # (issue)
 
 ## Type of Change
 
-- [ ] Bug fix
+  [ ] Bug fix
 - [ ] New feature
-- [ ] Breaking change
-- [x] Documentation update
-- [ ] Refactor
-- [ ] Other (please describe):
+  [ ] Breaking change
+- [ ] Documentation update
+  [ ] Refactor
+  [ ] Other (please describe):
 
 ## Checklist
 
-- [x] My code follows the style guidelines of this project
-- [x] I have performed a self-review of my code
-- [x] I have commented my code, particularly in hard-to-understand areas
-- [x] I have made corresponding changes to the documentation
-- [x] My changes generate no new warnings
-- [x] I have added tests that prove my fix is effective or that my feature works
-- [x] New and existing unit tests pass locally with my changes
-- [x] Any dependent changes have been merged and published in downstream modules
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published in downstream modules
 
 ## Screenshots (if applicable)
 
 
 ## Additional Context
 
-<!-- Add any other context about the PR here. -->
+### Notes for Reviewers:
+<!--
+- Swagger UI is accessible at `http://localhost:4000/api` when running the backend
+- All API endpoints are properly documented with request/response schemas
+- DTOs ensure type safety and clear documentation
+- No breaking changes to existing API contracts
+- Monorepo structure respected: all backend dependencies added only to `backend/package.json`
+-->
