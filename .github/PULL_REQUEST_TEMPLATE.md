@@ -50,11 +50,4 @@
 
 ## Additional Context
 
-### Notes for Reviewers:
-<!--
-- Swagger UI is accessible at `http://localhost:4000/api` when running the backend
-- All API endpoints are properly documented with request/response schemas
-- DTOs ensure type safety and clear documentation
-- No breaking changes to existing API contracts
-- Monorepo structure respected: all backend dependencies added only to `backend/package.json`
--->
+<!-- Add any other context about the PR here. -->
