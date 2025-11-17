@@ -35,7 +35,13 @@ export default function LandingPage() {
 
   return (
     <HomeLayout>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300">
+      <div
+        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300"
+        style={{
+          paddingLeft: window.innerWidth < 640 ? '1rem' : '2rem',
+          paddingRight: window.innerWidth < 640 ? '1rem' : '2rem',
+        }}
+      >
         <div
           style={{
             fontFamily: 'Inter, sans-serif',
