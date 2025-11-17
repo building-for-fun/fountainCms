@@ -1,53 +1,84 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
-import { RoleDetails } from './role-details.model';
+export class RoleDetails {
+  id!: string;
+  name!: string;
+  description?: string;
+  permissions?: string[];
+}
+
 @Injectable()
 export class RolesService {
-  private roles: RoleDetails[] = [
-    {
-      id: 'r1',
-      name: 'editor',
-      description: 'Can edit content',
-      permissions: ['read', 'write'],
-    },
-    {
-      id: 'r2',
-      name: 'admin',
-      description: 'Full access',
-      permissions: ['read', 'write', 'delete', 'admin'],
-    },
-  ];
+  constructor(private prisma: PrismaService) {}
 
-  getAll(): RoleDetails[] {
-    return this.roles;
+  async getAll(): Promise<RoleDetails[]> {
+    const roles = await this.prisma.role.findMany();
+    return roles.map((r) => ({
+      id: r.id,
+      name: r.name,
+      description: r.description ?? '',
+      permissions: r.permissions ?? [],
+    }));
   }
 
-  getById(id: string): RoleDetails | undefined {
-    return this.roles.find((r) => r.id === id);
-  }
-
-  create(role: Partial<RoleDetails>): RoleDetails {
-    const newRole: RoleDetails = {
-      id: role.id || Date.now().toString(),
-      name: role.name ?? '',
-      description: role.description ?? '',
-      permissions: role.permissions ?? [],
+  async getById(id: string): Promise<RoleDetails | undefined> {
+    const r = await this.prisma.role.findUnique({ where: { id } });
+    if (!r) return undefined;
+    return {
+      id: r.id,
+      name: r.name,
+      description: r.description ?? '',
+      permissions: r.permissions ?? [],
     };
-    this.roles.push(newRole);
-    return newRole;
   }
 
-  update(id: string, update: Partial<RoleDetails>): RoleDetails | undefined {
-    const role = this.getById(id);
-    if (!role) return undefined;
-    Object.assign(role, update);
-    return role;
+  async create(role: Partial<RoleDetails>): Promise<RoleDetails> {
+    const created = await this.prisma.role.create({
+      data: {
+        name: role.name ?? '',
+        description: role.description ?? undefined,
+        permissions: role.permissions ?? [],
+      },
+    });
+    return {
+      id: created.id,
+      name: created.name,
+      description: created.description ?? '',
+      permissions: created.permissions ?? [],
+    };
   }
 
-  delete(id: string): boolean {
-    const idx = this.roles.findIndex((r) => r.id === id);
-    if (idx === -1) return false;
-    this.roles.splice(idx, 1);
-    return true;
+  async update(
+    id: string,
+    update: Partial<RoleDetails>,
+  ): Promise<RoleDetails | undefined> {
+    try {
+      const updated = await this.prisma.role.update({
+        where: { id },
+        data: {
+          name: update.name ?? undefined,
+          description: update.description ?? undefined,
+          permissions: update.permissions ?? undefined,
+        },
+      });
+      return {
+        id: updated.id,
+        name: updated.name,
+        description: updated.description ?? '',
+        permissions: updated.permissions ?? [],
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  async delete(id: string): Promise<boolean> {
+    try {
+      await this.prisma.role.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

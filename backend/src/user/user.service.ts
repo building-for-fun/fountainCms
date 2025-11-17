@@ -1,119 +1,159 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 export interface UserDetails {
   id: string;
-  bookmark: object | null;
+  bookmark: any | null;
   user: string;
   role: string | null;
   collection: string;
-  search: object | null;
+  search: any | null;
   layout: string;
-  layout_query: object;
-  layout_options: object;
+  layout_query: any | null;
+  layout_options: any | null;
   refresh_interval: number | null;
-  filter: object | null;
+  filter: any | null;
   icon: string;
   color: string | null;
 }
 
 @Injectable()
 export class UserService {
-  private users: UserDetails[] = [
-    {
-      id: '1',
-      bookmark: null,
-      user: '79df1726-6c1b-4871-832b-902ff3a9b618',
-      role: null,
-      collection: 'directus_users',
-      search: null,
-      layout: 'cards',
-      layout_query: {
-        cards: {
-          sort: ['email'],
-          page: 1,
-        },
-      },
-      layout_options: {
-        cards: {
-          icon: 'account_circle',
-          title: '{{ first_name }} {{ last_name }}',
-          subtitle: '{{ email }}',
-          size: 4,
-        },
-      },
-      refresh_interval: null,
-      filter: null,
-      icon: 'bookmark',
-      color: null,
-    },
-    {
-      id: '2',
-      bookmark: null,
-      user: 'b2c1d2e3-f4a5-6789-0123-456789abcdef',
-      role: 'admin',
-      collection: 'directus_users',
-      search: null,
-      layout: 'cards',
-      layout_query: {
-        cards: {
-          sort: ['name'],
-          page: 2,
-        },
-      },
-      layout_options: {
-        cards: {
-          icon: 'admin_panel_settings',
-          title: '{{ first_name }} {{ last_name }}',
-          subtitle: '{{ email }}',
-          size: 4,
-        },
-      },
-      refresh_interval: null,
-      filter: null,
-      icon: 'admin',
-      color: '#ffcc00',
-    },
-  ];
+  constructor(private prisma: PrismaService) {}
 
-  getAll(): UserDetails[] {
-    return this.users;
+  async getAll(): Promise<UserDetails[]> {
+    const users = await this.prisma.user.findMany({ include: { role: true } });
+    return users.map((u) => ({
+      id: u.id,
+      bookmark: (u.bookmark ?? null) as any,
+      user: u.user,
+      role: u.role ? u.role.name : null,
+      collection: u.collection,
+      search: (u.search ?? null) as any,
+      layout: u.layout,
+      layout_query: (u.layout_query ?? null) as any,
+      layout_options: (u.layout_options ?? null) as any,
+      refresh_interval: u.refresh_interval ?? null,
+      filter: (u.filter ?? null) as any,
+      icon: u.icon,
+      color: u.color ?? null,
+    }));
   }
 
-  getById(id: string): UserDetails | undefined {
-    return this.users.find((u) => u.id === id);
-  }
-
-  create(user: Partial<UserDetails>): UserDetails {
-    const newUser: UserDetails = {
-      id: user.id || Date.now().toString(),
-      bookmark: user.bookmark ?? null,
-      user: user.user ?? '',
-      role: user.role ?? null,
-      collection: user.collection ?? '',
-      search: user.search ?? null,
-      layout: user.layout ?? '',
-      layout_query: user.layout_query ?? {},
-      layout_options: user.layout_options ?? {},
-      refresh_interval: user.refresh_interval ?? null,
-      filter: user.filter ?? null,
-      icon: user.icon ?? '',
-      color: user.color ?? null,
+  async getById(id: string): Promise<UserDetails | undefined> {
+    const u = await this.prisma.user.findUnique({
+      where: { id },
+      include: { role: true },
+    });
+    if (!u) return undefined;
+    return {
+      id: u.id,
+      bookmark: (u.bookmark ?? null) as any,
+      user: u.user,
+      role: u.role ? u.role.name : null,
+      collection: u.collection,
+      search: (u.search ?? null) as any,
+      layout: u.layout,
+      layout_query: (u.layout_query ?? null) as any,
+      layout_options: (u.layout_options ?? null) as any,
+      refresh_interval: u.refresh_interval ?? null,
+      filter: (u.filter ?? null) as any,
+      icon: u.icon,
+      color: u.color ?? null,
     };
-    this.users.push(newUser);
-    return newUser;
   }
 
-  update(id: string, update: Partial<UserDetails>): UserDetails | undefined {
-    const user = this.getById(id);
-    if (!user) return undefined;
-    Object.assign(user, update);
-    return user;
+  async create(user: Partial<UserDetails>): Promise<UserDetails> {
+    const created = await this.prisma.user.create({
+      data: {
+        bookmark: user.bookmark ?? undefined,
+        user: user.user ?? '',
+        collection: user.collection ?? '',
+        search: user.search ?? undefined,
+        layout: user.layout ?? '',
+        layout_query: user.layout_query ?? undefined,
+        layout_options: user.layout_options ?? undefined,
+        refresh_interval: user.refresh_interval ?? undefined,
+        filter: user.filter ?? undefined,
+        icon: user.icon ?? '',
+        color: user.color ?? undefined,
+        role: user.role ? { connect: { name: user.role } } : undefined,
+      },
+      include: { role: true },
+    });
+    return {
+      id: created.id,
+      bookmark: (created.bookmark ?? null) as any,
+      user: created.user,
+      role: created.role ? created.role.name : null,
+      collection: created.collection,
+      search: (created.search ?? null) as any,
+      layout: created.layout,
+      layout_query: (created.layout_query ?? null) as any,
+      layout_options: (created.layout_options ?? null) as any,
+      refresh_interval: created.refresh_interval ?? null,
+      filter: (created.filter ?? null) as any,
+      icon: created.icon,
+      color: created.color ?? null,
+    };
   }
 
-  delete(id: string): boolean {
-    const idx = this.users.findIndex((u) => u.id === id);
-    if (idx === -1) return false;
-    this.users.splice(idx, 1);
-    return true;
+  async update(
+    id: string,
+    update: Partial<UserDetails>,
+  ): Promise<UserDetails | undefined> {
+    try {
+      const data: any = {
+        bookmark: update.bookmark ?? undefined,
+        user: update.user ?? undefined,
+        collection: update.collection ?? undefined,
+        search: update.search ?? undefined,
+        layout: update.layout ?? undefined,
+        layout_query: update.layout_query ?? undefined,
+        layout_options: update.layout_options ?? undefined,
+        refresh_interval: update.refresh_interval ?? undefined,
+        filter: update.filter ?? undefined,
+        icon: update.icon ?? undefined,
+        color: update.color ?? undefined,
+      };
+      if (update.role !== undefined) {
+        if (update.role === null) {
+          data.role = { disconnect: true };
+        } else {
+          data.role = { connect: { name: update.role } };
+        }
+      }
+      const updated = await this.prisma.user.update({
+        where: { id },
+        data,
+        include: { role: true },
+      });
+      return {
+        id: updated.id,
+        bookmark: (updated.bookmark ?? null) as any,
+        user: updated.user,
+        role: updated.role ? updated.role.name : null,
+        collection: updated.collection,
+        search: (updated.search ?? null) as any,
+        layout: updated.layout,
+        layout_query: (updated.layout_query ?? null) as any,
+        layout_options: (updated.layout_options ?? null) as any,
+        refresh_interval: updated.refresh_interval ?? null,
+        filter: (updated.filter ?? null) as any,
+        icon: updated.icon,
+        color: updated.color ?? null,
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  async delete(id: string): Promise<boolean> {
+    try {
+      await this.prisma.user.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

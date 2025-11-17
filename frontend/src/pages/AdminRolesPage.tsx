@@ -1,37 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/Layouts/AdminLayout';
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
 interface Role {
-  id: number;
+  id: string; // Changed to string to match UUID from Prisma
   name: string;
   description: string;
 }
 
-const initialRoles: Role[] = [
-  { id: 1, name: 'Admin', description: 'Full access to all features.' },
-  { id: 2, name: 'Editor', description: 'Can edit content but not manage users.' },
-  { id: 3, name: 'Viewer', description: 'Can view content only.' },
-];
-
 const AdminRolesPage = () => {
-  const [roles, setRoles] = useState<Role[]>(initialRoles);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Form states
   const [newRole, setNewRole] = useState({ name: '', description: '' });
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editRole, setEditRole] = useState({ name: '', description: '' });
+
+  // FETCH ROLES
+  useEffect(() => {
+    fetch(`${apiBaseUrl}/api/roles`)
+      .then((res) => res.json())
+      .then((data) => {
+        // Backend returns { data: Role[] }
+        setRoles(data.data || []);
+        setLoading(false);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewRole((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddRole = (e: React.FormEvent) => {
+  // CREATE ROLE
+  const handleAddRole = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRole.name.trim()) return;
-    setRoles((prev) => [
-      { id: Date.now(), name: newRole.name.trim(), description: newRole.description.trim() },
-      ...prev,
-    ]);
-    setNewRole({ name: '', description: '' });
+
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/roles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRole),
+      });
+      const createdRole = await res.json();
+      setRoles((prev) => [...prev, createdRole]);
+      setNewRole({ name: '', description: '' });
+    } catch (err) {
+      console.error('Failed to create role', err);
+    }
   };
 
   const handleEditClick = (role: Role) => {
@@ -44,27 +64,43 @@ const AdminRolesPage = () => {
     setEditRole((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEditSave = (id: number) => {
-    setRoles((prev) =>
-      prev.map((role) =>
-        role.id === id ? { ...role, name: editRole.name, description: editRole.description } : role
-      )
-    );
-    setEditingId(null);
+  // UPDATE ROLE
+  const handleEditSave = async (id: string) => {
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/roles/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editRole),
+      });
+      const updatedRole = await res.json();
+
+      setRoles((prev) => prev.map((role) => (role.id === id ? updatedRole : role)));
+      setEditingId(null);
+    } catch (err) {
+      console.error('Failed to update role', err);
+    }
   };
 
   const handleEditCancel = () => {
     setEditingId(null);
   };
 
-  const handleDelete = (id: number) => {
-    setRoles((prev) => prev.filter((role) => role.id !== id));
+  // DELETE ROLE
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure?')) return;
+    try {
+      await fetch(`${apiBaseUrl}/api/roles/${id}`, { method: 'DELETE' });
+      setRoles((prev) => prev.filter((role) => role.id !== id));
+    } catch (err) {
+      console.error('Failed to delete role', err);
+    }
   };
 
   return (
     <AdminLayout>
       <div className="max-w-2xl mx-auto p-8 sm:p-12">
         <h1 className="text-2xl font-bold text-blue-700 mb-6">Roles & Permissions</h1>
+
         {/* Create Role Form */}
         <form
           onSubmit={handleAddRole}
@@ -99,10 +135,13 @@ const AdminRolesPage = () => {
             Add Role
           </button>
         </form>
+
         {/* Roles List */}
         <div className="bg-white rounded-xl shadow p-6 border border-blue-100">
           <h2 className="text-lg font-semibold mb-4">Existing Roles</h2>
-          {roles.length === 0 ? (
+          {loading ? (
+            <p>Loading...</p>
+          ) : roles.length === 0 ? (
             <div className="text-gray-500">No roles found.</div>
           ) : (
             <ul className="space-y-4">
