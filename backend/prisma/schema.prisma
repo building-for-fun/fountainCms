@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(uuid())
+  bookmark         Json?
+  user             String    @unique
+  roleId           String?
+  role             Role?     @relation(fields: [roleId], references: [id])
+  collection       String
+  search           Json?
+  layout           String
+  layout_query     Json?
+  layout_options   Json?
+  refresh_interval Int?
+  filter           Json?
+  icon             String
+  color            String?
+  contents         Content[] @relation("AuthorContents")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Role {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  permissions String[]
+  users       User[]
+}
+
+model Content {
+  id        String   @id @default(uuid())
+  title     String
+  body      String
+  authorId  String?
+  author    User?    @relation(name: "AuthorContents", fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

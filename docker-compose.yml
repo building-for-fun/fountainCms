@@ -1,12 +1,25 @@
 services:
   postgres:
     image: postgres:17
-    env_file:
-      - ./backend/.env
-    ports:
-      - '5432:5432'
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fountain_user
+      POSTGRES_PASSWORD: fountain_pass
+      POSTGRES_DB: fountain_db
     volumes:
-      - fountain_pgdata:/var/lib/postgresql/data
-
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://fountain_user:fountain_pass@postgres:5432/fountain_db?schema=public"
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
 volumes:
-  fountain_pgdata:
+  pgdata:
