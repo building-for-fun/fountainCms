@@ -40,7 +40,10 @@
     "lint-staged": "^16.2.1",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
+    "prisma": "^6.19.0",
     "tailwindcss": "^4.1.14"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0"
   }
-  
 }

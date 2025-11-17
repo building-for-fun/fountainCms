@@ -7,37 +7,35 @@ import {
   Body,
   Param,
 } from '@nestjs/common';
-import { RolesService, RoleDetails } from './roles.service';
+import { RolesService } from './roles.service';
+import { Role, Prisma } from '@prisma/client';
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Get()
-  async getAll(): Promise<{ data: RoleDetails[] }> {
+  async getAll(): Promise<{ data: Role[] }> {
     const data = await this.rolesService.getAll();
     return { data };
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string): Promise<RoleDetails | undefined> {
-    const role = await this.rolesService.getById(id);
-    return role;
+  async getById(@Param('id') id: string): Promise<Role | null> {
+    return await this.rolesService.getById(id);
   }
 
   @Post()
-  async create(@Body() body: Partial<RoleDetails>): Promise<RoleDetails> {
-    const created = await this.rolesService.create(body);
-    return created;
+  async create(@Body() body: Prisma.RoleCreateInput): Promise<Role> {
+    return await this.rolesService.create(body);
   }
 
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() body: Partial<RoleDetails>,
-  ): Promise<RoleDetails | undefined> {
-    const updated = await this.rolesService.update(id, body);
-    return updated;
+    @Body() body: Prisma.RoleUpdateInput,
+  ): Promise<Role | null> {
+    return await this.rolesService.update(id, body);
   }
 
   @Delete(':id')

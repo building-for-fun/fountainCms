@@ -1,75 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-
-export class RoleDetails {
-  id!: string;
-  name!: string;
-  description?: string;
-  permissions?: string[];
-}
+import { Role, Prisma } from '@prisma/client';
 
 @Injectable()
 export class RolesService {
   constructor(private prisma: PrismaService) {}
 
-  async getAll(): Promise<RoleDetails[]> {
-    const roles = await this.prisma.role.findMany();
-    return roles.map((r) => ({
-      id: r.id,
-      name: r.name,
-      description: r.description ?? '',
-      permissions: r.permissions ?? [],
-    }));
+  async getAll(): Promise<Role[]> {
+    return await this.prisma.role.findMany();
   }
 
-  async getById(id: string): Promise<RoleDetails | undefined> {
-    const r = await this.prisma.role.findUnique({ where: { id } });
-    if (!r) return undefined;
-    return {
-      id: r.id,
-      name: r.name,
-      description: r.description ?? '',
-      permissions: r.permissions ?? [],
-    };
+  async getById(id: string): Promise<Role | null> {
+    return await this.prisma.role.findUnique({ where: { id } });
   }
 
-  async create(role: Partial<RoleDetails>): Promise<RoleDetails> {
-    const created = await this.prisma.role.create({
-      data: {
-        name: role.name ?? '',
-        description: role.description ?? undefined,
-        permissions: role.permissions ?? [],
-      },
-    });
-    return {
-      id: created.id,
-      name: created.name,
-      description: created.description ?? '',
-      permissions: created.permissions ?? [],
-    };
+  async create(data: Prisma.RoleCreateInput): Promise<Role> {
+    return await this.prisma.role.create({ data });
   }
 
-  async update(
-    id: string,
-    update: Partial<RoleDetails>,
-  ): Promise<RoleDetails | undefined> {
+  async update(id: string, data: Prisma.RoleUpdateInput): Promise<Role | null> {
     try {
-      const updated = await this.prisma.role.update({
+      return await this.prisma.role.update({
         where: { id },
-        data: {
-          name: update.name ?? undefined,
-          description: update.description ?? undefined,
-          permissions: update.permissions ?? undefined,
-        },
+        data,
       });
-      return {
-        id: updated.id,
-        name: updated.name,
-        description: updated.description ?? '',
-        permissions: updated.permissions ?? [],
-      };
     } catch {
-      return undefined;
+      return null;
     }
   }
 
