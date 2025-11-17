@@ -39,8 +39,6 @@ export default function LandingPage() {
         <div
           style={{
             fontFamily: 'Inter, sans-serif',
-            background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)',
-            minHeight: '100vh',
             padding: '3rem 0',
           }}
         >
