@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from '@tanstack/react-router';
 import AdminLayout from '../components/Layouts/AdminLayout';
 
 interface User {

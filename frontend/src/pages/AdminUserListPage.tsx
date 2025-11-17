@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../components/Layouts/AdminLayout';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 
 interface User {
   id: string;
