@@ -1,53 +1,40 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { Role, Prisma } from '@prisma/client';
 
-import { RoleDetails } from './role-details.model';
 @Injectable()
 export class RolesService {
-  private roles: RoleDetails[] = [
-    {
-      id: 'r1',
-      name: 'editor',
-      description: 'Can edit content',
-      permissions: ['read', 'write'],
-    },
-    {
-      id: 'r2',
-      name: 'admin',
-      description: 'Full access',
-      permissions: ['read', 'write', 'delete', 'admin'],
-    },
-  ];
+  constructor(private prisma: PrismaService) {}
 
-  getAll(): RoleDetails[] {
-    return this.roles;
+  async getAll(): Promise<Role[]> {
+    return await this.prisma.role.findMany();
   }
 
-  getById(id: string): RoleDetails | undefined {
-    return this.roles.find((r) => r.id === id);
+  async getById(id: string): Promise<Role | null> {
+    return await this.prisma.role.findUnique({ where: { id } });
   }
 
-  create(role: Partial<RoleDetails>): RoleDetails {
-    const newRole: RoleDetails = {
-      id: role.id || Date.now().toString(),
-      name: role.name ?? '',
-      description: role.description ?? '',
-      permissions: role.permissions ?? [],
-    };
-    this.roles.push(newRole);
-    return newRole;
+  async create(data: Prisma.RoleCreateInput): Promise<Role> {
+    return await this.prisma.role.create({ data });
   }
 
-  update(id: string, update: Partial<RoleDetails>): RoleDetails | undefined {
-    const role = this.getById(id);
-    if (!role) return undefined;
-    Object.assign(role, update);
-    return role;
+  async update(id: string, data: Prisma.RoleUpdateInput): Promise<Role | null> {
+    try {
+      return await this.prisma.role.update({
+        where: { id },
+        data,
+      });
+    } catch {
+      return null;
+    }
   }
 
-  delete(id: string): boolean {
-    const idx = this.roles.findIndex((r) => r.id === id);
-    if (idx === -1) return false;
-    this.roles.splice(idx, 1);
-    return true;
+  async delete(id: string): Promise<boolean> {
+    try {
+      await this.prisma.role.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

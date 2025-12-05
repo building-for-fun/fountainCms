@@ -12,6 +12,7 @@ async function bootstrap() {
   console.log('🧩 Allowed Origins:', allowedOrigins);
 
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.enableCors({
     origin: allowedOrigins,
     credentials: true,
@@ -27,7 +28,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   await app.listen(process.env.PORT ?? 4000);
 }

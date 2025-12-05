@@ -7,6 +7,7 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     style={{
       minHeight: '100vh',
       display: 'flex',
+      margin: 'auto',
       flexDirection: 'column',
       fontFamily: 'Inter, sans-serif',
       background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-primary-light) 100%)',

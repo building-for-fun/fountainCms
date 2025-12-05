@@ -1,119 +1,64 @@
 import { Injectable } from '@nestjs/common';
-
-export interface UserDetails {
-  id: string;
-  bookmark: object | null;
-  user: string;
-  role: string | null;
-  collection: string;
-  search: object | null;
-  layout: string;
-  layout_query: object;
-  layout_options: object;
-  refresh_interval: number | null;
-  filter: object | null;
-  icon: string;
-  color: string | null;
-}
+import { PrismaService } from '../prisma/prisma.service';
+import { User, Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
-  private users: UserDetails[] = [
-    {
-      id: '1',
-      bookmark: null,
-      user: '79df1726-6c1b-4871-832b-902ff3a9b618',
-      role: null,
-      collection: 'directus_users',
-      search: null,
-      layout: 'cards',
-      layout_query: {
-        cards: {
-          sort: ['email'],
-          page: 1,
-        },
-      },
-      layout_options: {
-        cards: {
-          icon: 'account_circle',
-          title: '{{ first_name }} {{ last_name }}',
-          subtitle: '{{ email }}',
-          size: 4,
-        },
-      },
-      refresh_interval: null,
-      filter: null,
-      icon: 'bookmark',
-      color: null,
+  constructor(private prisma: PrismaService) {}
+
+  async getAll(): Promise<User[]> {
+    return await this.prisma.user.findMany({ include: { role: true } });
+  }
+
+  async getById(id: string): Promise<User | null> {
+    return await this.prisma.user.findUnique({
+      where: { id },
+      include: { role: true },
+    });
+  }
+
+  async create(data: Prisma.UserCreateInput): Promise<User> {
+    return await this.prisma.user.create({
+      data,
+      include: { role: true },
+    });
+  }
+
+  async update(
+    id: string,
+    params: {
+      data: Prisma.UserUpdateInput;
+      roleName?: string | null; // Handle role update logic specifically if needed
     },
-    {
-      id: '2',
-      bookmark: null,
-      user: 'b2c1d2e3-f4a5-6789-0123-456789abcdef',
-      role: 'admin',
-      collection: 'directus_users',
-      search: null,
-      layout: 'cards',
-      layout_query: {
-        cards: {
-          sort: ['name'],
-          page: 2,
-        },
-      },
-      layout_options: {
-        cards: {
-          icon: 'admin_panel_settings',
-          title: '{{ first_name }} {{ last_name }}',
-          subtitle: '{{ email }}',
-          size: 4,
-        },
-      },
-      refresh_interval: null,
-      filter: null,
-      icon: 'admin',
-      color: '#ffcc00',
-    },
-  ];
+  ): Promise<User | null> {
+    try {
+      const { data, roleName } = params;
 
-  getAll(): UserDetails[] {
-    return this.users;
+      // Handle relation update logic
+      if (roleName !== undefined) {
+        if (roleName === null) {
+          data.role = { disconnect: true };
+        } else {
+          data.role = { connect: { name: roleName } };
+        }
+      }
+
+      return await this.prisma.user.update({
+        where: { id },
+        data,
+        include: { role: true },
+      });
+    } catch {
+      return null;
+    }
   }
 
-  getById(id: string): UserDetails | undefined {
-    return this.users.find((u) => u.id === id);
-  }
-
-  create(user: Partial<UserDetails>): UserDetails {
-    const newUser: UserDetails = {
-      id: user.id || Date.now().toString(),
-      bookmark: user.bookmark ?? null,
-      user: user.user ?? '',
-      role: user.role ?? null,
-      collection: user.collection ?? '',
-      search: user.search ?? null,
-      layout: user.layout ?? '',
-      layout_query: user.layout_query ?? {},
-      layout_options: user.layout_options ?? {},
-      refresh_interval: user.refresh_interval ?? null,
-      filter: user.filter ?? null,
-      icon: user.icon ?? '',
-      color: user.color ?? null,
-    };
-    this.users.push(newUser);
-    return newUser;
-  }
-
-  update(id: string, update: Partial<UserDetails>): UserDetails | undefined {
-    const user = this.getById(id);
-    if (!user) return undefined;
-    Object.assign(user, update);
-    return user;
-  }
-
-  delete(id: string): boolean {
-    const idx = this.users.findIndex((u) => u.id === id);
-    if (idx === -1) return false;
-    this.users.splice(idx, 1);
-    return true;
+  async delete(id: string): Promise<boolean> {
+    try {
+      await this.prisma.user.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
