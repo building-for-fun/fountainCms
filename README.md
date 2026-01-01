@@ -1,8 +1,51 @@
 # <img src="assets/logo.png" alt="FountainCMS Logo" width="48" height="48" style="vertical-align:middle;"> FountainCMS Monorepo
 
-This repository is organized as a monorepo for the FountainCMS ecosystem, containing both frontend (React) and backend (NestJS) codebases.
+**FountainCMS** is a **headless, data-first Content Management System** designed to manage structured content, datasets, and metadata in a clean, scalable, and developer-friendly way.
 
-## Structure
+This repository is organized as a **monorepo** containing both the **frontend (React)** and **backend (NestJS)** codebases that together power the FountainCMS ecosystem.
+
+---
+
+## 🚀 What is FountainCMS?
+
+FountainCMS focuses on **explicit content modeling and API-first delivery**.
+
+Instead of tightly coupling content with presentation, it treats content as **structured data**, allowing teams to:
+- Define clear schemas for content and datasets
+- Validate and manage data centrally
+- Serve content securely through APIs
+- Power multiple frontends from a single backend
+
+It is built for teams that care about **data quality, strong contracts, and long-term maintainability**.
+
+---
+
+## 🎯 Why FountainCMS?
+
+Most CMS platforms are either:
+- Too rigid for real-world, evolving data models  
+- Too abstract, hiding important data decisions behind UI layers  
+
+FountainCMS solves this by:
+- Making schemas **explicit and versionable**
+- Encouraging **clean separation of concerns**
+- Prioritizing **developer control and predictability**
+
+This makes it especially useful for **data-heavy products, dashboards, internal tools, and modern web applications**.
+
+---
+
+## 👥 Who is this for?
+
+- Developers who want full control over content modeling
+- Backend-first or API-driven teams
+- Startups looking for a flexible, open CMS
+- Teams managing datasets, metadata, or configuration-heavy content
+
+---
+
+## 📁 Repository Structure
+
 
 ```
 fountaincms/
@@ -34,9 +77,12 @@ fountaincms/
 ├── .github/       # Issue/PR templates, workflows
 ├── .nvmrc         # Node.js version for development (v22.13.1)
 └── README.md
-```
 
-## Getting Started
+````
+
+---
+
+## 🏁 Getting Started
 
 ### Prerequisites
 
@@ -45,143 +91,138 @@ fountaincms/
 
 ### Install dependencies
 
-At the root of the repository, run:
+At the root of the repository:
 
 ```sh
 npm install
-```
+````
 
-This will install dependencies for both frontend and backend using npm workspaces.
+This installs dependencies for both frontend and backend using npm workspaces.
 
-### Running the whole project (frontend + backend)
+---
+
+## ▶️ Running the Project
+
+### Run frontend + backend together
 
 ```sh
 npm run dev
 ```
 
-This will start both the frontend and backend in parallel using `concurrently`.
+Starts both services in parallel using `concurrently`.
 
-### Running the Frontend only
+### Run Frontend only
 
 ```sh
 npm run dev:frontend
 ```
 
-### Running the Backend only
+### Run Backend only
 
 ```sh
 npm run dev:backend
 ```
 
-### API Documentation (Swagger) (Available after task completion [#20](https://github.com/building-for-fun/fountainCms/issues/20))
+---
 
-Once the backend is running, visit:
+## 📚 API Documentation (Swagger)
+
+Once the backend is running:
 
 ```
 http://localhost:4000/api-docs
 ```
 
-for interactive API docs (NestJS Swagger).
+---
 
-## Git Commit Message Template
+## 🧪 Linting, Formatting, and Testing
 
-To help you write consistent commit messages, a template is provided in `.gitmessage` following the Conventional Commits
-standard.
+* Linting and formatting are enforced via **Husky** and **lint-staged**
+* Run all tests:
 
-### Set up the default commit message template:
+  ```sh
+  npm test
+  ```
+* Pre-commit hooks will block commits if checks fail
+
+---
+
+## 📝 Git Commit Message Template
+
+This project follows **Conventional Commits**.
+
+### Enable commit template locally
 
 ```sh
 git config --local commit.template .gitmessage
 ```
 
-This will prompt you with the template when you run `git commit`.
+---
 
-## Linting, Formatting, and Testing
+## 📦 Release Management & Changelog
 
-- Linting and formatting are enforced via Husky and lint-staged for both frontend and backend.
-- Run all tests for both frontend and backend:
-  ```sh
-  npm test
-  ```
-- Pre-commit hooks will block commits if linting, formatting, or tests fail.
-
-## Release Management & Changelog
-
-This project uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
-and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+* Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+* Uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ### Tagging a Release
 
-1. Update `CHANGELOG.md` with changes for the new version.
-2. Commit your changes:
+1. Update `CHANGELOG.md`
+2. Commit:
+
    ```sh
-   git add CHANGELOG.md
    git commit -m "chore(release): update changelog for vX.Y.Z"
    ```
-3. Tag the release:
+3. Tag and push:
+
    ```sh
    git tag vX.Y.Z
-   git push origin vX.Y.Z
+   git push origin vX.Y.Z --follow-tags
    ```
-4. Push your branch and tags:
-   ```sh
-   git push --follow-tags
-   ```
-
-### Example Changelog Entry
-
-See [CHANGELOG.md](./CHANGELOG.md) for the latest changes and release history.
-
-## Contributing & Security
-
-- See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-- See [SECURITY.md](./SECURITY.md) for security policy and reporting vulnerabilities.
-
-## Community & Announcements
-
-### 🚀 Migration Complete!
-
-FountainCMS backend has been successfully migrated from Node.js/Express to NestJS for improved scalability, modularity,
-and type safety.
-
-- All API endpoints are now powered by NestJS.
-- Documentation and developer experience have been enhanced.
-- Release management and changelog are now in place for transparency.
-
-### 🤝 Get Involved!
-
-We welcome contributors of all experience levels:
-
-- Help us build new features and integrations
-- Report and fix bugs
-- Improve documentation and developer experience
-- Review and test code
-
-**How to join:**
-
-- Check [GitHub Issues](https://github.com/building-for-fun/fountainCms/issues) for open tasks and feature requests
-- Start or join discussions in [GitHub Discussions](https://github.com/building-for-fun/fountainCms/discussions)
-- Submit pull requests for improvements
-
-**Connect with us:**
-
-- Star the repo to show your support
-- Share feedback and ideas
-- Join our open source journey!
 
 ---
 
-GitHub: https://github.com/building-for-fun/fountainCms
+## 🤝 Contributing & Security
 
-Feel free to add more details as your project evolves.
+* See [CONTRIBUTING.md](./CONTRIBUTING.md)
+* See [SECURITY.md](./SECURITY.md)
 
-<hr>
-<h2 align = "center">Our Contributors ❤️</h2>
-<div align = "center">
- <h3>Thank you for contributing to our repository</h3>
+---
 
-<p><a href="https://github.com/building-for-fun/RepoStore/contributors">
+## 🌱 Community & Announcements
 
-<p><a href="https://github.com/building-for-fun/fountainCMS/contributors">
-  <img src="https://contrib.rocks/image?repo=building-for-fun/fountainCms" />
-</a></p>
+### 🚀 Migration Complete
+
+The backend has been migrated from **Express to NestJS** for:
+
+* Better scalability and modularity
+* Improved type safety
+* Cleaner architecture
+
+---
+
+### 🤝 Get Involved
+
+We welcome contributors of all experience levels:
+
+* Build features and integrations
+* Fix bugs
+* Improve docs and DX
+* Review and test code
+
+👉 Check:
+
+* [Issues](https://github.com/building-for-fun/fountainCms/issues)
+* [Discussions](https://github.com/building-for-fun/fountainCms/discussions)
+
+---
+
+## ❤️ Our Contributors
+
+<p align="center">
+  <a href="https://github.com/building-for-fun/fountainCMS/contributors">
+    <img src="https://contrib.rocks/image?repo=building-for-fun/fountainCms" />
+  </a>
+</p>
+
+---
+
