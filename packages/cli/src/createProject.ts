@@ -4,7 +4,7 @@ import { execa } from 'execa';
 
 export async function createProject(projectName: string) {
     const targetDir = path.resolve(process.cwd(), projectName);
-    const templateDir = path.resolve(__dirname, 'templates/monorepo');
+    const templateDir = path.resolve(__dirname, '../templates/monorepo');
 
     if (await fs.pathExists(targetDir)) {
         console.error('❌ Directory already exists:', projectName);
