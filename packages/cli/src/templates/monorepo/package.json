@@ -1,0 +1,23 @@
+{
+  "name": "create-fountaincms",
+  "version": "0.0.1",
+  "private": true,
+  "description": "CLI to scaffold a new FountainCMS project",
+  "bin": {
+    "create-fountaincms": "dist/index.js"
+  },
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "execa": "^9.6.0",
+    "fs-extra": "^11.3.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
