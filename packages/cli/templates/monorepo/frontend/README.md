@@ -3,6 +3,7 @@
 🚧 Frontend is not initialized yet.
 
 Planned stack:
+
 - React
 - Vite
 - TailwindCSS

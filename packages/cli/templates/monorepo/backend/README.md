@@ -3,6 +3,7 @@
 🚧 Backend is not initialized yet.
 
 Planned stack:
+
 - NestJS
 - Prisma
 - PostgreSQL

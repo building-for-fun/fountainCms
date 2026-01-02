@@ -6,7 +6,6 @@
 
 Fixes # (issue)
 
-
 ## Type of Change
 
 - [ ] Bug fix
@@ -28,7 +27,6 @@ Fixes # (issue)
 - [ ] Any dependent changes have been merged and published in downstream modules
 
 ## Screenshots (if applicable)
-
 
 ## Additional Context
 
