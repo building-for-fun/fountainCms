@@ -9,11 +9,13 @@
   "private": true,
   "workspaces": [
     "frontend",
-    "backend"
+    "backend",
+    "packages/*"
   ],
   "scripts": {
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run start:dev --workspace=backend",
+    "create:cms": "npm run dev --workspace packages/cli",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "test:frontend": "npm run test --workspace=frontend",
     "test:backend": "npm run test --workspace=backend",
