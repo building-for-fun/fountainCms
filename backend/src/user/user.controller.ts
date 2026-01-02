@@ -30,9 +30,9 @@ export class UserController {
     description: 'Return all users.',
     type: UserDetailsDto,
   })
-  async getAll(): Promise<{ data: User | null }> {
+  async getAll(): Promise<{ data: User[] | null }> {
     const users = await this.userService.getAll();
-    return { data: users.length > 0 ? users[0] : null };
+    return { data: users.length > 0 ? users : null };
   }
 
   @Get(':id')
