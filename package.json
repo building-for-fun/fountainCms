@@ -29,6 +29,8 @@
   "devDependencies": {
     "@commitlint/cli": "^20.0.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
     "autoprefixer": "^10.4.21",
@@ -42,5 +44,12 @@
     "prettier": "^3.6.2",
     "prisma": "^6.19.0",
     "tailwindcss": "^4.1.14"
+  },
+  "dependencies": {
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
+    "cookie-parser": "^1.4.7",
+    "passport-jwt": "^4.0.1"
+
   }
 }
