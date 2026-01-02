@@ -50,5 +50,6 @@
     "@nestjs/passport": "^11.0.5",
     "cookie-parser": "^1.4.7",
     "passport-jwt": "^4.0.1"
+
   }
 }
