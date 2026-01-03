@@ -1,0 +1,17 @@
+name: Discord Notifications
+
+on:
+  push:
+  pull_request:
+  issues:
+  release:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        uses: Ilshidur/action-discord@v2
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: FountainCMS Bot
