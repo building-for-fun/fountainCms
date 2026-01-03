@@ -1,22 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../components/Layouts/AdminLayout';
 import { Link } from 'react-router-dom';
-
-interface User {
-  id: string;
-  bookmark: any;
-  user: string;
-  role: any;
-  collection: string;
-  search: any;
-  layout: string;
-  layout_query: any;
-  layout_options: any;
-  refresh_interval: any;
-  filter: any;
-  icon: string;
-  color: any;
-}
+import type { User } from '../types/user';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -29,15 +14,14 @@ export default function AdminUserListPage() {
     fetch(`${apiBaseUrl}/api/user`)
       .then((res) => res.json())
       .then((data) => {
-        // The API returns { data: user } (single user or null)
-        if (data && data.data) {
-          setUsers([data.data]);
+        if (Array.isArray(data?.data)) {
+          setUsers(data.data);
         } else {
           setUsers([]);
         }
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError('Failed to fetch users');
         setLoading(false);
       });
@@ -73,7 +57,7 @@ export default function AdminUserListPage() {
                     </Link>
                   </td>
                   <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
-                    {user.role ?? '-'}
+                    {user.role?.name ?? '-'}
                   </td>
                   <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
                     {user.collection}
