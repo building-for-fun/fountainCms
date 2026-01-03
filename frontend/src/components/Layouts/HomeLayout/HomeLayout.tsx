@@ -4,19 +4,13 @@ import { Footer } from './Footer';
 
 const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
+    className="mx-auto min-h-screen flex flex-col"
     style={{
-      minHeight: '100vh',
-      display: 'flex',
-      margin: 'auto',
-      flexDirection: 'column',
-      fontFamily: 'Inter, sans-serif',
       background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-primary-light) 100%)',
-      color: 'var(--color-text)',
     }}
   >
     <Header />
-
-    <main style={{ flex: 1, padding: '2rem 0' }}>{children}</main>
+    <main>{children}</main>
     <Footer />
   </div>
 );

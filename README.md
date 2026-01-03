@@ -11,6 +11,7 @@ This repository is organized as a **monorepo** containing both the **frontend (R
 FountainCMS focuses on **explicit content modeling and API-first delivery**.
 
 Instead of tightly coupling content with presentation, it treats content as **structured data**, allowing teams to:
+
 - Define clear schemas for content and datasets
 - Validate and manage data centrally
 - Serve content securely through APIs
@@ -23,10 +24,12 @@ It is built for teams that care about **data quality, strong contracts, and long
 ## 🎯 Why FountainCMS?
 
 Most CMS platforms are either:
-- Too rigid for real-world, evolving data models  
-- Too abstract, hiding important data decisions behind UI layers  
+
+- Too rigid for real-world, evolving data models
+- Too abstract, hiding important data decisions behind UI layers
 
 FountainCMS solves this by:
+
 - Making schemas **explicit and versionable**
 - Encouraging **clean separation of concerns**
 - Prioritizing **developer control and predictability**
@@ -45,7 +48,6 @@ This makes it especially useful for **data-heavy products, dashboards, internal 
 ---
 
 ## 📁 Repository Structure
-
 
 ```
 fountaincms/
@@ -78,7 +80,7 @@ fountaincms/
 ├── .nvmrc         # Node.js version for development (v22.13.1)
 └── README.md
 
-````
+```
 
 ---
 
@@ -95,7 +97,7 @@ At the root of the repository:
 
 ```sh
 npm install
-````
+```
 
 This installs dependencies for both frontend and backend using npm workspaces.
 
@@ -137,13 +139,14 @@ http://localhost:4000/api-docs
 
 ## 🧪 Linting, Formatting, and Testing
 
-* Linting and formatting are enforced via **Husky** and **lint-staged**
-* Run all tests:
+- Linting and formatting are enforced via **Husky** and **lint-staged**
+- Run all tests:
 
   ```sh
   npm test
   ```
-* Pre-commit hooks will block commits if checks fail
+
+- Pre-commit hooks will block commits if checks fail
 
 ---
 
@@ -161,8 +164,8 @@ git config --local commit.template .gitmessage
 
 ## 📦 Release Management & Changelog
 
-* Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
-* Uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+- Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+- Uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ### Tagging a Release
 
@@ -172,6 +175,7 @@ git config --local commit.template .gitmessage
    ```sh
    git commit -m "chore(release): update changelog for vX.Y.Z"
    ```
+
 3. Tag and push:
 
    ```sh
@@ -183,8 +187,8 @@ git config --local commit.template .gitmessage
 
 ## 🤝 Contributing & Security
 
-* See [CONTRIBUTING.md](./CONTRIBUTING.md)
-* See [SECURITY.md](./SECURITY.md)
+- See [CONTRIBUTING.md](./CONTRIBUTING.md)
+- See [SECURITY.md](./SECURITY.md)
 
 ---
 
@@ -194,9 +198,9 @@ git config --local commit.template .gitmessage
 
 The backend has been migrated from **Express to NestJS** for:
 
-* Better scalability and modularity
-* Improved type safety
-* Cleaner architecture
+- Better scalability and modularity
+- Improved type safety
+- Cleaner architecture
 
 ---
 
@@ -204,15 +208,15 @@ The backend has been migrated from **Express to NestJS** for:
 
 We welcome contributors of all experience levels:
 
-* Build features and integrations
-* Fix bugs
-* Improve docs and DX
-* Review and test code
+- Build features and integrations
+- Fix bugs
+- Improve docs and DX
+- Review and test code
 
 👉 Check:
 
-* [Issues](https://github.com/building-for-fun/fountainCms/issues)
-* [Discussions](https://github.com/building-for-fun/fountainCms/discussions)
+- [Issues](https://github.com/building-for-fun/fountainCms/issues)
+- [Discussions](https://github.com/building-for-fun/fountainCms/discussions)
 
 ---
 
@@ -225,4 +229,3 @@ We welcome contributors of all experience levels:
 </p>
 
 ---
-

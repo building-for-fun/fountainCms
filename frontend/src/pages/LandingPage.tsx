@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { PRIMARY_COLOR } from '../helper/constant';
 import HomeLayout from '../components/Layouts/HomeLayout/HomeLayout';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
@@ -35,120 +34,43 @@ export default function LandingPage() {
 
   return (
     <HomeLayout>
-      <div
-        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300"
-        style={{
-          paddingLeft: window.innerWidth < 640 ? '1rem' : '2rem',
-          paddingRight: window.innerWidth < 640 ? '1rem' : '2rem',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            padding: '3rem 0',
-          }}
-        >
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: '1.5rem',
-              boxShadow: '0 8px 32px rgba(99,102,241,0.08)',
-              maxWidth: 700,
-              margin: 'auto',
-              padding: '2.5rem 2rem',
-            }}
-          >
-            <h1
-              style={{
-                fontSize: '2.8rem',
-                fontWeight: 800,
-                color: PRIMARY_COLOR,
-                marginBottom: '0.5rem',
-                letterSpacing: '-1px',
-              }}
-            >
-              FountainCMS
-            </h1>
-            <p style={{ fontSize: '1.25rem', color: '#334155', marginBottom: '2rem' }}>
-              A modern, API-driven content management system for JAMstack and beyond.
-            </p>
-            <h2
-              style={{
-                fontSize: '1.4rem',
-                color: PRIMARY_COLOR,
-                marginBottom: '0.5rem',
-                marginTop: '2rem',
-              }}
-            >
-              🚀 Content
+      <div className="flex flex-col items-center justify-center  bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 px-4 sm:px-6 lg:px-8 py-12">
+        <div className="px-8 py-10 sm:px-12 sm:py-12">
+          <h1 className="text-5xl sm:text-6xl font-black text-indigo-600 mb-2 leading-tight">
+            FountainCMS
+          </h1>
+          <p className="text-xl text-slate-600 mb-8 leading-relaxed">
+            A modern, API-driven content management system for JAMstack and beyond.
+          </p>
+
+          <div className="mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-6 flex items-center">
+              <span className="mr-3">🚀</span>
+              Content
             </h2>
+
             {loading ? (
-              <p>Loading...</p>
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                <span className="ml-3 text-slate-600">Loading...</span>
+              </div>
             ) : (
-              <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
-                {contents?.FEATURES_TEXT.map((feature, idx) => (
-                  <li
-                    key={feature}
-                    style={{
-                      marginBottom: '0.75rem',
-                      fontSize: '1.1rem',
-                      color: '#475569',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        width: 24,
-                        height: 24,
-                        background: PRIMARY_COLOR,
-                        borderRadius: '50%',
-                        color: '#fff',
-                        textAlign: 'center',
-                        marginRight: 12,
-                        fontWeight: 700,
-                        fontSize: '1rem',
-                        lineHeight: '24px',
-                      }}
-                    >
+              <ul className="space-y-3">
+                {contents?.FEATURES_TEXT.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-slate-700 text-lg">
+                    <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-indigo-600 text-white font-bold text-sm mt-1">
                       ✓
                     </span>
-                    {feature}
+                    <span className="pt-0.5">{feature}</span>
                   </li>
                 ))}
-                {contents?.GETTING_STARTED ? (
-                  <li
-                    key={'getting started'}
-                    style={{
-                      marginBottom: '0.75rem',
-                      fontSize: '1.1rem',
-                      color: '#475569',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        width: 24,
-                        height: 24,
-                        background: PRIMARY_COLOR,
-                        borderRadius: '50%',
-                        color: '#fff',
-                        textAlign: 'center',
-                        marginRight: 12,
-                        fontWeight: 700,
-                        fontSize: '1rem',
-                        lineHeight: '24px',
-                      }}
-                    >
+                {contents?.GETTING_STARTED && (
+                  <li className="flex items-start gap-3 text-slate-700 text-lg">
+                    <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-indigo-600 text-white font-bold text-sm mt-1">
                       ✓
                     </span>
-                    {contents?.GETTING_STARTED}
+                    <span className="pt-0.5">{contents.GETTING_STARTED}</span>
                   </li>
-                ) : (
-                  <></>
                 )}
               </ul>
             )}

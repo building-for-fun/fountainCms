@@ -1,10 +1,10 @@
 name: Monorepo Tests
 
 on:
-  pull_request: 
-    branches: [main, develop, "feature/**"]
+  pull_request:
+    branches: [main, develop, 'feature/**']
   push:
-    branches: [main, develop, "feature/**"]
+    branches: [main, develop, 'feature/**']
 
 jobs:
   run-tests:
