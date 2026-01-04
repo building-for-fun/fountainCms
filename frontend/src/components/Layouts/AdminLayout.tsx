@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const adminNavItems = [
   { to: '/admin', icon: '🛠️', label: 'Dashboard' },
@@ -69,7 +69,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
-        {/* Sidebar */}
         <nav
           style={{
             width: 240,
@@ -91,7 +90,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           {/* Logo (Desktop only) */}
           {!isMobile && (
-            <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 8 }}>
+            <div
+              style={{
+                marginBottom: '2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                paddingLeft: 8,
+              }}
+            >
               <div
                 style={{
                   width: 32,
@@ -181,7 +188,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </nav>
 
-        {/* Main Content */}
         <main
           style={{
             flex: 1,

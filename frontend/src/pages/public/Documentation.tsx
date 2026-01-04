@@ -1,6 +1,6 @@
 import React from 'react';
-import { GETTING_STARTED, INSTALLATION_STEPS, API_REFERENCES } from './../helper/constant';
-import HomeLayout from '../components/Layouts/HomeLayout/HomeLayout';
+import { API_REFERENCES, GETTING_STARTED, INSTALLATION_STEPS } from '../../helper/constant';
+import HomeLayout from '../../components/Layouts/HomeLayout/HomeLayout';
 
 const Documentation: React.FC = () => (
   <HomeLayout>

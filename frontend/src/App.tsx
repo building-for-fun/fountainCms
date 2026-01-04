@@ -1,17 +1,17 @@
-import LandingPage from './pages/LandingPage';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Documentation from './pages/Documenation';
+import LandingPage from './pages/public/LandingPage';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Documentation from './pages/public/Documentation';
 import AdminPage from './pages/AdminPage';
 import AdminUserListPage from './pages/AdminUserListPage';
 import AdminUserDetailPage from './pages/AdminUserDetailPage';
-import LoginPage from './pages/LoginPage';
+import LoginPage from './pages/public/LoginPage';
 import { FountainThemeProvider } from './theme/ThemeProvider';
 import AdminContentTypesPage from './pages/AdminContentTypesPage';
 import AdminEntriesPage from './pages/AdminEntriesPage';
-import AdminMediaPage from './pages/AdminMediaPage';
+import MediaLibrary from './pages/admin/MediaLibrary';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminRolesPage from './pages/AdminRolesPage';
-import AdminLogsPage from './pages/AdminLogsPage';
+import ActivityLogs from './pages/admin/ActivityLogs';
 import AdminProfilePage from './pages/AdminProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 import InternalServerErrorPage from './pages/InternalServerErrorPage';
@@ -29,10 +29,10 @@ export default function App() {
             <Route path="users/:id" element={<AdminUserDetailPage />} />
             <Route path="content-types" element={<AdminContentTypesPage />} />
             <Route path="entries" element={<AdminEntriesPage />} />
-            <Route path="media" element={<AdminMediaPage />} />
+            <Route path="media" element={<MediaLibrary />} />
             <Route path="settings" element={<AdminSettingsPage />} />
             <Route path="roles" element={<AdminRolesPage />} />
-            <Route path="logs" element={<AdminLogsPage />} />
+            <Route path="logs" element={<ActivityLogs />} />
             <Route path="profile" element={<AdminProfilePage />} />
           </Route>
           <Route path="/" element={<LandingPage />} />

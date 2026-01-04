@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import HomeLayout from '../components/Layouts/HomeLayout/HomeLayout';
+import HomeLayout from '../../components/Layouts/HomeLayout/HomeLayout';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 

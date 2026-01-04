@@ -1,7 +1,7 @@
 import React from 'react';
-import AdminLayout from '../components/Layouts/AdminLayout';
+import AdminLayout from '../../components/Layouts/AdminLayout';
 
-const AdminLogsPage = () => (
+const ActivityLogs = () => (
   <AdminLayout>
     <div style={{ padding: '2rem' }}>
       <h1>Activity Logs</h1>
@@ -10,4 +10,4 @@ const AdminLogsPage = () => (
   </AdminLayout>
 );
 
-export default AdminLogsPage;
+export default ActivityLogs;
