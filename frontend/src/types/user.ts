@@ -1,13 +1,14 @@
 export interface Role {
-  name: string;
+  name: string | null;
 }
 
 export interface User {
   id: string;
-  user: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isActive?: boolean;
   role?: Role;
-  collection: string;
-  layout: string;
-  icon: string;
-  color?: string;
+  permissions: string[];
 }

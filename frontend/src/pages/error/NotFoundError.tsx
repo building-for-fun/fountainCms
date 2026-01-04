@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function NotFoundPage() {
+export default function NotFoundError() {
   const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">

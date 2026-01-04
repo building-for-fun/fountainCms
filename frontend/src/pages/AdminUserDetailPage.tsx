@@ -1,24 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../components/Layouts/AdminLayout';
-
-interface User {
-  id: string;
-  bookmark: any;
-  user: string;
-  role: any;
-  collection: string;
-  search: any;
-  layout: string;
-  layout_query: any;
-  layout_options: any;
-  refresh_interval: any;
-  filter: any;
-  icon: string;
-  color: any;
-  // permisssions is optional and may be saved by frontend
-  permissions?: string[];
-}
+import { User } from '../types/user';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -56,7 +39,7 @@ export default function AdminUserDetailPage() {
         if ((data as any).permissions && Array.isArray((data as any).permissions)) {
           for (const p of (data as any).permissions) perms[p] = true;
         }
-        if (data.role === 'admin') perms.admin = true;
+        if (data.role?.name === 'admin') perms.admin = true;
         // default read for all users
         perms.read = true;
         setPermissions(perms);
@@ -82,9 +65,8 @@ export default function AdminUserDetailPage() {
       .map(([k]) => k);
     const updated: Partial<User> = {
       ...user,
-      // persist permissions array; backend will accept arbitrary fields
       permissions: permsArray,
-      role: permissions.admin ? 'admin' : null,
+      role: { name: permissions.admin ? 'admin' : null },
     };
 
     try {
@@ -133,10 +115,16 @@ export default function AdminUserDetailPage() {
               <strong>ID:</strong> <span>{user.id}</span>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>User:</strong> <span>{user.user}</span>
+              <strong>Firstname:</strong> <span>{user.firstName}</span>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>Role:</strong> <span>{user.role ?? '-'}</span>
+              <strong>Lastname:</strong> <span>{user.lastName}</span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>Username:</strong> <span>{user.username}</span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>Role:</strong> <span>{user?.role?.name ?? '-'}</span>
             </div>
 
             <section style={{ marginTop: 8 }}>

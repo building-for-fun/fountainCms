@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -12,7 +13,7 @@ async function main() {
     },
   });
 
-  const userRole = await prisma.role.upsert({
+  await prisma.role.upsert({
     where: { name: 'user' },
     update: {},
     create: {
@@ -23,30 +24,20 @@ async function main() {
   });
 
   await prisma.user.upsert({
-    where: { user: 'admin' },
+    where: { username: 'admin' },
     update: {},
     create: {
-      user: 'admin',
-      collection: '',
-      layout: 'default',
-      refresh_interval: null,
-      icon: 'user',
-      color: null,
+      username: 'admin',
       role: { connect: { id: admin.id } },
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com',
+      isActive: false,
     },
   });
-
-  await prisma.content.createMany({
-    data: [
-      { title: 'Welcome', body: 'Welcome to FountainCMS' },
-      { title: 'Getting Started', body: 'Follow the docs to get started' },
-    ],
-  });
-
   await prisma.$disconnect();
 }
 
 main().catch(async (e) => {
   await prisma.$disconnect();
-  process.exit(1);
 });

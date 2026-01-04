@@ -8,26 +8,30 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  user      String   @unique
-  roleId    String?
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName String   @db.VarChar(255)
+  lastName  String   @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  roleId    String?  @db.Uuid
   role      Role?    @relation(fields: [roleId], references: [id])
+  username  String   @unique
+  isActive  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Role {
-  id          String   @id @default(uuid())
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String   @unique
-  description String?
+  description String?  @db.VarChar(255)
   permissions String[]
   users       User[]
 }
 
 model ContentItem {
-  id         String   @id @default(uuid())
-  collection String
-  data       Json
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  collection String   @db.VarChar(255)
+  data       Json     @db.Json
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
