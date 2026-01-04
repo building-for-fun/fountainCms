@@ -1,25 +1,47 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { ContentService, ContentDto, ContentItem } from './content.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { ContentService } from './content.service';
 
-@Controller('content')
+@Controller('content/collections')
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
-  @Get()
-  async getAll(): Promise<{ items: ContentItem[] } & Record<string, unknown>> {
-    const result = await this.contentService.getAll();
-    return result;
+  @Get(':collection')
+  getMany(@Param('collection') collection: string) {
+    return this.contentService.findMany(collection);
   }
 
-  @Get(':key')
-  async getByKey(@Param('key') key: string): Promise<unknown> {
-    const item = await this.contentService.getByKey(key);
-    return item;
+  @Get(':collection/:id')
+  getOne(@Param('collection') collection: string, @Param('id') id: string) {
+    return this.contentService.findOne(collection, id);
   }
 
-  @Post()
-  async create(@Body() body: ContentDto): Promise<ContentItem> {
-    const created = await this.contentService.create(body);
-    return created;
+  @Post(':collection')
+  create(
+    @Param('collection') collection: string,
+    @Body() payload: Record<string, unknown>,
+  ) {
+    return this.contentService.create(collection, payload);
+  }
+
+  @Patch(':collection/:id')
+  update(
+    @Param('collection') collection: string,
+    @Param('id') id: string,
+    @Body() payload: Record<string, unknown>,
+  ) {
+    return this.contentService.update(collection, id, payload);
+  }
+
+  @Delete(':collection/:id')
+  delete(@Param('collection') collection: string, @Param('id') id: string) {
+    return this.contentService.delete(collection, id);
   }
 }

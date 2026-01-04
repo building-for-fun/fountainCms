@@ -1,0 +1,17 @@
+{
+  "collections": {
+    "posts": {
+      "label": "Posts",
+      "fields": {
+        "title": {
+          "type": "string",
+          "required": true
+        },
+        "published": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

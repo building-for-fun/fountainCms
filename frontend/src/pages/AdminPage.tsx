@@ -38,10 +38,20 @@ function StatCard({
       }}
     >
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
           {title}
         </div>
-        <div style={{ fontSize: 32, fontWeight: 700, marginTop: 8, color: 'var(--color-text)' }}>{value}</div>
+        <div style={{ fontSize: 32, fontWeight: 700, marginTop: 8, color: 'var(--color-text)' }}>
+          {value}
+        </div>
       </div>
       <div style={{ marginTop: 16 }}>{children}</div>
     </div>
@@ -60,7 +70,14 @@ function Sparkline({ data, color = 'var(--color-primary)' }: { data: number[]; c
 
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden style={{ overflow: 'visible' }}>
-      <polyline fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" points={points} />
+      <polyline
+        fill="none"
+        stroke={color}
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        points={points}
+      />
     </svg>
   );
 }
@@ -116,11 +133,13 @@ export default function AdminPage() {
             alignItems: 'center',
             marginBottom: 32,
             borderBottom: '1px solid var(--color-border)',
-            paddingBottom: 20
+            paddingBottom: 20,
           }}
         >
           <div>
-            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: 'var(--color-text)' }}>Admin Dashboard</h1>
+            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: 'var(--color-text)' }}>
+              Admin Dashboard
+            </h1>
             <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: 14 }}>
               Welcome back, here is what is happening today.
             </p>
@@ -141,7 +160,9 @@ export default function AdminPage() {
                 fontWeight: 500,
                 transition: 'background 0.2s',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')
+              }
               onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-primary)')}
             >
               Refresh Stats
@@ -167,7 +188,11 @@ export default function AdminPage() {
         </div>
 
         <div style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: 'var(--color-text)' }}>Overview</h2>
+          <h2
+            style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: 'var(--color-text)' }}
+          >
+            Overview
+          </h2>
           <div
             style={{
               display: 'grid',
@@ -187,7 +212,11 @@ export default function AdminPage() {
                 }}
               >
                 <Sparkline data={sparkDataUsers} />
-                <div style={{ fontSize: 13, color: 'var(--color-success, #10b981)', fontWeight: 500 }}>+12%</div>
+                <div
+                  style={{ fontSize: 13, color: 'var(--color-success, #10b981)', fontWeight: 500 }}
+                >
+                  +12%
+                </div>
               </div>
             </StatCard>
 
@@ -248,39 +277,51 @@ export default function AdminPage() {
                 border: '1px solid var(--color-border)',
               }}
             >
-              <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>New User Signups</h3>
+              <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>
+                New User Signups
+              </h3>
               <ul style={{ margin: 0, padding: 0 }}>
-                {['user-a@example.com', 'user-b@example.com', 'user-c@example.com'].map((email, i) => (
-                  <li
-                    key={i}
-                    style={{
-                      padding: '12px 0',
-                      borderBottom: i < 2 ? '1px solid var(--color-border)' : 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                    }}
-                  >
-                    <div
+                {['user-a@example.com', 'user-b@example.com', 'user-c@example.com'].map(
+                  (email, i) => (
+                    <li
+                      key={i}
                       style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: '50%',
-                        background: 'var(--color-bg)',
+                        padding: '12px 0',
+                        borderBottom: i < 2 ? '1px solid var(--color-border)' : 'none',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 14,
+                        gap: 12,
                       }}
                     >
-                      👤
-                    </div>
-                    <span style={{ color: 'var(--color-text)', fontSize: 14, fontWeight: 500 }}>{email}</span>
-                    <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--color-text-muted)' }}>
-                      {Math.floor(Math.random() * 24)}h ago
-                    </span>
-                  </li>
-                ))}
+                      <div
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '50%',
+                          background: 'var(--color-bg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 14,
+                        }}
+                      >
+                        👤
+                      </div>
+                      <span style={{ color: 'var(--color-text)', fontSize: 14, fontWeight: 500 }}>
+                        {email}
+                      </span>
+                      <span
+                        style={{
+                          marginLeft: 'auto',
+                          fontSize: 12,
+                          color: 'var(--color-text-muted)',
+                        }}
+                      >
+                        {Math.floor(Math.random() * 24)}h ago
+                      </span>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
 
@@ -294,16 +335,27 @@ export default function AdminPage() {
                 border: '1px solid var(--color-border)',
               }}
             >
-              <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600 }}>Storage Distribution</h3>
+              <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600 }}>
+                Storage Distribution
+              </h3>
               <p style={{ margin: '0 0 20px', color: 'var(--color-text-muted)', fontSize: 13 }}>
                 Breakdown of resource usage
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 6 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: 14,
+                      marginBottom: 6,
+                    }}
+                  >
                     <span style={{ fontWeight: 500 }}>Images</span>
-                    <span style={{ color: 'var(--color-text-muted)' }}>{Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)}%</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>
+                      {Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)}%
+                    </span>
                   </div>
                   <div
                     style={{
@@ -328,7 +380,14 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 6 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: 14,
+                      marginBottom: 6,
+                    }}
+                  >
                     <span style={{ fontWeight: 500 }}>Database</span>
                     <span style={{ color: 'var(--color-text-muted)' }}>15%</span>
                   </div>
@@ -351,7 +410,14 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 6 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: 14,
+                      marginBottom: 6,
+                    }}
+                  >
                     <span style={{ fontWeight: 500 }}>Logs</span>
                     <span style={{ color: 'var(--color-text-muted)' }}>5%</span>
                   </div>

@@ -1,3 +1,4 @@
+@collection = posts
 
 ### Get Home Content
 
@@ -11,3 +12,29 @@ GET http://localhost:4000/api/user
 #### swagger ui
 
 Swagger UI URL: http://localhost:4000/api
+
+###
+
+GET http://localhost:4000/api/content/collection/{{collection}}
+accept: */*
+
+###
+
+POST http://localhost:4000/api/content/collections/{{collection}}
+Content-Type: application/json
+
+{
+  "title": "Single item test"
+}
+
+###
+
+PATCH http://localhost:4000/api/content/collections/{{collection}}/e3d0789e-3d44-4a8d-b29b-a5b9fb9c4f31
+Content-Type: application/json
+
+{
+  "title": "Updated title"
+}
+
+###
+DELETE http://localhost:4000/api/content/collections/{{collection}}/e3d0789e-3d44-4a8d-b29b-a5b9fb9c4f31

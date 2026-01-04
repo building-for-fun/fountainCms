@@ -94,7 +94,13 @@ const AdminProfilePage = () => {
           Manage your account settings and preferences.
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: 24,
+          }}
+        >
           {/* Profile Card */}
           <div
             style={{
@@ -180,7 +186,9 @@ const AdminProfilePage = () => {
                     cursor: 'pointer',
                     transition: 'background 0.2s',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')
+                  }
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-primary)')}
                 >
                   Edit Profile
@@ -218,7 +226,13 @@ const AdminProfilePage = () => {
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: 20,
+              }}
+            >
               <InputGroup
                 label="First Name"
                 name="firstName"
@@ -253,7 +267,13 @@ const AdminProfilePage = () => {
             {isEditing && (
               <div style={{ marginTop: 32 }}>
                 <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Change Password</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                    gap: 20,
+                  }}
+                >
                   <InputGroup
                     label="Current Password"
                     name="currentPassword"
