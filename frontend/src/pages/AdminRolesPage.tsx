@@ -4,7 +4,7 @@ import AdminLayout from '../components/Layouts/AdminLayout';
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
 interface Role {
-  id: string; // Changed to string to match UUID from Prisma
+  id: string;
   name: string;
   description: string;
 }
@@ -12,22 +12,34 @@ interface Role {
 const AdminRolesPage = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Form states
   const [newRole, setNewRole] = useState({ name: '', description: '' });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editRole, setEditRole] = useState({ name: '', description: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // FETCH ROLES
   useEffect(() => {
-    fetch(`${apiBaseUrl}/api/roles`)
-      .then((res) => res.json())
-      .then((data) => {
-        // Backend returns { data: Role[] }
+    const fetchRoles = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch(`${apiBaseUrl}/api/roles`);
+        if (!res.ok) throw new Error('Failed to fetch roles');
+        const data = await res.json();
         setRoles(data.data || []);
+      } catch (err) {
+        setError('Failed to load roles. Please try again.');
+        console.error(err);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => console.error(err));
+      }
+    };
+
+    fetchRoles();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -41,22 +53,30 @@ const AdminRolesPage = () => {
     if (!newRole.name.trim()) return;
 
     try {
+      setIsSubmitting(true);
       const res = await fetch(`${apiBaseUrl}/api/roles`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newRole),
       });
+
+      if (!res.ok) throw new Error('Failed to create role');
+
       const createdRole = await res.json();
       setRoles((prev) => [...prev, createdRole]);
       setNewRole({ name: '', description: '' });
+      setShowCreateForm(false);
     } catch (err) {
+      setError('Failed to create role. Please try again.');
       console.error('Failed to create role', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleEditClick = (role: Role) => {
     setEditingId(role.id);
-    setEditRole({ name: role.name, description: role.description });
+    setEditRole({ name: role.name, description: role.description || '' });
   };
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -67,148 +87,592 @@ const AdminRolesPage = () => {
   // UPDATE ROLE
   const handleEditSave = async (id: string) => {
     try {
+      setIsSubmitting(true);
       const res = await fetch(`${apiBaseUrl}/api/roles/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editRole),
       });
-      const updatedRole = await res.json();
 
+      if (!res.ok) throw new Error('Failed to update role');
+
+      const updatedRole = await res.json();
       setRoles((prev) => prev.map((role) => (role.id === id ? updatedRole : role)));
       setEditingId(null);
     } catch (err) {
+      setError('Failed to update role. Please try again.');
       console.error('Failed to update role', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleEditCancel = () => {
     setEditingId(null);
+    setEditRole({ name: '', description: '' });
   };
 
   // DELETE ROLE
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure?')) return;
+    const roleName = roles.find((r) => r.id === id)?.name || 'this role';
+    if (
+      !window.confirm(
+        `Are you sure you want to delete "${roleName}"? This action cannot be undone.`
+      )
+    )
+      return;
+
     try {
-      await fetch(`${apiBaseUrl}/api/roles/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${apiBaseUrl}/api/roles/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete role');
       setRoles((prev) => prev.filter((role) => role.id !== id));
     } catch (err) {
+      setError('Failed to delete role. Please try again.');
       console.error('Failed to delete role', err);
     }
   };
 
+  const pageStyles: React.CSSProperties = {
+    padding: '2rem',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    minHeight: '100vh',
+  };
+
+  const headerStyles: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '2rem',
+    flexWrap: 'wrap',
+    gap: '1rem',
+  };
+
+  const titleStyles: React.CSSProperties = {
+    fontSize: '2rem',
+    fontWeight: 700,
+    color: 'var(--color-text)',
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+  };
+
+  const buttonStyles = (
+    variant: 'primary' | 'secondary' | 'danger' | 'success'
+  ): React.CSSProperties => {
+    const base: React.CSSProperties = {
+      padding: '0.625rem 1.25rem',
+      borderRadius: 'var(--radius-md)',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '0.875rem',
+      fontWeight: 600,
+      transition: 'all 0.2s ease',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+    };
+
+    switch (variant) {
+      case 'primary':
+        return {
+          ...base,
+          background: 'var(--color-primary)',
+          color: 'var(--color-surface)',
+        };
+      case 'secondary':
+        return {
+          ...base,
+          background: 'var(--color-surface)',
+          color: 'var(--color-text)',
+          border: '1px solid var(--color-border)',
+        };
+      case 'danger':
+        return {
+          ...base,
+          background: 'var(--color-error)',
+          color: 'var(--color-surface)',
+        };
+      case 'success':
+        return {
+          ...base,
+          background: '#10b981',
+          color: 'var(--color-surface)',
+        };
+      default:
+        return base;
+    }
+  };
+
+  const cardStyles: React.CSSProperties = {
+    background: 'var(--color-surface)',
+    borderRadius: 'var(--radius-lg)',
+    padding: '1.5rem',
+    boxShadow: 'var(--shadow-md)',
+    border: '1px solid var(--color-border)',
+    marginBottom: '1.5rem',
+  };
+
+  const inputStyles: React.CSSProperties = {
+    width: '100%',
+    padding: '0.75rem',
+    borderRadius: 'var(--radius-md)',
+    border: '1px solid var(--color-border)',
+    background: 'var(--color-surface)',
+    color: 'var(--color-text)',
+    fontSize: '0.875rem',
+    fontFamily: 'inherit',
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+  };
+
+  const roleCardStyles: React.CSSProperties = {
+    background: 'var(--color-surface)',
+    borderRadius: 'var(--radius-md)',
+    padding: '1.25rem',
+    border: '1px solid var(--color-border)',
+    marginBottom: '1rem',
+    transition: 'all 0.2s ease',
+  };
+
   return (
     <AdminLayout>
-      <div className="max-w-2xl mx-auto p-8 sm:p-12">
-        <h1 className="text-2xl font-bold text-blue-700 mb-6">Roles & Permissions</h1>
+      <div style={pageStyles}>
+        {/* Header */}
+        <div style={headerStyles}>
+          <h1 style={titleStyles}>
+            <span>🔑</span>
+            <span>Roles & Permissions</span>
+          </h1>
+          {!showCreateForm && (
+            <button
+              onClick={() => setShowCreateForm(true)}
+              style={buttonStyles('primary')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.9';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <span>➕</span>
+              <span>Create Role</span>
+            </button>
+          )}
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div
+            style={{
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid var(--color-error)',
+              borderRadius: 'var(--radius-md)',
+              padding: '1rem',
+              marginBottom: '1.5rem',
+              color: 'var(--color-error)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+            }}
+          >
+            <span>⚠️</span>
+            <span>{error}</span>
+            <button
+              onClick={() => setError(null)}
+              style={{
+                marginLeft: 'auto',
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-error)',
+                cursor: 'pointer',
+                fontSize: '1.25rem',
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         {/* Create Role Form */}
-        <form
-          onSubmit={handleAddRole}
-          className="bg-white rounded-xl shadow p-6 mb-8 border border-blue-100"
-        >
-          <h2 className="text-lg font-semibold mb-4">Create New Role</h2>
-          <div className="mb-3">
-            <label className="block font-medium mb-1">Role Name</label>
-            <input
-              type="text"
-              name="name"
-              value={newRole.name}
-              onChange={handleInputChange}
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
+        {showCreateForm && (
+          <div style={cardStyles}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 600,
+                  color: 'var(--color-text)',
+                  margin: 0,
+                }}
+              >
+                Create New Role
+              </h2>
+              <button
+                onClick={() => {
+                  setShowCreateForm(false);
+                  setNewRole({ name: '', description: '' });
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-text-muted)',
+                  cursor: 'pointer',
+                  fontSize: '1.5rem',
+                  padding: '0.25rem',
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={handleAddRole}>
+              <div style={{ marginBottom: '1rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: 'var(--color-text)',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  Role Name <span style={{ color: 'var(--color-error)' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={newRole.name}
+                  onChange={handleInputChange}
+                  style={inputStyles}
+                  placeholder="e.g., Administrator, Editor, Viewer"
+                  required
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-primary)';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: 'var(--color-text)',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={newRole.description}
+                  onChange={handleInputChange}
+                  style={{
+                    ...inputStyles,
+                    minHeight: '100px',
+                    resize: 'vertical',
+                    fontFamily: 'inherit',
+                  }}
+                  placeholder="Describe the role's permissions and responsibilities..."
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-primary)';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    setNewRole({ name: '', description: '' });
+                  }}
+                  style={buttonStyles('secondary')}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={buttonStyles('primary')}
+                  disabled={isSubmitting || !newRole.name.trim()}
+                  onMouseEnter={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.opacity = '0.9';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.opacity = '1';
+                    }
+                  }}
+                >
+                  {isSubmitting ? '⏳ Creating...' : '✅ Create Role'}
+                </button>
+              </div>
+            </form>
           </div>
-          <div className="mb-3">
-            <label className="block font-medium mb-1">Description</label>
-            <textarea
-              name="description"
-              value={newRole.description}
-              onChange={handleInputChange}
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              rows={2}
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition font-semibold"
-          >
-            Add Role
-          </button>
-        </form>
+        )}
 
         {/* Roles List */}
-        <div className="bg-white rounded-xl shadow p-6 border border-blue-100">
-          <h2 className="text-lg font-semibold mb-4">Existing Roles</h2>
+        <div style={cardStyles}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1.5rem',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: '1.25rem',
+                fontWeight: 600,
+                color: 'var(--color-text)',
+                margin: 0,
+              }}
+            >
+              Existing Roles
+            </h2>
+            <span
+              style={{
+                fontSize: '0.875rem',
+                color: 'var(--color-text-muted)',
+                background: 'var(--color-bg)',
+                padding: '0.25rem 0.75rem',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              {roles.length} {roles.length === 1 ? 'role' : 'roles'}
+            </span>
+          </div>
+
           {loading ? (
-            <p>Loading...</p>
+            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+              <div>Loading roles...</div>
+            </div>
           ) : roles.length === 0 ? (
-            <div className="text-gray-500">No roles found.</div>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '3rem',
+                color: 'var(--color-text-muted)',
+              }}
+            >
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔐</div>
+              <div
+                style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 500,
+                  marginBottom: '0.5rem',
+                  color: 'var(--color-text)',
+                }}
+              >
+                No roles found
+              </div>
+              <div style={{ marginBottom: '1.5rem' }}>Get started by creating your first role.</div>
+              {!showCreateForm && (
+                <button onClick={() => setShowCreateForm(true)} style={buttonStyles('primary')}>
+                  <span>➕</span>
+                  <span>Create Your First Role</span>
+                </button>
+              )}
+            </div>
           ) : (
-            <ul className="space-y-4">
+            <div>
               {roles.map((role) => (
-                <li
+                <div
                   key={role.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3 last:border-b-0 last:pb-0"
+                  style={roleCardStyles}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-primary)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
                   {editingId === role.id ? (
-                    <div className="flex-1 flex flex-col gap-2">
-                      <input
-                        type="text"
-                        name="name"
-                        value={editRole.name}
-                        onChange={handleEditChange}
-                        className="border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 font-semibold"
-                      />
-                      <textarea
-                        name="description"
-                        value={editRole.description}
-                        onChange={handleEditChange}
-                        className="border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        rows={2}
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex-1">
-                      <div className="font-semibold text-blue-800">{role.name}</div>
-                      <div className="text-gray-600 text-sm">{role.description}</div>
-                    </div>
-                  )}
-                  <div className="flex gap-2 mt-2 sm:mt-0">
-                    {editingId === role.id ? (
-                      <>
-                        <button
-                          onClick={() => handleEditSave(role.id)}
-                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition text-sm font-semibold"
+                    <div>
+                      <div style={{ marginBottom: '1rem' }}>
+                        <label
+                          style={{
+                            display: 'block',
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            color: 'var(--color-text)',
+                            marginBottom: '0.5rem',
+                          }}
                         >
-                          Save
-                        </button>
+                          Role Name <span style={{ color: 'var(--color-error)' }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={editRole.name}
+                          onChange={handleEditChange}
+                          style={inputStyles}
+                          required
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--color-primary)';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--color-border)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        />
+                      </div>
+                      <div style={{ marginBottom: '1rem' }}>
+                        <label
+                          style={{
+                            display: 'block',
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            color: 'var(--color-text)',
+                            marginBottom: '0.5rem',
+                          }}
+                        >
+                          Description
+                        </label>
+                        <textarea
+                          name="description"
+                          value={editRole.description}
+                          onChange={handleEditChange}
+                          style={{
+                            ...inputStyles,
+                            minHeight: '80px',
+                            resize: 'vertical',
+                            fontFamily: 'inherit',
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--color-primary)';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--color-border)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                         <button
                           onClick={handleEditCancel}
-                          className="bg-gray-300 text-gray-800 px-3 py-1 rounded hover:bg-gray-400 transition text-sm font-semibold"
+                          style={buttonStyles('secondary')}
+                          disabled={isSubmitting}
                         >
                           Cancel
                         </button>
-                      </>
-                    ) : (
-                      <>
+                        <button
+                          onClick={() => handleEditSave(role.id)}
+                          style={buttonStyles('success')}
+                          disabled={isSubmitting || !editRole.name.trim()}
+                        >
+                          {isSubmitting ? '⏳' : '💾'} Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: '1rem',
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            fontSize: '1.125rem',
+                            fontWeight: 600,
+                            color: 'var(--color-text)',
+                            marginBottom: '0.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                          }}
+                        >
+                          <span>🛡️</span>
+                          <span>{role.name}</span>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '0.875rem',
+                            color: 'var(--color-text-muted)',
+                            lineHeight: 1.6,
+                          }}
+                        >
+                          {role.description || (
+                            <span style={{ fontStyle: 'italic', opacity: 0.6 }}>
+                              No description provided
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
                         <button
                           onClick={() => handleEditClick(role)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-sm font-semibold"
+                          style={{
+                            ...buttonStyles('secondary'),
+                            padding: '0.5rem 1rem',
+                            fontSize: '0.8125rem',
+                          }}
+                          title="Edit role"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--color-primary)';
+                            e.currentTarget.style.color = 'var(--color-surface)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'var(--color-surface)';
+                            e.currentTarget.style.color = 'var(--color-text)';
+                          }}
                         >
-                          Edit
+                          ✏️ Edit
                         </button>
                         <button
                           onClick={() => handleDelete(role.id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition text-sm font-semibold"
+                          style={{
+                            ...buttonStyles('danger'),
+                            padding: '0.5rem 1rem',
+                            fontSize: '0.8125rem',
+                          }}
+                          title="Delete role"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.opacity = '0.9';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.opacity = '1';
+                          }}
                         >
-                          Delete
+                          🗑️ Delete
                         </button>
-                      </>
-                    )}
-                  </div>
-                </li>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </div>
