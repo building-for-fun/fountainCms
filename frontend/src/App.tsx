@@ -1,10 +1,10 @@
-import LandingPage from './pages/public/LandingPage';
+import Landing from './pages/public/Landing';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Documentation from './pages/public/Documentation';
 import AdminPage from './pages/AdminPage';
 import AdminUserListPage from './pages/AdminUserListPage';
 import AdminUserDetailPage from './pages/AdminUserDetailPage';
-import LoginPage from './pages/public/LoginPage';
+import Login from './pages/public/Login';
 import { FountainThemeProvider } from './theme/ThemeProvider';
 import AdminContentTypesPage from './pages/AdminContentTypesPage';
 import AdminEntriesPage from './pages/AdminEntriesPage';
@@ -22,7 +22,7 @@ export default function App() {
     <FountainThemeProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/admin">
             <Route index element={<AdminPage />} />
             <Route path="users" element={<AdminUserListPage />} />
@@ -35,7 +35,7 @@ export default function App() {
             <Route path="logs" element={<ActivityLogs />} />
             <Route path="profile" element={<AdminProfilePage />} />
           </Route>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/docs" element={<Documentation />} />
           {/* Error Handling Routes */}
           <Route path="/401" element={<UnauthorizedPage />} />

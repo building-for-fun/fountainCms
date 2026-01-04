@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeLayout from '../../components/Layouts/HomeLayout/HomeLayout';
 
-export default function LoginPage() {
+export default function Login() {
   const [username, setUsername] = useState('admin@example.com');
   const [password, setPassword] = useState('password');
   const navigate = useNavigate();
