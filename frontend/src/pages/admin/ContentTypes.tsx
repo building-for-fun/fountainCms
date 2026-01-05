@@ -1,21 +1,7 @@
 import React from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { useQuery } from '@tanstack/react-query';
-import { AppSchema } from '../../types/contentTypes';
-
-async function fetchSchema(): Promise<AppSchema> {
-  const res = await fetch('http://localhost:4000/api/schema', {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!res.ok) {
-    throw new Error('Failed to load schema');
-  }
-
-  return res.json();
-}
+import { fetchSchema } from '../../api/schema';
 
 const ContentTypes = () => {
   const {
