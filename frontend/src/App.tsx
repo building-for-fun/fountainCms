@@ -6,7 +6,7 @@ import UsersList from './pages/admin/UsersList';
 import AdminUserDetailPage from './pages/AdminUserDetailPage';
 import Login from './pages/public/Login';
 import { FountainThemeProvider } from './theme/ThemeProvider';
-import AdminContentTypesPage from './pages/AdminContentTypesPage';
+import ContentTypes from './pages/admin/ContentTypes';
 import AdminEntriesPage from './pages/AdminEntriesPage';
 import MediaLibrary from './pages/admin/MediaLibrary';
 import AdminSettingsPage from './pages/AdminSettingsPage';
@@ -27,7 +27,7 @@ export default function App() {
             <Route index element={<AdminPage />} />
             <Route path="users" element={<UsersList />} />
             <Route path="users/:id" element={<AdminUserDetailPage />} />
-            <Route path="content-types" element={<AdminContentTypesPage />} />
+            <Route path="content-types" element={<ContentTypes />} />
             <Route path="entries" element={<AdminEntriesPage />} />
             <Route path="media" element={<MediaLibrary />} />
             <Route path="settings" element={<AdminSettingsPage />} />
