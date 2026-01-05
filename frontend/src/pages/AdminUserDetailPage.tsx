@@ -29,19 +29,28 @@ export default function AdminUserDetailPage() {
       })
       .then((data: User) => {
         setUser(data);
-        // derive permissions from user.permissions or role
+        // derive permissions from role
         const perms: Record<string, boolean> = {
           read: false,
           write: false,
           admin: false,
           delete: false,
         };
-        if ((data as any).permissions && Array.isArray((data as any).permissions)) {
-          for (const p of (data as any).permissions) perms[p] = true;
+        
+        // If user has admin role, grant all permissions
+        if (data.role?.name === 'admin') {
+          perms.read = true;
+          perms.write = true;
+          perms.admin = true;
+          perms.delete = true;
+        } else if (data.role?.name === 'user') {
+          // Regular user role only has read permission
+          perms.read = true;
+        } else {
+          // No role, default to read only
+          perms.read = true;
         }
-        if (data.role?.name === 'admin') perms.admin = true;
-        // default read for all users
-        perms.read = true;
+        
         setPermissions(perms);
         setLoading(false);
       })
@@ -60,13 +69,16 @@ export default function AdminUserDetailPage() {
     setSaving(true);
     setError(null);
 
-    const permsArray = Object.entries(permissions)
-      .filter(([, v]) => v)
-      .map(([k]) => k);
-    const updated: Partial<User> = {
-      ...user,
-      permissions: permsArray,
-      role: { name: permissions.admin ? 'admin' : null },
+    // Determine role based on admin permission checkbox
+    // If admin is checked, assign admin role (which grants all permissions)
+    // Otherwise, assign user role (which only has read permission)
+    const updated = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      username: user.username,
+      isActive: user.isActive,
+      role: permissions.admin ? 'admin' : 'user',
     };
 
     try {
@@ -75,15 +87,37 @@ export default function AdminUserDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated),
       });
-      if (!res.ok) throw new Error('Save failed');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Save failed');
+      }
       const saved = await res.json();
+      if (!saved || !saved.id) {
+        throw new Error('Invalid response from server');
+      }
       setUser(saved);
+      
+      // Update permissions based on the saved role
+      if (saved.role?.name === 'admin') {
+        setPermissions({
+          read: true,
+          write: true,
+          admin: true,
+          delete: true,
+        });
+      } else {
+        setPermissions({
+          read: true,
+          write: false,
+          admin: false,
+          delete: false,
+        });
+      }
+      
       setSaving(false);
-      // navigate back to users list
-      // keep on page and show success message briefly
-      alert('Permissions saved');
+      alert('User saved successfully');
     } catch (e) {
-      setError('Failed to save user');
+      setError(e instanceof Error ? e.message : 'Failed to save user');
       setSaving(false);
     }
   };
