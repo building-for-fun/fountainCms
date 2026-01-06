@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../components/Layouts/AdminLayout';
 import { User } from '../types/user';
+import { getUserRole, getPermissionsFromRole } from '../helper/userHelper';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -12,12 +13,7 @@ export default function AdminUserDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [permissions, setPermissions] = useState<Record<string, boolean>>({
-    read: false,
-    write: false,
-    admin: false,
-    delete: false,
-  });
+  const [selectedRole, setSelectedRole] = useState<string>('user');
 
   useEffect(() => {
     if (!id) return;
@@ -29,29 +25,8 @@ export default function AdminUserDetailPage() {
       })
       .then((data: User) => {
         setUser(data);
-        // derive permissions from role
-        const perms: Record<string, boolean> = {
-          read: false,
-          write: false,
-          admin: false,
-          delete: false,
-        };
-        
-        // If user has admin role, grant all permissions
-        if (data.role?.name === 'admin') {
-          perms.read = true;
-          perms.write = true;
-          perms.admin = true;
-          perms.delete = true;
-        } else if (data.role?.name === 'user') {
-          // Regular user role only has read permission
-          perms.read = true;
-        } else {
-          // No role, default to read only
-          perms.read = true;
-        }
-        
-        setPermissions(perms);
+        const roleName = getUserRole(data);
+        setSelectedRole(roleName);
         setLoading(false);
       })
       .catch(() => {
@@ -60,8 +35,8 @@ export default function AdminUserDetailPage() {
       });
   }, [id]);
 
-  const toggle = (key: string) => {
-    setPermissions((p) => ({ ...p, [key]: !p[key] }));
+  const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedRole(event.target.value);
   };
 
   const handleSave = async () => {
@@ -69,16 +44,13 @@ export default function AdminUserDetailPage() {
     setSaving(true);
     setError(null);
 
-    // Determine role based on admin permission checkbox
-    // If admin is checked, assign admin role (which grants all permissions)
-    // Otherwise, assign user role (which only has read permission)
     const updated = {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       username: user.username,
       isActive: user.isActive,
-      role: permissions.admin ? 'admin' : 'user',
+      role: selectedRole,
     };
 
     try {
@@ -96,24 +68,8 @@ export default function AdminUserDetailPage() {
         throw new Error('Invalid response from server');
       }
       setUser(saved);
-      
-      // Update permissions based on the saved role
-      if (saved.role?.name === 'admin') {
-        setPermissions({
-          read: true,
-          write: true,
-          admin: true,
-          delete: true,
-        });
-      } else {
-        setPermissions({
-          read: true,
-          write: false,
-          admin: false,
-          delete: false,
-        });
-      }
-      
+      const roleName = getUserRole(saved);
+      setSelectedRole(roleName);
       setSaving(false);
       alert('User saved successfully');
     } catch (e) {
@@ -123,6 +79,8 @@ export default function AdminUserDetailPage() {
   };
 
   if (!id) return <div>Missing user id</div>;
+
+  const permissions = getPermissionsFromRole(selectedRole);
 
   return (
     <AdminLayout>
@@ -157,38 +115,54 @@ export default function AdminUserDetailPage() {
             <div style={{ marginBottom: 16 }}>
               <strong>Username:</strong> <span>{user.username}</span>
             </div>
-            <div style={{ marginBottom: 16 }}>
-              <strong>Role:</strong> <span>{user?.role?.name ?? '-'}</span>
-            </div>
 
-            <section style={{ marginTop: 8 }}>
-              <h3>Permissions</h3>
+            <section style={{ marginTop: 24, marginBottom: 24 }}>
+              <h3>Role</h3>
+              <select
+                value={selectedRole}
+                onChange={handleRoleChange}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  minWidth: '200px',
+                }}
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </section>
+
+            <section style={{ marginTop: 24, marginBottom: 24 }}>
+              <h3>Permissions (based on role)</h3>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {['read', 'write', 'admin', 'delete'].map((p) => (
-                  <label
-                    key={p}
+                {permissions.map((permission) => (
+                  <div
+                    key={permission}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 8,
                       padding: '8px 12px',
                       borderRadius: 8,
-                      background: permissions[p] ? 'var(--color-primary)' : 'var(--color-surface)',
-                      color: permissions[p] ? 'var(--color-surface)' : 'var(--color-text)',
-                      cursor: 'pointer',
+                      background: 'var(--color-primary)',
+                      color: 'var(--color-surface)',
                       boxShadow: 'var(--shadow-sm)',
                     }}
                   >
-                    <input
-                      type="checkbox"
-                      checked={!!permissions[p]}
-                      onChange={() => toggle(p)}
-                      style={{ width: 16, height: 16 }}
-                    />
-                    <span style={{ textTransform: 'capitalize' }}>{p}</span>
-                  </label>
+                    <span style={{ textTransform: 'capitalize' }}>{permission}</span>
+                  </div>
                 ))}
               </div>
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: 8 }}>
+                {selectedRole === 'admin'
+                  ? 'Admin role has full access to all features'
+                  : 'User role has read-only access'}
+              </p>
             </section>
 
             <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
@@ -201,7 +175,8 @@ export default function AdminUserDetailPage() {
                   background: 'var(--color-primary)',
                   color: 'var(--color-surface)',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  opacity: saving ? 0.6 : 1,
                 }}
               >
                 {saving ? 'Saving...' : 'Save'}
@@ -212,6 +187,8 @@ export default function AdminUserDetailPage() {
                   padding: '8px 14px',
                   borderRadius: 8,
                   border: '1px solid var(--color-border)',
+                  background: 'transparent',
+                  cursor: 'pointer',
                 }}
               >
                 Cancel
