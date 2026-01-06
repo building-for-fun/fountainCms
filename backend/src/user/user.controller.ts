@@ -87,13 +87,14 @@ export class UserController {
   async update(
     @Param('id') id: string,
     @Body() body: any,
-  ): Promise<User | null> {
+  ): Promise<User> {
     try {
-      const { role, ...userData } = body;
-      return await this.userService.update(id, {
+      const { role, permissions, ...userData } = body;
+      const updatedUser = await this.userService.update(id, {
         data: userData,
         roleName: role,
       });
+      return updatedUser;
     } catch (error) {
       console.error(`🔥 Failed to update user ${id}:`, error);
       throw new InternalServerErrorException('Failed to update user');
