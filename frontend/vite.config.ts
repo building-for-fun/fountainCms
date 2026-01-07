@@ -16,5 +16,17 @@ export default defineConfig({
                 secure: false,
             },
         },
+        // Ensure SPA routing works in dev mode
+        strictPort: false,
+    },
+    preview: {
+        port: 5173,
+        // Ensure SPA routing works in preview mode
+        strictPort: false,
+    },
+    // Build configuration for production
+    build: {
+        outDir: 'dist',
+        assetsDir: 'assets',
     },
 })
