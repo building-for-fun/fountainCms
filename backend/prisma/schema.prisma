@@ -15,6 +15,7 @@ model User {
   roleId    String?  @db.Uuid
   role      Role?    @relation(fields: [roleId], references: [id])
   username  String   @unique
+  permissions String[] @default([])
   isActive  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
