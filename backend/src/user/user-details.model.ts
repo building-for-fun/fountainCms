@@ -1,61 +1,54 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { RoleDetails } from '../roles/role-details.model';
 
 export class UserDetailsDto {
-  @ApiProperty({ example: 'u1', description: 'Unique user ID' })
-  id: string;
-
-  @ApiProperty({ description: 'Bookmark data', type: Object, nullable: true })
-  bookmark: object | null;
+  @ApiProperty({ example: 'u1', description: 'Unique user ID', required: false })
+  id?: string;
 
   @ApiProperty({ example: 'john_doe', description: 'Username' })
-  user: string;
+  username: string;
 
-  @ApiProperty({ description: 'Role data', type: Object, nullable: true })
-  role: object | null;
+  @ApiProperty({ example: 'John', description: 'First name' })
+  firstName: string;
+
+  @ApiProperty({ example: 'Doe', description: 'Last name' })
+  lastName: string;
+
+  @ApiProperty({ example: 'john@example.com', description: 'Email address' })
+  email: string;
 
   @ApiProperty({
-    example: 'default_collection',
-    description: 'Collection name',
+    example: true,
+    description: 'Whether the user account is active',
+    default: false,
+    required: false,
   })
-  collection: string;
-
-  @ApiProperty({ description: 'Search data', type: Object, nullable: true })
-  search: object | null;
-
-  @ApiProperty({ example: 'grid', description: 'Layout type' })
-  layout: string;
+  isActive?: boolean;
 
   @ApiProperty({
-    description: 'Layout query parameters',
-    type: Object,
+    description: 'Associated role ID (if any)',
+    required: false,
     nullable: true,
   })
-  layout_query: object | null;
+  roleId?: string | null;
 
   @ApiProperty({
-    description: 'Options for layout',
-    type: Object,
+    description: 'Role information including permissions',
+    type: RoleDetails,
+    required: false,
     nullable: true,
   })
-  layout_options: object | null;
+  role?: RoleDetails | null;
 
   @ApiProperty({
-    description: 'Refresh interval',
-    type: Object,
-    nullable: true,
+    description: 'Timestamp when the user was created',
+    required: false,
   })
-  refresh_interval: object | null;
-
-  @ApiProperty({ description: 'Filter details', type: Object, nullable: true })
-  filter: object | null;
-
-  @ApiProperty({ example: 'user-icon.png', description: 'Icon URL or name' })
-  icon: string;
+  createdAt?: Date;
 
   @ApiProperty({
-    description: 'Color information',
-    type: Object,
-    nullable: true,
+    description: 'Timestamp when the user was last updated',
+    required: false,
   })
-  color: object | null;
+  updatedAt?: Date;
 }
