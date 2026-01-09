@@ -86,13 +86,15 @@ export class UserController {
   })
   async update(
     @Param('id') id: string,
-    @Body() body: any,
+    @Body() body: UserDetailsDto,
   ): Promise<User> {
     try {
       const { role, ...userData } = body;
 
-      // Normalize role value: accept either a plain string or an object with a name field,
-      // since the frontend currently sends `{ role: { name: 'admin' | null } }`.
+      // Normalize role value: accept either a plain string or an object with a name field.
+      // This dual-format handling exists to support the current frontend payload
+      // where role may be sent as `"admin"` or as `{ name: 'admin' | null }`.
+      // Once all clients consistently send the string form, this logic can be simplified.
       let roleName: string | null | undefined = undefined;
       if (typeof role === 'string' || role === null) {
         roleName = role;
