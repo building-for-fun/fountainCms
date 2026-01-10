@@ -17,11 +17,11 @@ function StatCard({
       style={{
         background: 'var(--color-surface)',
         color: 'var(--color-text)',
-        padding: 24,
+        padding: '16px',
         borderRadius: 16,
         boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
         border: '1px solid var(--color-border)',
-        minWidth: 240,
+        minWidth: 0,
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         display: 'flex',
         flexDirection: 'column',
@@ -40,7 +40,7 @@ function StatCard({
       <div>
         <div
           style={{
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: 600,
             color: 'var(--color-text-muted)',
             textTransform: 'uppercase',
@@ -49,7 +49,7 @@ function StatCard({
         >
           {title}
         </div>
-        <div style={{ fontSize: 32, fontWeight: 700, marginTop: 8, color: 'var(--color-text)' }}>
+        <div style={{ fontSize: 28, fontWeight: 700, marginTop: 8, color: 'var(--color-text)' }}>
           {value}
         </div>
       </div>
@@ -125,27 +125,27 @@ export default function AdminPage() {
 
   return (
     <AdminLayout>
-      <div style={{ padding: '24px 32px', maxWidth: 1400, margin: '0 auto' }}>
+      <div style={{ padding: '16px', maxWidth: 1400, margin: '0 auto' }}>
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 32,
+            flexDirection: 'column',
+            gap: '12px',
+            marginBottom: 24,
             borderBottom: '1px solid var(--color-border)',
-            paddingBottom: 20,
+            paddingBottom: 16,
           }}
         >
           <div>
-            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: 'var(--color-text)' }}>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: 'var(--color-text)' }}>
               Admin Dashboard
             </h1>
-            <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: 14 }}>
+            <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: 13 }}>
               Welcome back, here is what is happening today.
             </p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ color: 'var(--color-text-muted)', fontSize: 13, fontStyle: 'italic' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+            <div style={{ color: 'var(--color-text-muted)', fontSize: 12, fontStyle: 'italic', flex: '1 1 auto', minWidth: 'fit-content' }}>
               {lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}
             </div>
             <button
@@ -158,7 +158,9 @@ export default function AdminPage() {
                 border: 'none',
                 cursor: 'pointer',
                 fontWeight: 500,
+                fontSize: 13,
                 transition: 'background 0.2s',
+                whiteSpace: 'nowrap',
               }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')
@@ -177,7 +179,9 @@ export default function AdminPage() {
                 color: 'var(--color-text)',
                 cursor: 'pointer',
                 fontWeight: 500,
+                fontSize: 13,
                 transition: 'background 0.2s',
+                whiteSpace: 'nowrap',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-surface)')}
@@ -187,17 +191,17 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div style={{ marginBottom: 40 }}>
+        <div style={{ marginBottom: 32 }}>
           <h2
-            style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: 'var(--color-text)' }}
+            style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: 'var(--color-text)' }}
           >
             Overview
           </h2>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: 24,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+              gap: 16,
             }}
           >
             <StatCard
@@ -252,7 +256,7 @@ export default function AdminPage() {
           <h2
             style={{
               marginBottom: 16,
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: 600,
               color: 'var(--color-text)',
             }}
@@ -263,21 +267,21 @@ export default function AdminPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-              gap: 24,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+              gap: 16,
             }}
           >
             {/* Recent Users Card */}
             <div
               style={{
                 background: 'var(--color-surface)',
-                padding: 24,
+                padding: '16px',
                 borderRadius: 16,
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                 border: '1px solid var(--color-border)',
               }}
             >
-              <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600 }}>
                 New User Signups
               </h3>
               <ul style={{ margin: 0, padding: 0 }}>
@@ -291,6 +295,7 @@ export default function AdminPage() {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
+                        flexWrap: 'wrap',
                       }}
                     >
                       <div
@@ -303,11 +308,12 @@ export default function AdminPage() {
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: 14,
+                          flexShrink: 0,
                         }}
                       >
                         👤
                       </div>
-                      <span style={{ color: 'var(--color-text)', fontSize: 14, fontWeight: 500 }}>
+                      <span style={{ color: 'var(--color-text)', fontSize: 13, fontWeight: 500, flex: '1 1 auto', minWidth: '120px', wordBreak: 'break-word' }}>
                         {email}
                       </span>
                       <span
@@ -315,6 +321,7 @@ export default function AdminPage() {
                           marginLeft: 'auto',
                           fontSize: 12,
                           color: 'var(--color-text-muted)',
+                          flexShrink: 0,
                         }}
                       >
                         {Math.floor(Math.random() * 24)}h ago
@@ -329,16 +336,16 @@ export default function AdminPage() {
             <div
               style={{
                 background: 'var(--color-surface)',
-                padding: 24,
+                padding: '16px',
                 borderRadius: 16,
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                 border: '1px solid var(--color-border)',
               }}
             >
-              <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600 }}>
+              <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>
                 Storage Distribution
               </h3>
-              <p style={{ margin: '0 0 20px', color: 'var(--color-text-muted)', fontSize: 13 }}>
+              <p style={{ margin: '0 0 20px', color: 'var(--color-text-muted)', fontSize: 12 }}>
                 Breakdown of resource usage
               </p>
 
@@ -348,7 +355,7 @@ export default function AdminPage() {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      fontSize: 14,
+                      fontSize: 13,
                       marginBottom: 6,
                     }}
                   >
@@ -384,7 +391,7 @@ export default function AdminPage() {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      fontSize: 14,
+                      fontSize: 13,
                       marginBottom: 6,
                     }}
                   >
@@ -414,7 +421,7 @@ export default function AdminPage() {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      fontSize: 14,
+                      fontSize: 13,
                       marginBottom: 6,
                     }}
                   >

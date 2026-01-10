@@ -1,61 +1,38 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { PrimaryButton } from '../../PrimaryButton';
 import ThemeToggle from '../../ThemeToggle';
+import { PrimaryButton } from '../../PrimaryButton';
 
-export const Navbar = () => {
+type NavbarProps = {
+  onNavigate?: () => void;
+  isMobile?: boolean;
+};
+
+const Navbar: React.FC<NavbarProps> = ({ onNavigate, isMobile = false }) => {
   return (
-    <nav
-      style={{
-        background: 'rgba(255, 255, 255, 0.15)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '1.5rem',
-          alignItems: 'center',
-          justifyContent: 'center',
+    <nav className={isMobile ? 'drawer-nav' : 'desktop-nav'}>
+      <Link onClick={onNavigate} className="nav-link" to="/">
+        Home
+      </Link>
 
-          width: '100%',
-          padding: '1rem 1.5rem',
-          boxSizing: 'border-box',
-        }}
-      >
-        <Link
-          to="/"
-          style={{
-            color: 'var(--color-primary)',
-            textDecoration: 'none',
-            fontWeight: 600,
-          }}
-        >
-          Home
-        </Link>
-        <Link
-          to="/docs"
-          style={{
-            color: 'var(--color-primary)',
-            textDecoration: 'none',
-            fontWeight: 600,
-          }}
-        >
-          Documentation
-        </Link>
+      <Link onClick={onNavigate} className="nav-link" to="/docs">
+        Documentation
+      </Link>
+
+      {/* COMPACT THEME TOGGLE (MOBILE ONLY) */}
+      {isMobile ? (
+        <div className="drawer-theme-toggle">
+          <ThemeToggle />
+        </div>
+      ) : (
         <ThemeToggle />
-        <Link to="/login">
-          <PrimaryButton>Get Started</PrimaryButton>
-        </Link>
-      </div>
+      )}
+
+      <Link onClick={onNavigate} to="/login">
+        <PrimaryButton>Get Started</PrimaryButton>
+      </Link>
     </nav>
   );
 };
+
+export default Navbar;

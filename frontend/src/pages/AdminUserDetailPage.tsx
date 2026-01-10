@@ -84,11 +84,11 @@ export default function AdminUserDetailPage() {
 
   return (
     <AdminLayout>
-      <div style={{ padding: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ margin: 0 }}>User Details</h1>
+      <div style={{ padding: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 700 }}>User Details</h1>
           <div>
-            <Link to="/admin/users" style={{ marginRight: 12, color: 'var(--color-primary)' }}>
+            <Link to="/admin/users" style={{ color: 'var(--color-primary)', fontSize: '14px', textDecoration: 'none' }}>
               ← Back to users
             </Link>
             <button
@@ -102,22 +102,22 @@ export default function AdminUserDetailPage() {
         {loading && <p>Loading...</p>}
         {error && <p style={{ color: 'var(--color-error)' }}>{error}</p>}
         {!loading && user && (
-          <div style={{ marginTop: 16, maxWidth: 800 }}>
-            <div style={{ marginBottom: 16 }}>
+          <div style={{ marginTop: 16, maxWidth: '100%' }}>
+            <div style={{ marginBottom: 16, wordBreak: 'break-word' }}>
               <strong>ID:</strong> <span>{user.id}</span>
             </div>
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 16, wordBreak: 'break-word' }}>
               <strong>Firstname:</strong> <span>{user.firstName}</span>
             </div>
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 16, wordBreak: 'break-word' }}>
               <strong>Lastname:</strong> <span>{user.lastName}</span>
             </div>
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 16, wordBreak: 'break-word' }}>
               <strong>Username:</strong> <span>{user.username}</span>
             </div>
 
             <section style={{ marginTop: 24, marginBottom: 24 }}>
-              <h3>Role</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>Role</h3>
               <select
                 value={selectedRole}
                 onChange={handleRoleChange}
@@ -129,7 +129,8 @@ export default function AdminUserDetailPage() {
                   color: 'var(--color-text)',
                   fontSize: '14px',
                   cursor: 'pointer',
-                  minWidth: '200px',
+                  width: '100%',
+                  maxWidth: '300px',
                 }}
               >
                 <option value="user">User</option>
@@ -138,7 +139,7 @@ export default function AdminUserDetailPage() {
             </section>
 
             <section style={{ marginTop: 24, marginBottom: 24 }}>
-              <h3>Permissions (based on role)</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>Permissions (based on role)</h3>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 {permissions.map((permission) => (
                   <div
@@ -152,6 +153,7 @@ export default function AdminUserDetailPage() {
                       background: 'var(--color-primary)',
                       color: 'var(--color-surface)',
                       boxShadow: 'var(--shadow-sm)',
+                      fontSize: '14px',
                     }}
                   >
                     <span style={{ textTransform: 'capitalize' }}>{permission}</span>
@@ -165,18 +167,23 @@ export default function AdminUserDetailPage() {
               </p>
             </section>
 
-            <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
+            <div style={{ marginTop: 24, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
               <button
                 onClick={handleSave}
                 disabled={saving}
                 style={{
-                  padding: '8px 14px',
+                  padding: '10px 16px',
                   borderRadius: 8,
                   background: 'var(--color-primary)',
                   color: 'var(--color-surface)',
                   border: 'none',
                   cursor: saving ? 'not-allowed' : 'pointer',
                   opacity: saving ? 0.6 : 1,
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  minWidth: '100px',
+                  flex: '1 1 auto',
+                  maxWidth: '200px',
                 }}
               >
                 {saving ? 'Saving...' : 'Save'}
@@ -184,11 +191,16 @@ export default function AdminUserDetailPage() {
               <button
                 onClick={() => navigate('/admin/users')}
                 style={{
-                  padding: '8px 14px',
+                  padding: '10px 16px',
                   borderRadius: 8,
                   border: '1px solid var(--color-border)',
                   background: 'transparent',
                   cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  minWidth: '100px',
+                  flex: '1 1 auto',
+                  maxWidth: '200px',
                 }}
               >
                 Cancel
