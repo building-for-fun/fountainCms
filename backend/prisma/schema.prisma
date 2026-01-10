@@ -8,39 +8,32 @@ datasource db {
 }
 
 model User {
-  id               String    @id @default(uuid())
-  bookmark         Json?
-  user             String    @unique
-  roleId           String?
-  role             Role?     @relation(fields: [roleId], references: [id])
-  collection       String
-  search           Json?
-  layout           String
-  layout_query     Json?
-  layout_options   Json?
-  refresh_interval Int?
-  filter           Json?
-  icon             String
-  color            String?
-  contents         Content[] @relation("AuthorContents")
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName String   @db.VarChar(255)
+  lastName  String   @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  roleId    String?  @db.Uuid
+  role      Role?    @relation(fields: [roleId], references: [id])
+  username  String   @unique
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Role {
-  id          String  @id @default(uuid())
-  name        String  @unique
-  description String?
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @unique
+  description String?  @db.VarChar(255)
   permissions String[]
   users       User[]
 }
 
-model Content {
-  id        String   @id @default(uuid())
-  title     String
-  body      String
-  authorId  String?
-  author    User?    @relation(name: "AuthorContents", fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model ContentItem {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  collection String   @db.VarChar(255)
+  data       Json     @db.Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([collection])
 }

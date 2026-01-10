@@ -1,24 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../components/Layouts/AdminLayout';
-
-interface User {
-  id: string;
-  bookmark: any;
-  user: string;
-  role: any;
-  collection: string;
-  search: any;
-  layout: string;
-  layout_query: any;
-  layout_options: any;
-  refresh_interval: any;
-  filter: any;
-  icon: string;
-  color: any;
-  // permisssions is optional and may be saved by frontend
-  permissions?: string[];
-}
+import { User } from '../types/user';
+import { getUserRole, getPermissionsFromRole } from '../helper/userHelper';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -29,12 +13,7 @@ export default function AdminUserDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [permissions, setPermissions] = useState<Record<string, boolean>>({
-    read: false,
-    write: false,
-    admin: false,
-    delete: false,
-  });
+  const [selectedRole, setSelectedRole] = useState<string>('user');
 
   useEffect(() => {
     if (!id) return;
@@ -46,20 +25,8 @@ export default function AdminUserDetailPage() {
       })
       .then((data: User) => {
         setUser(data);
-        // derive permissions from user.permissions or role
-        const perms: Record<string, boolean> = {
-          read: false,
-          write: false,
-          admin: false,
-          delete: false,
-        };
-        if ((data as any).permissions && Array.isArray((data as any).permissions)) {
-          for (const p of (data as any).permissions) perms[p] = true;
-        }
-        if (data.role === 'admin') perms.admin = true;
-        // default read for all users
-        perms.read = true;
-        setPermissions(perms);
+        const roleName = getUserRole(data);
+        setSelectedRole(roleName);
         setLoading(false);
       })
       .catch(() => {
@@ -68,8 +35,8 @@ export default function AdminUserDetailPage() {
       });
   }, [id]);
 
-  const toggle = (key: string) => {
-    setPermissions((p) => ({ ...p, [key]: !p[key] }));
+  const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedRole(event.target.value);
   };
 
   const handleSave = async () => {
@@ -77,14 +44,13 @@ export default function AdminUserDetailPage() {
     setSaving(true);
     setError(null);
 
-    const permsArray = Object.entries(permissions)
-      .filter(([, v]) => v)
-      .map(([k]) => k);
-    const updated: Partial<User> = {
-      ...user,
-      // persist permissions array; backend will accept arbitrary fields
-      permissions: permsArray,
-      role: permissions.admin ? 'admin' : null,
+    const updated = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      username: user.username,
+      isActive: user.isActive,
+      role: selectedRole,
     };
 
     try {
@@ -93,20 +59,28 @@ export default function AdminUserDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated),
       });
-      if (!res.ok) throw new Error('Save failed');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Save failed');
+      }
       const saved = await res.json();
+      if (!saved || !saved.id) {
+        throw new Error('Invalid response from server');
+      }
       setUser(saved);
+      const roleName = getUserRole(saved);
+      setSelectedRole(roleName);
       setSaving(false);
-      // navigate back to users list
-      // keep on page and show success message briefly
-      alert('Permissions saved');
+      alert('User saved successfully');
     } catch (e) {
-      setError('Failed to save user');
+      setError(e instanceof Error ? e.message : 'Failed to save user');
       setSaving(false);
     }
   };
 
   if (!id) return <div>Missing user id</div>;
+
+  const permissions = getPermissionsFromRole(selectedRole);
 
   return (
     <AdminLayout>
@@ -133,40 +107,62 @@ export default function AdminUserDetailPage() {
               <strong>ID:</strong> <span>{user.id}</span>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>User:</strong> <span>{user.user}</span>
+              <strong>Firstname:</strong> <span>{user.firstName}</span>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>Role:</strong> <span>{user.role ?? '-'}</span>
+              <strong>Lastname:</strong> <span>{user.lastName}</span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>Username:</strong> <span>{user.username}</span>
             </div>
 
-            <section style={{ marginTop: 8 }}>
-              <h3>Permissions</h3>
+            <section style={{ marginTop: 24, marginBottom: 24 }}>
+              <h3>Role</h3>
+              <select
+                value={selectedRole}
+                onChange={handleRoleChange}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  minWidth: '200px',
+                }}
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </section>
+
+            <section style={{ marginTop: 24, marginBottom: 24 }}>
+              <h3>Permissions (based on role)</h3>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {['read', 'write', 'admin', 'delete'].map((p) => (
-                  <label
-                    key={p}
+                {permissions.map((permission) => (
+                  <div
+                    key={permission}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 8,
                       padding: '8px 12px',
                       borderRadius: 8,
-                      background: permissions[p] ? 'var(--color-primary)' : 'var(--color-surface)',
-                      color: permissions[p] ? 'var(--color-surface)' : 'var(--color-text)',
-                      cursor: 'pointer',
+                      background: 'var(--color-primary)',
+                      color: 'var(--color-surface)',
                       boxShadow: 'var(--shadow-sm)',
                     }}
                   >
-                    <input
-                      type="checkbox"
-                      checked={!!permissions[p]}
-                      onChange={() => toggle(p)}
-                      style={{ width: 16, height: 16 }}
-                    />
-                    <span style={{ textTransform: 'capitalize' }}>{p}</span>
-                  </label>
+                    <span style={{ textTransform: 'capitalize' }}>{permission}</span>
+                  </div>
                 ))}
               </div>
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: 8 }}>
+                {selectedRole === 'admin'
+                  ? 'Admin role has full access to all features'
+                  : 'User role has read-only access'}
+              </p>
             </section>
 
             <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
@@ -179,7 +175,8 @@ export default function AdminUserDetailPage() {
                   background: 'var(--color-primary)',
                   color: 'var(--color-surface)',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  opacity: saving ? 0.6 : 1,
                 }}
               >
                 {saving ? 'Saving...' : 'Save'}
@@ -190,6 +187,8 @@ export default function AdminUserDetailPage() {
                   padding: '8px 14px',
                   borderRadius: 8,
                   border: '1px solid var(--color-border)',
+                  background: 'transparent',
+                  cursor: 'pointer',
                 }}
               >
                 Cancel

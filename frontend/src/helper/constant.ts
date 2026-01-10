@@ -13,8 +13,6 @@ export const SETUP_STEPS_TEXT = [
   'Access API at http://localhost:4000/api/content',
 ];
 
-export const PRIMARY_COLOR = '#6366f1';
-
 export const GETTING_STARTED = `
 FountainCMS lets you manage content via APIs for JAMstack and modern web apps.
 `;

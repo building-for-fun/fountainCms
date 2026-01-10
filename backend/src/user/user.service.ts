@@ -30,27 +30,23 @@ export class UserService {
       data: Prisma.UserUpdateInput;
       roleName?: string | null; // Handle role update logic specifically if needed
     },
-  ): Promise<User | null> {
-    try {
-      const { data, roleName } = params;
+  ): Promise<User> {
+    const { data, roleName } = params;
 
-      // Handle relation update logic
-      if (roleName !== undefined) {
-        if (roleName === null) {
-          data.role = { disconnect: true };
-        } else {
-          data.role = { connect: { name: roleName } };
-        }
+    // Handle relation update logic
+    if (roleName !== undefined) {
+      if (roleName === null) {
+        data.role = { disconnect: true };
+      } else {
+        data.role = { connect: { name: roleName } };
       }
-
-      return await this.prisma.user.update({
-        where: { id },
-        data,
-        include: { role: true },
-      });
-    } catch {
-      return null;
     }
+
+    return await this.prisma.user.update({
+      where: { id },
+      data,
+      include: { role: true },
+    });
   }
 
   async delete(id: string): Promise<boolean> {

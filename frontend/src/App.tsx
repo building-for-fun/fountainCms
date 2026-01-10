@@ -1,46 +1,48 @@
-import LandingPage from './pages/LandingPage';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Documentation from './pages/Documenation';
+import Landing from './pages/public/Landing';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Documentation from './pages/public/Documentation';
 import AdminPage from './pages/AdminPage';
-import AdminUserListPage from './pages/AdminUserListPage';
+import UsersList from './pages/admin/UsersList';
 import AdminUserDetailPage from './pages/AdminUserDetailPage';
-import LoginPage from './pages/LoginPage';
+import Login from './pages/public/Login';
 import { FountainThemeProvider } from './theme/ThemeProvider';
-import AdminContentTypesPage from './pages/AdminContentTypesPage';
+import ContentTypes from './pages/admin/ContentTypes';
 import AdminEntriesPage from './pages/AdminEntriesPage';
-import AdminMediaPage from './pages/AdminMediaPage';
+import MediaLibrary from './pages/admin/MediaLibrary';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminRolesPage from './pages/AdminRolesPage';
-import AdminLogsPage from './pages/AdminLogsPage';
+import ActivityLogs from './pages/admin/ActivityLogs';
 import AdminProfilePage from './pages/AdminProfilePage';
-import NotFoundPage from './pages/NotFoundPage';
-import InternalServerErrorPage from './pages/InternalServerErrorPage';
-import UnauthorizedPage from './pages/UnauthorizedPage';
+import NotFoundError from './pages/error/NotFoundError';
+import InternalServerError from './pages/error/InternalServerError';
+import UnauthorizedError from './pages/error/UnauthorizedError';
+import ContentEntries from './pages/admin/ContentEntries';
 
 export default function App() {
   return (
     <FountainThemeProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/admin">
             <Route index element={<AdminPage />} />
-            <Route path="users" element={<AdminUserListPage />} />
+            <Route path="users" element={<UsersList />} />
             <Route path="users/:id" element={<AdminUserDetailPage />} />
-            <Route path="content-types" element={<AdminContentTypesPage />} />
+            <Route path="content-types" element={<ContentTypes />} />
             <Route path="entries" element={<AdminEntriesPage />} />
-            <Route path="media" element={<AdminMediaPage />} />
+            <Route path="media" element={<MediaLibrary />} />
             <Route path="settings" element={<AdminSettingsPage />} />
             <Route path="roles" element={<AdminRolesPage />} />
-            <Route path="logs" element={<AdminLogsPage />} />
+            <Route path="logs" element={<ActivityLogs />} />
             <Route path="profile" element={<AdminProfilePage />} />
+            <Route path="content/:collection" element={<ContentEntries />} />
           </Route>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/docs" element={<Documentation />} />
           {/* Error Handling Routes */}
-          <Route path="/401" element={<UnauthorizedPage />} />
-          <Route path="/500" element={<InternalServerErrorPage />} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path="/401" element={<UnauthorizedError />} />
+          <Route path="/500" element={<InternalServerError />} />
+          <Route path="*" element={<NotFoundError />} />
         </Routes>
       </BrowserRouter>
     </FountainThemeProvider>

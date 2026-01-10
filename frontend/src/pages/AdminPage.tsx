@@ -17,29 +17,67 @@ function StatCard({
       style={{
         background: 'var(--color-surface)',
         color: 'var(--color-text)',
-        padding: 16,
-        borderRadius: 12,
-        boxShadow: 'var(--shadow-sm)',
-        minWidth: 180,
+        padding: 24,
+        borderRadius: 16,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        border: '1px solid var(--color-border)',
+        minWidth: 240,
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: '100%',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'none';
+        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
       }}
     >
-      <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{title}</div>
-      <div style={{ fontSize: 24, fontWeight: 700, marginTop: 8 }}>{value}</div>
-      <div style={{ marginTop: 12 }}>{children}</div>
+      <div>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
+          {title}
+        </div>
+        <div style={{ fontSize: 32, fontWeight: 700, marginTop: 8, color: 'var(--color-text)' }}>
+          {value}
+        </div>
+      </div>
+      <div style={{ marginTop: 16 }}>{children}</div>
     </div>
   );
 }
 
 function Sparkline({ data, color = 'var(--color-primary)' }: { data: number[]; color?: string }) {
   const w = 120;
-  const h = 36;
+  const h = 40;
   const max = Math.max(...data, 1);
+  const min = Math.min(...data);
+  const range = max - min || 1;
   const points = data
-    .map((v, i) => `${(i / (data.length - 1 || 1)) * w},${h - (v / max) * h}`)
+    .map((v, i) => `${(i / (data.length - 1 || 1)) * w},${h - ((v - min) / range) * h}`)
     .join(' ');
+
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden>
-      <polyline fill="none" stroke={color} strokeWidth={2} points={points} />
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden style={{ overflow: 'visible' }}>
+      <polyline
+        fill="none"
+        stroke={color}
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        points={points}
+      />
     </svg>
   );
 }
@@ -108,21 +146,25 @@ export default function AdminPage() {
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            marginTop: 20,
-            width: '100%',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 32,
+            borderBottom: '1px solid var(--color-border)',
+            paddingBottom: 20,
           }}
         >
-          {/* Top-right buttons */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: 8,
-              marginBottom: 16,
-              flexWrap: 'wrap',
-            }}
-          >
+          <div>
+            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: 'var(--color-text)' }}>
+              Admin Dashboard
+            </h1>
+            <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: 14 }}>
+              Welcome back, here is what is happening today.
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ color: 'var(--color-text-muted)', fontSize: 13, fontStyle: 'italic' }}>
+              {lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}
+            </div>
             <button
               onClick={handleRefreshStorage}
               style={{
@@ -131,9 +173,16 @@ export default function AdminPage() {
                 background: 'var(--color-primary)',
                 color: 'var(--color-surface)',
                 border: 'none',
+                cursor: 'pointer',
+                fontWeight: 500,
+                transition: 'background 0.2s',
               }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-primary)')}
             >
-              Refresh stats
+              Refresh Stats
             </button>
             <button
               onClick={() => window.location.reload()}
@@ -141,122 +190,155 @@ export default function AdminPage() {
                 padding: '8px 12px',
                 borderRadius: 8,
                 border: '1px solid var(--color-border)',
-                background: 'transparent',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text)',
+                cursor: 'pointer',
+                fontWeight: 500,
+                transition: 'background 0.2s',
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-surface)')}
             >
               Reload
             </button>
           </div>
+        </div>
 
-          {/* Stats grid */}
+        <div style={{ marginBottom: 40 }}>
+          <h2
+            style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: 'var(--color-text)' }}
+          >
+            Overview
+          </h2>
           <div
             style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-              gap: 16,
-              width: '100%',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: 24,
             }}
           >
-            <div style={{ flex: '1 1 30%', minWidth: 280 }}>
-              <StatCard
-                title="Users"
-                value={loadingUsers ? 'Loading…' : (usersCount?.toString() ?? '-')}
+            <StatCard
+              title="Total Users"
+              value={loadingUsers ? '...' : (usersCount?.toString() ?? '-')}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
+                <Sparkline data={sparkDataUsers} />
                 <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
+                  style={{ fontSize: 13, color: 'var(--color-success, #10b981)', fontWeight: 500 }}
                 >
-                  <Sparkline data={sparkDataUsers} />
-                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>active</div>
+                  +12%
                 </div>
-              </StatCard>
-            </div>
+              </div>
+            </StatCard>
 
-            <div style={{ flex: '1 1 30%', minWidth: 280 }}>
-              <StatCard title="Images (MB)" value={`${imagesSizeMB} MB`}>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Sparkline data={sparkDataImages} color="var(--color-accent)" />
-                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
-                    images total size
-                  </div>
-                </div>
-              </StatCard>
-            </div>
+            <StatCard title="Images Size" value={`${imagesSizeMB} MB`}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Sparkline data={sparkDataImages} color="var(--color-accent)" />
+                <div style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>total size</div>
+              </div>
+            </StatCard>
 
-            <div style={{ flex: '1 1 30%', minWidth: 280 }}>
-              <StatCard title="Storage (GB)" value={`${storageUsedGB} GB`}>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Sparkline data={sparkDataStorage} color="var(--color-warning)" />
-                  <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>used</div>
-                </div>
-              </StatCard>
-            </div>
+            <StatCard title="Storage Used" value={`${storageUsedGB} GB`}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Sparkline data={sparkDataStorage} color="var(--color-warning)" />
+                <div style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>of 100 GB</div>
+              </div>
+            </StatCard>
           </div>
         </div>
 
-        <section style={{ marginTop: 32, width: '100%' }}>
+        <section style={{ width: '100%' }}>
           <h2
             style={{
               marginBottom: 16,
               fontSize: 20,
               fontWeight: 600,
               color: 'var(--color-text)',
-              borderBottom: '1px solid var(--color-border)',
-              paddingBottom: 4,
             }}
           >
-            Activity
+            Recent Activity
           </h2>
 
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: 16,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+              gap: 24,
             }}
           >
             {/* Recent Users Card */}
             <div
               style={{
                 background: 'var(--color-surface)',
-                padding: 16,
-                borderRadius: 12,
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                padding: 24,
+                borderRadius: 16,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                border: '1px solid var(--color-border)',
               }}
             >
-              <h3 style={{ margin: 0, fontSize: 16 }}>Recent Users</h3>
-              <p style={{ margin: '4px 0 12px', color: 'var(--color-text-muted)', fontSize: 14 }}>
-                Latest user signups (mocked)
-              </p>
-              <ul style={{ margin: 0, paddingLeft: 16, color: 'var(--color-text)' }}>
-                <li>user-a@example.com</li>
-                <li>user-b@example.com</li>
-                <li>user-c@example.com</li>
+              <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>
+                New User Signups
+              </h3>
+              <ul style={{ margin: 0, padding: 0 }}>
+                {['user-a@example.com', 'user-b@example.com', 'user-c@example.com'].map(
+                  (email, i) => (
+                    <li
+                      key={i}
+                      style={{
+                        padding: '12px 0',
+                        borderBottom: i < 2 ? '1px solid var(--color-border)' : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '50%',
+                          background: 'var(--color-bg)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 14,
+                        }}
+                      >
+                        👤
+                      </div>
+                      <span style={{ color: 'var(--color-text)', fontSize: 14, fontWeight: 500 }}>
+                        {email}
+                      </span>
+                      <span
+                        style={{
+                          marginLeft: 'auto',
+                          fontSize: 12,
+                          color: 'var(--color-text-muted)',
+                        }}
+                      >
+                        {Math.floor(Math.random() * 24)}h ago
+                      </span>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
 
@@ -264,51 +346,114 @@ export default function AdminPage() {
             <div
               style={{
                 background: 'var(--color-surface)',
-                padding: 16,
-                borderRadius: 12,
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                padding: 24,
+                borderRadius: 16,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                border: '1px solid var(--color-border)',
               }}
             >
-              <h3 style={{ margin: 0, fontSize: 16 }}>Storage Breakdown</h3>
-              <p style={{ margin: '4px 0 12px', color: 'var(--color-text-muted)', fontSize: 14 }}>
-                Images, backups, and other files
+              <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600 }}>
+                Storage Distribution
+              </h3>
+              <p style={{ margin: '0 0 20px', color: 'var(--color-text-muted)', fontSize: 13 }}>
+                Breakdown of resource usage
               </p>
 
-              <div style={{ marginTop: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-                  <span>Images</span>
-                  <span>{Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)}%</span>
-                </div>
-
-                <div
-                  style={{
-                    height: 10,
-                    background: 'var(--color-border)',
-                    borderRadius: 8,
-                    overflow: 'hidden',
-                    marginTop: 6,
-                  }}
-                >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
                   <div
                     style={{
-                      width: `${Math.min(
-                        100,
-                        Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)
-                      )}%`,
-                      height: '100%',
-                      background: 'var(--color-primary)',
-                      transition: 'width 0.3s ease',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: 14,
+                      marginBottom: 6,
                     }}
-                  />
+                  >
+                    <span style={{ fontWeight: 500 }}>Images</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>
+                      {Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)}%
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      height: 8,
+                      background: 'var(--color-bg)',
+                      borderRadius: 4,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          Math.round((imagesSizeMB / (storageUsedGB * 1024)) * 100)
+                        )}%`,
+                        height: '100%',
+                        background: 'var(--color-accent)',
+                        transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: 14,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <span style={{ fontWeight: 500 }}>Database</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>15%</span>
+                  </div>
+                  <div
+                    style={{
+                      height: 8,
+                      background: 'var(--color-bg)',
+                      borderRadius: 4,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '15%',
+                        height: '100%',
+                        background: 'var(--color-primary)',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: 14,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <span style={{ fontWeight: 500 }}>Logs</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>5%</span>
+                  </div>
+                  <div
+                    style={{
+                      height: 8,
+                      background: 'var(--color-bg)',
+                      borderRadius: 4,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '5%',
+                        height: '100%',
+                        background: 'var(--color-warning)',
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

@@ -6,6 +6,7 @@ import { RolesModule } from './roles/roles.module';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { SchemaModule } from './schema/schema.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
     ContentModule,
     RolesModule,
     UserModule,
+    SchemaModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

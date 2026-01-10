@@ -1,0 +1,13 @@
+{
+  "name": "fountaincms-app",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "echo \"🚧 FountainCMS is under active development\"",
+    "dev:frontend": "echo \"Frontend not initialized yet\"",
+    "dev:backend": "echo \"Backend not initialized yet\""
+  }
+}
