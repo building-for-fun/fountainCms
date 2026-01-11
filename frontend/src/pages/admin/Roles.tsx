@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AdminLayout from '../components/Layouts/AdminLayout';
+import AdminLayout from '../../components/Layouts/AdminLayout';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -9,7 +9,7 @@ interface Role {
   description: string;
 }
 
-const AdminRolesPage = () => {
+const Roles = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +27,7 @@ const AdminRolesPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`${apiBaseUrl}/api/roles`);
+        const res = await fetch(`${apiBaseUrl}/roles`);
         if (!res.ok) throw new Error('Failed to fetch roles');
         const data = await res.json();
         setRoles(data.data || []);
@@ -54,7 +54,7 @@ const AdminRolesPage = () => {
 
     try {
       setIsSubmitting(true);
-      const res = await fetch(`${apiBaseUrl}/api/roles`, {
+      const res = await fetch(`${apiBaseUrl}/roles`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newRole),
@@ -88,7 +88,7 @@ const AdminRolesPage = () => {
   const handleEditSave = async (id: string) => {
     try {
       setIsSubmitting(true);
-      const res = await fetch(`${apiBaseUrl}/api/roles/${id}`, {
+      const res = await fetch(`${apiBaseUrl}/roles/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editRole),
@@ -123,7 +123,7 @@ const AdminRolesPage = () => {
       return;
 
     try {
-      const res = await fetch(`${apiBaseUrl}/api/roles/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${apiBaseUrl}/roles/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete role');
       setRoles((prev) => prev.filter((role) => role.id !== id));
     } catch (err) {
@@ -680,4 +680,4 @@ const AdminRolesPage = () => {
   );
 };
 
-export default AdminRolesPage;
+export default Roles;

@@ -6,25 +6,16 @@ import { LoadingState, EmptyState, ErrorState } from '../../components/states';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
-/**
- * UsersList component displays all users in the system
- * Implements proper loading, error, and empty states
- * Includes retry functionality for failed API requests
- */
 export default function UsersList() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  /**
-   * Fetches users from the API with proper error handling
-   */
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${apiBaseUrl}/api/user`);
+      const response = await fetch(`${apiBaseUrl}/user`);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
@@ -53,9 +44,6 @@ export default function UsersList() {
     fetchUsers();
   }, [fetchUsers]);
 
-  /**
-   * Handles retry action for failed requests
-   */
   const handleRetry = () => {
     fetchUsers();
   };

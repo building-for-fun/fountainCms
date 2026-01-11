@@ -37,9 +37,7 @@ export default function Landing() {
         </p>
 
         <div style={{ marginTop: 48 }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 24 }}>
-            🚀 Content
-          </h2>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 24 }}>🚀 Content</h2>
 
           <ul
             style={{
@@ -103,9 +101,7 @@ export default function Landing() {
                 >
                   ✓
                 </span>
-                <span style={{ lineHeight: 1.5 }}>
-                  {GETTING_STARTED}
-                </span>
+                <span style={{ lineHeight: 1.5 }}>{GETTING_STARTED}</span>
               </li>
             )}
           </ul>
