@@ -2,17 +2,22 @@ import React from 'react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
-const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div
-    className="mx-auto min-h-screen flex flex-col"
-    style={{
-      background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-primary-light) 100%)',
-    }}
-  >
-    <Header />
-    <main>{children}</main>
-    <Footer />
-  </div>
-);
+const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'linear-gradient(135deg, var(--color-bg), var(--color-primary-light))',
+        overflowX: 'hidden', // ✅ important for mobile
+      }}
+    >
+      <Header />
+      <main style={{ flex: 1, width: '100%' }}>{children}</main>
+      <Footer />
+    </div>
+  );
+};
 
 export default HomeLayout;

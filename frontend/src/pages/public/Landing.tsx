@@ -5,42 +5,112 @@ import { FEATURES_TEXT, GETTING_STARTED } from '../../helper/constant';
 export default function Landing() {
   return (
     <HomeLayout>
-      <div className="flex flex-col items-center justify-center  bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 px-4 sm:px-6 lg:px-8 py-12">
-        <div className="px-8 py-10 sm:px-12 sm:py-12">
-          <h1 className="text-5xl sm:text-6xl font-black text-indigo-600 mb-2 leading-tight">
-            FountainCMS
-          </h1>
-          <p className="text-xl text-slate-600 mb-8 leading-relaxed">
-            A modern, API-driven content management system for JAMstack and beyond.
-          </p>
+      <section
+        style={{
+          maxWidth: 900,
+          margin: '0 auto',
+          padding: '64px 16px',
+          width: '100%',
+          boxSizing: 'border-box',
+        }}
+      >
+        <h1
+          style={{
+            fontSize: 'clamp(2.5rem, 6vw, 3.5rem)',
+            fontWeight: 900,
+            textAlign: 'center',
+            color: 'var(--color-primary)',
+          }}
+        >
+          FountainCMS
+        </h1>
 
-          <div className="mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-6 flex items-center">
-              <span className="mr-3">🚀</span>
-              Content
-            </h2>
+        <p
+          style={{
+            textAlign: 'center',
+            marginTop: 16,
+            fontSize: 'clamp(1rem, 3vw, 1.25rem)',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          A modern, API-driven content management system for JAMstack and beyond.
+        </p>
 
-            <ul className="space-y-3">
-              {FEATURES_TEXT.map((feature) => (
-                <li key={feature} className="flex items-start gap-3 text-slate-700 text-lg">
-                  <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-indigo-600 text-white font-bold text-sm mt-1">
-                    ✓
-                  </span>
-                  <span className="pt-0.5">{feature}</span>
-                </li>
-              ))}
-              {GETTING_STARTED && (
-                <li className="flex items-start gap-3 text-slate-700 text-lg">
-                  <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-indigo-600 text-white font-bold text-sm mt-1">
-                    ✓
-                  </span>
-                  <span className="pt-0.5">{GETTING_STARTED}</span>
-                </li>
-              )}
-            </ul>
-          </div>
+        <div style={{ marginTop: 48 }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 24 }}>
+            🚀 Content
+          </h2>
+
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              display: 'grid',
+              gap: 16,
+            }}
+          >
+            {FEATURES_TEXT.map((feature) => (
+              <li
+                key={feature}
+                style={{
+                  display: 'flex',
+                  gap: 12,
+                  alignItems: 'flex-start',
+                }}
+              >
+                <span
+                  style={{
+                    minWidth: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    background: 'var(--color-primary)',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                    flexShrink: 0,
+                    marginTop: 2,
+                  }}
+                >
+                  ✓
+                </span>
+                <span style={{ lineHeight: 1.5 }}>{feature}</span>
+              </li>
+            ))}
+
+            {GETTING_STARTED && (
+              <li
+                style={{
+                  display: 'flex',
+                  gap: 12,
+                  alignItems: 'flex-start',
+                }}
+              >
+                <span
+                  style={{
+                    minWidth: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    background: 'var(--color-primary)',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    marginTop: 2,
+                  }}
+                >
+                  ✓
+                </span>
+                <span style={{ lineHeight: 1.5 }}>
+                  {GETTING_STARTED}
+                </span>
+              </li>
+            )}
+          </ul>
         </div>
-      </div>
+      </section>
     </HomeLayout>
   );
 }
