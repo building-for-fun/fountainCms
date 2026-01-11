@@ -64,6 +64,7 @@ export default function EmptyState({
       </p>
       {actionLabel && onAction && (
         <button
+          type="button"
           onClick={onAction}
           style={{
             padding: '0.75rem 1.5rem',
