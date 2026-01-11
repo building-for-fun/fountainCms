@@ -67,6 +67,7 @@ export default function ErrorState({
       </p>
       {onRetry && (
         <button
+          type="button"
           onClick={onRetry}
           style={{
             padding: '0.75rem 1.5rem',
