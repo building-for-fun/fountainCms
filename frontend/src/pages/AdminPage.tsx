@@ -1,113 +1,30 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import AdminLayout from '../components/Layouts/AdminLayout';
+import StatCard from '../components/StatCard';
+import Sparkline from '../components/Sparkline';
+import { useQuery } from '@tanstack/react-query';
+import { fetchUsersCount } from '../api/admin.api';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
-function StatCard({
-  title,
-  value,
-  children,
-}: {
-  title: string;
-  value: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div
-      style={{
-        background: 'var(--color-surface)',
-        color: 'var(--color-text)',
-        padding: '16px',
-        borderRadius: 16,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-        border: '1px solid var(--color-border)',
-        minWidth: 0,
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: '100%',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'none';
-        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
-      }}
-    >
-      <div>
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: 'var(--color-text-muted)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-          }}
-        >
-          {title}
-        </div>
-        <div style={{ fontSize: 28, fontWeight: 700, marginTop: 8, color: 'var(--color-text)' }}>
-          {value}
-        </div>
-      </div>
-      <div style={{ marginTop: 16 }}>{children}</div>
-    </div>
-  );
-}
-
-function Sparkline({ data, color = 'var(--color-primary)' }: { data: number[]; color?: string }) {
-  const w = 120;
-  const h = 40;
-  const max = Math.max(...data, 1);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-  const points = data
-    .map((v, i) => `${(i / (data.length - 1 || 1)) * w},${h - ((v - min) / range) * h}`)
-    .join(' ');
-
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden style={{ overflow: 'visible' }}>
-      <polyline
-        fill="none"
-        stroke={color}
-        strokeWidth={2.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        points={points}
-      />
-    </svg>
-  );
-}
-
 export default function AdminPage() {
-  const [usersCount, setUsersCount] = useState<number | null>(null);
-  const [loadingUsers, setLoadingUsers] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: usersCount,
+    isLoading: loadingUsers,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['admin', 'users', 'count'],
+    queryFn: fetchUsersCount,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
 
   // mock storage metrics — in a real app these would come from the backend
   const [imagesSizeMB, setImagesSizeMB] = useState(124.5);
   const [storageUsedGB, setStorageUsedGB] = useState(12.3);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-
-  useEffect(() => {
-    setLoadingUsers(true);
-    fetch(`${apiBaseUrl}/api/user`)
-      .then((res) => res.json())
-      .then((data) => {
-        // backend returns { data: user } (single user) or { data: null }
-        if (!data) return setUsersCount(0);
-        if (Array.isArray(data)) return setUsersCount(data.length);
-        if (data.data == null) return setUsersCount(0);
-        // data.data could be an array or single user
-        if (Array.isArray(data.data)) setUsersCount(data.data.length);
-        else setUsersCount(1);
-      })
-      .catch(() => setError('Failed to fetch users'))
-      .finally(() => setLoadingUsers(false));
-  }, []);
 
   const sparkDataUsers = useMemo(
     () => [2, 3, 4, 5, usersCount ?? 5, (usersCount ?? 5) + 1, usersCount ?? 5],
@@ -117,7 +34,6 @@ export default function AdminPage() {
   const sparkDataStorage = [8, 9, 10, 11, 11.5, 12, storageUsedGB];
 
   const handleRefreshStorage = () => {
-    // simulate fetching storage stats; in a real integration you'd call an API
     setImagesSizeMB((s) => Math.round((s + Math.random() * 10 - 3) * 10) / 10);
     setStorageUsedGB((s) => Math.round((s + Math.random() * 1 - 0.3) * 10) / 10);
     setLastUpdated(new Date());
@@ -144,6 +60,7 @@ export default function AdminPage() {
               Welcome back, here is what is happening today.
             </p>
           </div>
+
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
             <div
               style={{
@@ -157,6 +74,22 @@ export default function AdminPage() {
               {lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}
             </div>
             <button
+              onClick={() => refetch()}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 8,
+                background: 'var(--color-primary)',
+                color: 'var(--color-surface)',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 500,
+                fontSize: 13,
+              }}
+            >
+              Refetch Users
+            </button>
+
+            <button
               onClick={handleRefreshStorage}
               style={{
                 padding: '8px 12px',
@@ -167,44 +100,22 @@ export default function AdminPage() {
                 cursor: 'pointer',
                 fontWeight: 500,
                 fontSize: 13,
-                transition: 'background 0.2s',
-                whiteSpace: 'nowrap',
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')
-              }
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-primary)')}
             >
               Refresh Stats
-            </button>
-            <button
-              onClick={() => window.location.reload()}
-              style={{
-                padding: '8px 12px',
-                borderRadius: 8,
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                color: 'var(--color-text)',
-                cursor: 'pointer',
-                fontWeight: 500,
-                fontSize: 13,
-                transition: 'background 0.2s',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-surface)')}
-            >
-              Reload
             </button>
           </div>
         </div>
 
+        {isError && (
+          <div style={{ color: 'var(--color-danger, red)', fontSize: 13 }}>
+            Failed to fetch users: {error?.message}
+          </div>
+        )}
+
         <div style={{ marginBottom: 32 }}>
-          <h2
-            style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: 'var(--color-text)' }}
-          >
-            Overview
-          </h2>
+          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Overview</h2>
+
           <div
             style={{
               display: 'grid',
@@ -216,45 +127,23 @@ export default function AdminPage() {
               title="Total Users"
               value={loadingUsers ? '...' : (usersCount?.toString() ?? '-')}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Sparkline data={sparkDataUsers} />
-                <div
-                  style={{ fontSize: 13, color: 'var(--color-success, #10b981)', fontWeight: 500 }}
-                >
-                  +12%
-                </div>
+                <div style={{ color: 'var(--color-success)', fontWeight: 500 }}>+12%</div>
               </div>
             </StatCard>
 
             <StatCard title="Images Size" value={`${imagesSizeMB} MB`}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Sparkline data={sparkDataImages} color="var(--color-accent)" />
-                <div style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>total size</div>
+                <div style={{ fontSize: 13 }}>total size</div>
               </div>
             </StatCard>
 
             <StatCard title="Storage Used" value={`${storageUsedGB} GB`}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Sparkline data={sparkDataStorage} color="var(--color-warning)" />
-                <div style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>of 100 GB</div>
+                <div style={{ fontSize: 13 }}>of 100 GB</div>
               </div>
             </StatCard>
           </div>
