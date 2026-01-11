@@ -36,7 +36,7 @@ export class UserController {
       const users = await this.userService.getAll();
       return { data: users ?? [] };
     } catch (error) {
-      console.error('🔥 Failed to fetch users:', error);
+      console.error(' Failed to fetch users:', error);
       throw new InternalServerErrorException('Failed to fetch users');
     }
   }
@@ -53,7 +53,7 @@ export class UserController {
     try {
       return await this.userService.getById(id);
     } catch (error) {
-      console.error(`🔥 Failed to fetch user ${id}:`, error);
+      console.error(` Failed to fetch user ${id}:`, error);
       throw new InternalServerErrorException('Failed to fetch user');
     }
   }
@@ -70,7 +70,7 @@ export class UserController {
     try {
       return await this.userService.create(body);
     } catch (error) {
-      console.error('🔥 Failed to create user:', error);
+      console.error(' Failed to create user:', error);
       throw new InternalServerErrorException('Failed to create user');
     }
   }
@@ -86,17 +86,28 @@ export class UserController {
   })
   async update(
     @Param('id') id: string,
-    @Body() body: any,
+    @Body() body: UserDetailsDto,
   ): Promise<User> {
     try {
-      const { role, permissions, ...userData } = body;
-      const updatedUser = await this.userService.update(id, {
+      const { role, ...userData } = body;
+
+      // Normalize role value: accept either a plain string or an object with a name field.
+      // This dual-format handling exists to support the current frontend payload
+      // where role may be sent as `"admin"` or as `{ name: 'admin' | null }`.
+      // Once all clients consistently send the string form, this logic can be simplified.
+      let roleName: string | null | undefined = undefined;
+      if (typeof role === 'string' || role === null) {
+        roleName = role;
+      } else if (role && typeof role === 'object' && 'name' in role) {
+        roleName = (role as { name: string | null }).name;
+      }
+
+      return await this.userService.update(id, {
         data: userData,
-        roleName: role,
+        roleName,
       });
-      return updatedUser;
     } catch (error) {
-      console.error(`🔥 Failed to update user ${id}:`, error);
+      console.error(` Failed to update user ${id}:`, error);
       throw new InternalServerErrorException('Failed to update user');
     }
   }
@@ -113,7 +124,7 @@ export class UserController {
       const ok = await this.userService.delete(id);
       return { success: ok };
     } catch (error) {
-      console.error(`🔥 Failed to delete user ${id}:`, error);
+      console.error(` Failed to delete user ${id}:`, error);
       throw new InternalServerErrorException('Failed to delete user');
     }
   }
