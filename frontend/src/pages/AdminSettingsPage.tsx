@@ -27,12 +27,10 @@ const AdminSettingsPage = () => {
     setSettings((prev) => ({ ...prev, [name]: value }));
     setEditing(true);
     setSaved(false);
-    // Do not call setMode here
   };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would send settings to the backend
     setMode(settings.theme as 'light' | 'dark');
     setSaved(true);
     setEditing(false);
@@ -46,12 +44,17 @@ const AdminSettingsPage = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center py-8">
-        <div className="w-full max-w-2xl bg-white/90 rounded-2xl shadow-2xl p-10 border border-blue-100">
-          <h1 className="text-3xl font-extrabold text-blue-700 mb-6 text-center tracking-tight">
-            Website Settings
-          </h1>
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-800 flex items-center justify-center px-4">
+        <div className="w-full max-w-2xl bg-white/95 rounded-2xl shadow-2xl p-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Website Settings</h1>
+          <p className="text-sm text-gray-500 mb-6">Manage global configuration for your website</p>
+
           <form onSubmit={handleSave} className="space-y-6">
+            {/* ===== General Section ===== */}
+            <div className="border-b pb-4 mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">General</h2>
+            </div>
+
             <div>
               <label className="block font-semibold text-gray-700 mb-2">Website Title</label>
               <input
@@ -59,32 +62,40 @@ const AdminSettingsPage = () => {
                 name="title"
                 value={settings.title}
                 onChange={handleChange}
-                className="w-full border border-blue-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow-sm"
+                className="w-full border border-blue-200 rounded-lg px-4 py-2"
                 required
               />
             </div>
+
             <div>
               <label className="block font-semibold text-gray-700 mb-2">Description</label>
               <textarea
                 name="description"
                 value={settings.description}
                 onChange={handleChange}
-                className="w-full border border-blue-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow-sm"
+                className="w-full border border-blue-200 rounded-lg px-4 py-2"
                 rows={3}
               />
             </div>
+
+            {/* ===== Appearance Section ===== */}
+            <div className="border-b pt-8 pb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Appearance</h2>
+            </div>
+
             <div>
               <label className="block font-semibold text-gray-700 mb-2">Theme</label>
               <select
                 name="theme"
                 value={settings.theme}
                 onChange={handleChange}
-                className="w-full border border-blue-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow-sm"
+                className="w-full border border-blue-200 rounded-lg px-4 py-2"
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
               </select>
             </div>
+
             <div>
               <label className="block font-semibold text-gray-700 mb-2">Logo URL</label>
               <input
@@ -92,7 +103,7 @@ const AdminSettingsPage = () => {
                 name="logoUrl"
                 value={settings.logoUrl}
                 onChange={handleChange}
-                className="w-full border border-blue-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow-sm"
+                className="w-full border border-blue-200 rounded-lg px-4 py-2"
                 placeholder="https://example.com/logo.png"
               />
               {settings.logoUrl && (
@@ -101,33 +112,32 @@ const AdminSettingsPage = () => {
                   <img
                     src={settings.logoUrl}
                     alt="Logo Preview"
-                    className="h-20 w-auto rounded-lg shadow border border-blue-100 bg-white p-2"
+                    className="h-20 w-auto rounded-lg shadow border bg-white p-2"
                   />
                 </div>
               )}
             </div>
-            <div className="flex gap-8 mt-6 justify-center">
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!editing}
-              >
-                Save
-              </button>
+
+            {/* ===== Actions ===== */}
+            <div className="flex justify-end gap-4 pt-6">
               <button
                 type="button"
-                className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg font-semibold shadow hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleCancel}
                 disabled={!editing}
+                className="px-6 py-2 rounded-lg border text-gray-700 disabled:opacity-50"
               >
                 Cancel
               </button>
+              <button
+                type="submit"
+                disabled={!editing}
+                className="px-6 py-2 rounded-lg bg-blue-600 text-white disabled:opacity-50"
+              >
+                Save Changes
+              </button>
             </div>
-            {saved && (
-              <div className="text-green-600 text-center font-medium mt-2 animate-pulse">
-                Settings saved!
-              </div>
-            )}
+
+            {saved && <div className="text-green-600 text-center font-medium">Settings saved!</div>}
           </form>
         </div>
       </div>
