@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  API_REFERENCES,
-  GETTING_STARTED,
-  INSTALLATION_STEPS,
-} from '../../helper/constant';
+import { API_REFERENCES, GETTING_STARTED, INSTALLATION_STEPS } from '../../helper/constant';
 import HomeLayout from '../../components/Layouts/HomeLayout/HomeLayout';
 
 const Documentation: React.FC = () => {
@@ -163,14 +159,14 @@ const Documentation: React.FC = () => {
                             api.method === 'GET'
                               ? 'rgba(59,130,246,0.15)'
                               : api.method === 'POST'
-                              ? 'rgba(34,197,94,0.15)'
-                              : 'rgba(148,163,184,0.2)',
+                                ? 'rgba(34,197,94,0.15)'
+                                : 'rgba(148,163,184,0.2)',
                           color:
                             api.method === 'GET'
                               ? '#3B82F6'
                               : api.method === 'POST'
-                              ? '#22C55E'
-                              : 'var(--color-text)',
+                                ? '#22C55E'
+                                : 'var(--color-text)',
                         }}
                       >
                         {api.method}

@@ -10,13 +10,13 @@ import ContentTypes from './pages/admin/ContentTypes';
 import AdminEntriesPage from './pages/AdminEntriesPage';
 import MediaLibrary from './pages/admin/MediaLibrary';
 import AdminSettingsPage from './pages/AdminSettingsPage';
-import AdminRolesPage from './pages/AdminRolesPage';
 import ActivityLogs from './pages/admin/ActivityLogs';
 import AdminProfilePage from './pages/AdminProfilePage';
 import NotFoundError from './pages/error/NotFoundError';
 import InternalServerError from './pages/error/InternalServerError';
 import UnauthorizedError from './pages/error/UnauthorizedError';
 import ContentEntries from './pages/admin/ContentEntries';
+import Roles from './pages/admin/Roles';
 
 export default function App() {
   return (
@@ -32,7 +32,7 @@ export default function App() {
             <Route path="entries" element={<AdminEntriesPage />} />
             <Route path="media" element={<MediaLibrary />} />
             <Route path="settings" element={<AdminSettingsPage />} />
-            <Route path="roles" element={<AdminRolesPage />} />
+            <Route path="roles" element={<Roles />} />
             <Route path="logs" element={<ActivityLogs />} />
             <Route path="profile" element={<AdminProfilePage />} />
             <Route path="content/:collection" element={<ContentEntries />} />

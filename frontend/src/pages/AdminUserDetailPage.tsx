@@ -85,10 +85,21 @@ export default function AdminUserDetailPage() {
   return (
     <AdminLayout>
       <div style={{ padding: '16px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start', marginBottom: '16px' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            alignItems: 'flex-start',
+            marginBottom: '16px',
+          }}
+        >
           <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 700 }}>User Details</h1>
           <div>
-            <Link to="/admin/users" style={{ color: 'var(--color-primary)', fontSize: '14px', textDecoration: 'none' }}>
+            <Link
+              to="/admin/users"
+              style={{ color: 'var(--color-primary)', fontSize: '14px', textDecoration: 'none' }}
+            >
               ← Back to users
             </Link>
             <button
@@ -139,7 +150,9 @@ export default function AdminUserDetailPage() {
             </section>
 
             <section style={{ marginTop: 24, marginBottom: 24 }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>Permissions (based on role)</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>
+                Permissions (based on role)
+              </h3>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 {permissions.map((permission) => (
                   <div

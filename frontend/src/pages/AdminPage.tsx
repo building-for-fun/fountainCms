@@ -145,7 +145,15 @@ export default function AdminPage() {
             </p>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
-            <div style={{ color: 'var(--color-text-muted)', fontSize: 12, fontStyle: 'italic', flex: '1 1 auto', minWidth: 'fit-content' }}>
+            <div
+              style={{
+                color: 'var(--color-text-muted)',
+                fontSize: 12,
+                fontStyle: 'italic',
+                flex: '1 1 auto',
+                minWidth: 'fit-content',
+              }}
+            >
               {lastUpdated ? `Last updated ${lastUpdated.toLocaleTimeString()}` : ''}
             </div>
             <button
@@ -313,7 +321,16 @@ export default function AdminPage() {
                       >
                         👤
                       </div>
-                      <span style={{ color: 'var(--color-text)', fontSize: 13, fontWeight: 500, flex: '1 1 auto', minWidth: '120px', wordBreak: 'break-word' }}>
+                      <span
+                        style={{
+                          color: 'var(--color-text)',
+                          fontSize: 13,
+                          fontWeight: 500,
+                          flex: '1 1 auto',
+                          minWidth: '120px',
+                          wordBreak: 'break-word',
+                        }}
+                      >
                         {email}
                       </span>
                       <span

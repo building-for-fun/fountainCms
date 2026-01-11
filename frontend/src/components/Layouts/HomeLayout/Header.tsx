@@ -37,11 +37,7 @@ export const Header = () => {
           <Navbar />
 
           {/* MOBILE HAMBURGER */}
-          <button
-            className="mobile-toggle"
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-          >
+          <button className="mobile-toggle" onClick={() => setOpen(true)} aria-label="Open menu">
             <svg
               width="26"
               height="26"
@@ -60,19 +56,13 @@ export const Header = () => {
       </header>
 
       {/* OVERLAY */}
-      {open && (
-        <div className="drawer-overlay" onClick={() => setOpen(false)} />
-      )}
+      {open && <div className="drawer-overlay" onClick={() => setOpen(false)} />}
 
       {/* LEFT SIDE DRAWER */}
       <aside className={`mobile-drawer ${open ? 'open' : ''}`}>
         <div className="drawer-header">
           <span className="drawer-title">Menu</span>
-          <button
-            className="drawer-close"
-            onClick={() => setOpen(false)}
-            aria-label="Close menu"
-          >
+          <button className="drawer-close" onClick={() => setOpen(false)} aria-label="Close menu">
             ✕
           </button>
         </div>
