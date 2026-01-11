@@ -1,40 +1,91 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { Link } from 'react-router-dom';
 import type { User } from '../../types/user';
+import { LoadingState, EmptyState, ErrorState } from '../../components/states';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
+/**
+ * UsersList component displays all users in the system
+ * Implements proper loading, error, and empty states
+ * Includes retry functionality for failed API requests
+ */
 export default function UsersList() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch(`${apiBaseUrl}/api/user`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data?.data)) {
-          setUsers(data.data);
-        } else {
-          setUsers([]);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Failed to fetch users');
-        setLoading(false);
-      });
+  /**
+   * Fetches users from the API with proper error handling
+   */
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`${apiBaseUrl}/api/user`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (Array.isArray(data?.data)) {
+        setUsers(data.data);
+      } else {
+        setUsers([]);
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Unable to load users. Please check your connection and try again.';
+      setError(errorMessage);
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  /**
+   * Handles retry action for failed requests
+   */
+  const handleRetry = () => {
+    fetchUsers();
+  };
 
   return (
     <AdminLayout>
       <div style={{ padding: '2rem' }}>
-        <h1>Users Directory</h1>
-        {loading && <p>Loading users...</p>}
-        {error && <p style={{ color: 'var(--color-error)' }}>{error}</p>}
-        {!loading && users.length === 0 && <p>No users found.</p>}
-        {!loading && users.length > 0 && (
+        <h1 style={{ marginBottom: '1.5rem', fontSize: '2rem', fontWeight: 700 }}>
+          Users Directory
+        </h1>
+
+        {/* Loading State */}
+        {loading && <LoadingState message="Loading users..." />}
+
+        {/* Error State */}
+        {!loading && error && (
+          <ErrorState title="Failed to Load Users" message={error} onRetry={handleRetry} />
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && users.length === 0 && (
+          <EmptyState
+            title="No Users Found"
+            message="There are no users in the system yet. Users will appear here once they are created."
+            icon="👥"
+          />
+        )}
+
+        {/* Users Table */}
+        {!loading && !error && users.length > 0 && (
           <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
             <thead>
               <tr style={{ background: 'var(--color-surface)' }}>
