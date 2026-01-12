@@ -10,8 +10,7 @@ import ContentTypes from './pages/admin/ContentTypes';
 import AdminEntriesPage from './pages/AdminEntriesPage';
 import MediaLibrary from './pages/admin/MediaLibrary';
 import AdminSettingsPage from './pages/AdminSettingsPage';
-import AdminRolesPage from './pages/AdminRolesPage';
-import ActivityLogs from './pages/admin/ActivityLogs';
+import AuditLogs from './pages/admin/AuditLogs';
 import AdminProfilePage from './pages/AdminProfilePage';
 import NotFoundError from './pages/error/NotFoundError';
 import InternalServerError from './pages/error/InternalServerError';
@@ -33,8 +32,8 @@ export default function App() {
             <Route path="entries" element={<AdminEntriesPage />} />
             <Route path="media" element={<MediaLibrary />} />
             <Route path="settings" element={<AdminSettingsPage />} />
-            <Route path="roles" element={<AdminRolesPage />} />
-            <Route path="logs" element={<ActivityLogs />} />
+            <Route path="roles" element={<Roles />} />
+            <Route path="logs" element={<AuditLogs />} />
             <Route path="profile" element={<AdminProfilePage />} />
             <Route path="content/:collection" element={<ContentEntries />} />
             <Route path="content/:collection/new" element={<ContentEntryDetail />} />
