@@ -90,8 +90,8 @@ describe('ContentTypes', () => {
     await waitFor(() => {
       expect(screen.getByText('Blog Posts')).toBeInTheDocument();
       expect(screen.getByText('Authors')).toBeInTheDocument();
-      expect(screen.getByText('2')).toBeInTheDocument(); // Number of fields for posts
-      expect(screen.getByText('1')).toBeInTheDocument(); // Number of fields for authors
+      expect(screen.getByText('2 fields')).toBeInTheDocument(); // Number of fields for posts
+      expect(screen.getByText('1 field')).toBeInTheDocument(); // Number of fields for authors
     });
   });
 
