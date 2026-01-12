@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeLayout from '../../components/Layouts/HomeLayout/HomeLayout';
+import { login as persistLogin } from '../../lib/auth';
 
 export default function Login() {
   const [username, setUsername] = useState('admin@example.com');
@@ -10,6 +11,11 @@ export default function Login() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (username === 'admin@example.com' && password === 'password') {
+      persistLogin({
+        email: username,
+        role: 'Super Admin',
+        id: 'local-admin',
+      });
       navigate('/admin');
     } else {
       alert('Invalid credentials');

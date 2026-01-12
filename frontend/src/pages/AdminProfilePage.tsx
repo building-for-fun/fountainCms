@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AdminLayout from '../components/Layouts/AdminLayout';
+import { getUser } from '../lib/auth';
 
 const InputGroup = ({
   label,
@@ -57,12 +58,14 @@ const InputGroup = ({
 );
 
 const AdminProfilePage = () => {
+  const currentUser = getUser();
+
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: 'Admin',
-    lastName: 'User',
-    email: 'admin@fountaincms.com',
-    role: 'Super Admin',
+    firstName: currentUser?.email?.split('@')[0] ?? 'Admin',
+    lastName: '007',
+    email: currentUser?.email ?? 'admin@fountaincms.com',
+    role: currentUser?.role ?? 'Super Admin',
     currentPassword: '',
     newPassword: '',
   });
@@ -174,26 +177,7 @@ const AdminProfilePage = () => {
               }}
             >
               <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>Account Details</h3>
-              {!isEditing ? (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: 8,
-                    background: 'var(--color-primary)',
-                    color: '#fff',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    transition: 'background 0.2s',
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')
-                  }
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-primary)')}
-                >
-                  Edit Profile
-                </button>
-              ) : (
+              {isEditing ? (
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
                     onClick={handleCancel}
@@ -223,6 +207,25 @@ const AdminProfilePage = () => {
                     Save Changes
                   </button>
                 </div>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 8,
+                    background: 'var(--color-primary)',
+                    color: '#fff',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = 'var(--color-primary-dark, #1d4ed8)')
+                  }
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-primary)')}
+                >
+                  Edit Profile
+                </button>
               )}
             </div>
 
