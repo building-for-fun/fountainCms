@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../../ThemeToggle';
 import { PrimaryButton } from '../../PrimaryButton';
+import { isAuthenticated } from '../../../lib/auth';
 
 type NavbarProps = {
   onNavigate?: () => void;
@@ -28,9 +29,15 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, isMobile = false }) => {
         <ThemeToggle />
       )}
 
-      <Link onClick={onNavigate} to="/login">
-        <PrimaryButton>Get Started</PrimaryButton>
-      </Link>
+      {isAuthenticated() ? (
+        <Link onClick={onNavigate} to="/admin">
+          <PrimaryButton>Dashboard</PrimaryButton>
+        </Link>
+      ) : (
+        <Link onClick={onNavigate} to="/login">
+          <PrimaryButton>Get Started</PrimaryButton>
+        </Link>
+      )}
     </nav>
   );
 };

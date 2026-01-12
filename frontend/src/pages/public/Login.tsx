@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeLayout from '../../components/Layouts/HomeLayout/HomeLayout';
-import { login as persistLogin } from '../../lib/auth';
+import { login as persistLogin, isAuthenticated } from '../../lib/auth';
 
 export default function Login() {
   const [username, setUsername] = useState('admin@example.com');
   const [password, setPassword] = useState('password');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate('/admin', { replace: true });
+    }
+  }, [navigate]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +22,7 @@ export default function Login() {
         role: 'Super Admin',
         id: 'local-admin',
       });
-      navigate('/admin');
+      navigate('/admin', { replace: true });
     } else {
       alert('Invalid credentials');
     }

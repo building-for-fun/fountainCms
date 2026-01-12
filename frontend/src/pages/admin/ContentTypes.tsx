@@ -22,7 +22,7 @@ const ContentTypes = () => {
         {isLoading && <p>Loading schema…</p>}
 
         {/* Error */}
-        {isError && <p style={{ color: 'red' }}>{(error as Error).message}</p>}
+        {isError && <p style={{ color: 'red' }}>{error.message}</p>}
 
         {/* Data */}
         {schema && (
