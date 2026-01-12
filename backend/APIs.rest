@@ -1,4 +1,5 @@
 @collection = posts
+@host = http://localhost:4000/api
 
 ### Get Home Content
 
@@ -38,3 +39,7 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:4000/api/content/collections/{{collection}}/e3d0789e-3d44-4a8d-b29b-a5b9fb9c4f31
+
+###
+
+GET {{host}}/audit-logs

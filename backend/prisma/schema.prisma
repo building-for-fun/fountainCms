@@ -18,6 +18,8 @@ model User {
   isActive  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  auditLogs AuditLog[]
 }
 
 model Role {
@@ -36,4 +38,26 @@ model ContentItem {
   updatedAt  DateTime @updatedAt
 
   @@index([collection])
+}
+
+model AuditLog {
+  id         String  @id @default(uuid()) @db.Uuid
+  action     String
+  entity     String
+  entityId   String?
+  collection String?
+
+  userId String? @db.Uuid
+  user   User?   @relation(fields: [userId], references: [id])
+
+  ip        String?
+  userAgent String?
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([entity])
+  @@index([collection])
+  @@index([userId])
+  @@index([createdAt])
 }

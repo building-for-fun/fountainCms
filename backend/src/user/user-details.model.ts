@@ -2,7 +2,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { RoleDetails } from '../roles/role-details.model';
 
 export class UserDetailsDto {
-  @ApiProperty({ example: 'u1', description: 'Unique user ID', required: false })
+  @ApiProperty({
+    example: 'u1',
+    description: 'Unique user ID',
+    required: false,
+  })
   id?: string;
 
   @ApiProperty({ example: 'john_doe', description: 'Username' })

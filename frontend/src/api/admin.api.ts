@@ -1,5 +1,5 @@
 import { api } from './client';
-import { UserResponse } from '../types/admin';
+import { AuditLog, UserResponse } from '../types/admin';
 
 export async function fetchUsersCount(): Promise<number> {
   const res = await api<UserResponse>('/user');
@@ -14,4 +14,11 @@ export async function fetchUsersCount(): Promise<number> {
   }
 
   return 0;
+}
+
+export function fetchAuditLogs() {
+  return api<{
+    data: AuditLog[];
+    meta: { total: number };
+  }>('/audit-logs');
 }
