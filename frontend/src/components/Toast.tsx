@@ -79,7 +79,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) 
   return (
     <div className="fixed bottom-4 right-4 z-50 space-y-2">
       {toasts.map((toast) => (
-        <div key={toast.id} className={`${getToastStyles(toast.type)} animate-slide-in`}>
+        <div key={toast.id} className={getToastStyles(toast.type)}>
           <span className="text-2xl font-bold">{getToastIcon(toast.type)}</span>
           <span className="flex-1">{toast.message}</span>
           <button
