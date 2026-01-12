@@ -64,6 +64,112 @@ const ContentTypes = () => {
 
   return (
     <AdminLayout>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        .content-grid {
+          display: grid !important;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+          gap: 1.5rem !important;
+        }
+        .content-card {
+          background: white !important;
+          border-radius: 0.75rem !important;
+          border: 1px solid #e2e8f0 !important;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+          padding: 1.5rem !important;
+          transition: all 0.2s ease !important;
+          display: flex !important;
+          flex-direction: column !important;
+        }
+        .dark .content-card {
+          background: #1e293b !important;
+          border-color: #334155 !important;
+          color: white !important;
+        }
+        .content-card:hover {
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+          transform: translateY(-4px) !important;
+          border-color: #3b82f6 !important;
+        }
+        .card-icon {
+          width: 3rem !important;
+          height: 3rem !important;
+          border-radius: 0.5rem !important;
+          background-color: #dbeafe !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 1.5rem !important;
+          margin-bottom: 1rem !important;
+        }
+        .dark .card-icon {
+          background-color: rgba(30, 58, 138, 0.4) !important;
+        }
+        .card-title {
+          font-size: 1.25rem !important;
+          font-weight: 600 !important;
+          margin-bottom: 0.25rem !important;
+        }
+        .card-key {
+          font-family: monospace !important;
+          font-size: 0.875rem !important;
+          color: #64748b !important;
+          margin-bottom: 1rem !important;
+        }
+        .card-stats {
+          display: flex !important;
+          align-items: center !important;
+          gap: 0.5rem !important;
+          font-size: 0.875rem !important;
+          color: #475569 !important;
+          margin-bottom: 1.5rem !important;
+        }
+        .dark .card-stats {
+          color: #94a3b8 !important;
+        }
+        .card-action {
+          margin-top: auto !important;
+          padding-top: 1rem !important;
+          border-top: 1px solid #f1f5f9 !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: 0.5rem !important;
+          color: #2563eb !important;
+          font-weight: 500 !important;
+          text-decoration: none !important;
+        }
+        .dark .card-action {
+          border-top-color: #334155 !important;
+          color: #60a5fa !important;
+        }
+        .search-input {
+          width: 100% !important;
+          padding: 0.5rem 1rem !important;
+          border-radius: 0.5rem !important;
+          border: 1px solid #d1d5db !important;
+          background: white !important;
+        }
+        .dark .search-input {
+          background: #1f2937 !important;
+          border-color: #4b5563 !important;
+          color: white !important;
+        }
+        .sort-select {
+          width: 100% !important;
+          padding: 0.5rem 1rem !important;
+          border-radius: 0.5rem !important;
+          border: 1px solid #d1d5db !important;
+          background: white !important;
+        }
+        .dark .sort-select {
+          background: #1f2937 !important;
+          border-color: #4b5563 !important;
+          color: white !important;
+        }
+      `,
+        }}
+      />
       <div className="p-6 md:p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -107,7 +213,7 @@ const ContentTypes = () => {
                   placeholder="Search content types..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100"
+                  className="search-input"
                 />
               </div>
 
@@ -116,7 +222,7 @@ const ContentTypes = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100"
+                  className="sort-select"
                 >
                   <option value="name-asc">Name (A-Z)</option>
                   <option value="name-desc">Name (Z-A)</option>
@@ -143,51 +249,24 @@ const ContentTypes = () => {
 
             {/* Card Grid */}
             {filteredAndSortedTypes.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="content-grid">
                 {filteredAndSortedTypes.map(({ key, label, fieldCount }) => (
-                  <div
-                    key={key}
-                    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group"
-                  >
-                    <div className="p-6">
-                      {/* Icon and Title */}
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-2xl">
-                            📦
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                              {label}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                              {key}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                  <div key={key} className="content-card">
+                    <div className="card-icon">📦</div>
+                    <div className="card-title">{label}</div>
+                    <div className="card-key">{key}</div>
 
-                      {/* Stats */}
-                      <div className="flex items-center space-x-4 mb-4">
-                        <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                          <span className="text-base">🏷️</span>
-                          <span>
-                            {fieldCount} {fieldCount === 1 ? 'field' : 'fields'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <a
-                          href={`/admin/content/${key}`}
-                          className="inline-flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors group-hover:translate-x-1 transform duration-200"
-                        >
-                          <span>Manage Content</span>
-                          <span className="text-lg">→</span>
-                        </a>
-                      </div>
+                    <div className="card-stats">
+                      <span>🏷️</span>
+                      <span>
+                        {fieldCount} {fieldCount === 1 ? 'field' : 'fields'}
+                      </span>
                     </div>
+
+                    <a href={`/admin/content/${key}`} className="card-action">
+                      <span>Manage Content</span>
+                      <span>→</span>
+                    </a>
                   </div>
                 ))}
               </div>

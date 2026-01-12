@@ -17,6 +17,7 @@ import NotFoundError from './pages/error/NotFoundError';
 import InternalServerError from './pages/error/InternalServerError';
 import UnauthorizedError from './pages/error/UnauthorizedError';
 import ContentEntries from './pages/admin/ContentEntries';
+import ContentEntryDetail from './pages/admin/ContentEntryDetail';
 
 export default function App() {
   return (
@@ -36,6 +37,8 @@ export default function App() {
             <Route path="logs" element={<ActivityLogs />} />
             <Route path="profile" element={<AdminProfilePage />} />
             <Route path="content/:collection" element={<ContentEntries />} />
+            <Route path="content/:collection/new" element={<ContentEntryDetail />} />
+            <Route path="content/:collection/:id" element={<ContentEntryDetail />} />
           </Route>
           <Route path="/" element={<Landing />} />
           <Route path="/docs" element={<Documentation />} />
