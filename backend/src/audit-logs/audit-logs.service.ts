@@ -21,4 +21,18 @@ export class AuditLogsService {
       },
     };
   }
+
+  async create(data: {
+    action: string;
+    entity: string;
+    entityId?: string | null;
+    collection?: string | null;
+    userId?: string | null;
+    ip?: string | null;
+    userAgent?: string | null;
+    payload?: unknown;
+  }) {
+    const created = await this.auditLogsRepository.create(data);
+    return created;
+  }
 }
