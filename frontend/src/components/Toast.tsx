@@ -85,6 +85,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) 
           <button
             onClick={() => removeToast(toast.id)}
             className="text-white hover:opacity-75 transition-opacity"
+            aria-label="Close notification"
           >
             ✕
           </button>
