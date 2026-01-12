@@ -66,7 +66,7 @@ describe('ContentTypes', () => {
     });
   });
 
-  it('displays content types table when data is available', async () => {
+  it('displays content types when data is available', async () => {
     vi.mocked(schemaApi.fetchSchema).mockResolvedValue({
       collections: {
         posts: {
