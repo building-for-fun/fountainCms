@@ -18,7 +18,7 @@ services:
       DATABASE_URL: 'postgresql://fountain_user:fountain_pass@postgres:5432/fountain_db?schema=public'
       NODE_ENV: development
     ports:
-      - '3000:3000'
+      - '4000:4000'
     depends_on:
       - db
 volumes:

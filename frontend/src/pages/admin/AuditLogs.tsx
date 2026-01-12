@@ -47,7 +47,7 @@ const AuditLogs = () => {
               </tr>
             </thead>
             <tbody>
-              {data.data.map((log: AuditLog) => (
+              {data?.data?.map((log: AuditLog) => (
                 <tr key={log.id}>
                   <td>{new Date(log.createdAt).toLocaleString()}</td>
                   <td>{log.user ? log.user.username : 'System'}</td>

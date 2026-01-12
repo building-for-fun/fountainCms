@@ -6,8 +6,10 @@ import { AuditLog } from '@prisma/client';
 export class AuditLogsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findMany(): Promise<AuditLog[]> {
+  async findMany(limit: number, offset: number) {
     return this.prisma.auditLog.findMany({
+      take: limit,
+      skip: offset,
       include: {
         user: {
           select: {
@@ -21,5 +23,9 @@ export class AuditLogsRepository {
         createdAt: 'desc',
       },
     });
+  }
+
+  count() {
+    return this.prisma.auditLog.count();
   }
 }
