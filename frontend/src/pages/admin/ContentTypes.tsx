@@ -2,6 +2,9 @@ import React from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSchema } from '../../api/schema';
+import LoadingState from '../../components/LoadingState';
+import ErrorState from '../../components/ErrorState';
+import EmptyState from '../../components/EmptyState';
 
 const ContentTypes = () => {
   const {
@@ -9,23 +12,39 @@ const ContentTypes = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['schema'],
     queryFn: fetchSchema,
   });
+
   return (
     <AdminLayout>
       <div style={{ padding: '2rem' }}>
         <h1>Content Types</h1>
 
-        {/* Loading */}
-        {isLoading && <p>Loading schema…</p>}
+        {/* Loading State */}
+        {isLoading && <LoadingState message="Loading content types..." />}
 
-        {/* Error */}
-        {isError && <p style={{ color: 'red' }}>{(error as Error).message}</p>}
+        {/* Error State */}
+        {isError && (
+          <ErrorState
+            message={(error as Error).message || 'Failed to fetch content types'}
+            onRetry={() => refetch()}
+          />
+        )}
+
+        {/* Empty State */}
+        {schema && Object.keys(schema.collections).length === 0 && (
+          <EmptyState
+            message="No Content Types Yet"
+            description="Content types define the structure of your data. Start by creating your first content type."
+            icon="📦"
+          />
+        )}
 
         {/* Data */}
-        {schema && (
+        {schema && Object.keys(schema.collections).length > 0 && (
           <table
             style={{
               width: '100%',
@@ -57,9 +76,6 @@ const ContentTypes = () => {
             </tbody>
           </table>
         )}
-
-        {/* Empty state */}
-        {schema && Object.keys(schema.collections).length === 0 && <p>No content types defined.</p>}
       </div>
     </AdminLayout>
   );
