@@ -1,5 +1,5 @@
 import Landing from './pages/public/Landing';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom';
 import Documentation from './pages/public/Documentation';
 import AdminPage from './pages/AdminPage';
 import UsersList from './pages/admin/UsersList';
@@ -24,7 +24,14 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/admin">
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth requiredRole="Super Admin">
+                <Outlet />
+              </RequireAuth>
+            }
+          >
             <Route index element={<AdminPage />} />
             <Route path="users" element={<UsersList />} />
             <Route path="users/:id" element={<AdminUserDetailPage />} />
@@ -41,7 +48,6 @@ export default function App() {
           </Route>
           <Route path="/" element={<Landing />} />
           <Route path="/docs" element={<Documentation />} />
-          {/* Error Handling Routes */}
           <Route path="/401" element={<UnauthorizedError />} />
           <Route path="/500" element={<InternalServerError />} />
           <Route path="*" element={<NotFoundError />} />

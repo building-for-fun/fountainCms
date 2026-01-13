@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { logout } from '../../lib/auth';
 
 const adminNavItems = [
   { to: '/admin', icon: '🛠️', label: 'Dashboard' },
@@ -13,7 +14,7 @@ const adminNavItems = [
   { to: '/admin/profile', icon: '🙍‍♂️', label: 'Profile' },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -31,6 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, []);
 
   const handleLogout = () => {
+    logout();
     navigate('/login');
   };
 
@@ -79,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             padding: '1.5rem 1rem',
             position: isMobile ? 'absolute' : 'sticky',
             left: 0,
-            top: isMobile ? 0 : 0,
+            top: isMobile ? 0 : 1,
             height: isMobile ? 'calc(100vh - 60px)' : '100vh',
             overflowY: 'auto',
             zIndex: 99,
