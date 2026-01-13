@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 /* CSS Reset and base styles for FountainCMS */
 
@@ -17,8 +15,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background: #f8fafc;
-  color: #222;
   min-height: 100vh;
 }
 
