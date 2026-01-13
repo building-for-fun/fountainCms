@@ -64,121 +64,11 @@ const ContentTypes = () => {
 
   return (
     <AdminLayout>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .content-grid {
-          display: grid !important;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
-          gap: 1.5rem !important;
-        }
-        .content-card {
-          background: white !important;
-          border-radius: 0.75rem !important;
-          border: 1px solid #e2e8f0 !important;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-          padding: 1.5rem !important;
-          transition: all 0.2s ease !important;
-          display: flex !important;
-          flex-direction: column !important;
-        }
-        .dark .content-card {
-          background: #1e293b !important;
-          border-color: #334155 !important;
-          color: white !important;
-        }
-        .content-card:hover {
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-          transform: translateY(-4px) !important;
-          border-color: #3b82f6 !important;
-        }
-        .card-icon {
-          width: 3rem !important;
-          height: 3rem !important;
-          border-radius: 0.5rem !important;
-          background-color: #dbeafe !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 1.5rem !important;
-          margin-bottom: 1rem !important;
-        }
-        .dark .card-icon {
-          background-color: rgba(30, 58, 138, 0.4) !important;
-        }
-        .card-title {
-          font-size: 1.25rem !important;
-          font-weight: 600 !important;
-          margin-bottom: 0.25rem !important;
-        }
-        .card-key {
-          font-family: monospace !important;
-          font-size: 0.875rem !important;
-          color: #64748b !important;
-          margin-bottom: 1rem !important;
-        }
-        .card-stats {
-          display: flex !important;
-          align-items: center !important;
-          gap: 0.5rem !important;
-          font-size: 0.875rem !important;
-          color: #475569 !important;
-          margin-bottom: 1.5rem !important;
-        }
-        .dark .card-stats {
-          color: #94a3b8 !important;
-        }
-        .card-action {
-          margin-top: auto !important;
-          padding-top: 1rem !important;
-          border-top: 1px solid #f1f5f9 !important;
-          display: flex !important;
-          align-items: center !important;
-          gap: 0.5rem !important;
-          color: #2563eb !important;
-          font-weight: 500 !important;
-          text-decoration: none !important;
-        }
-        .dark .card-action {
-          border-top-color: #334155 !important;
-          color: #60a5fa !important;
-        }
-        .search-input {
-          width: 100% !important;
-          padding: 0.5rem 1rem !important;
-          border-radius: 0.5rem !important;
-          border: 1px solid #d1d5db !important;
-          background: white !important;
-        }
-        .dark .search-input {
-          background: #1f2937 !important;
-          border-color: #4b5563 !important;
-          color: white !important;
-        }
-        .sort-select {
-          width: 100% !important;
-          padding: 0.5rem 1rem !important;
-          border-radius: 0.5rem !important;
-          border: 1px solid #d1d5db !important;
-          background: white !important;
-        }
-        .dark .sort-select {
-          background: #1f2937 !important;
-          border-color: #4b5563 !important;
-          color: white !important;
-        }
-      `,
-        }}
-      />
-      <div className="p-6 md:p-8 max-w-7xl mx-auto">
+      <div className="p-6 md:p-10 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Content Types
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Manage and organize your content structures
-          </p>
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-text mb-2">Content Types</h1>
+          <p className="text-text-muted">Manage and organize your content structures</p>
         </div>
 
         {/* Loading State */}
@@ -205,7 +95,7 @@ const ContentTypes = () => {
         {schema && Object.keys(schema.collections).length > 0 && (
           <>
             {/* Search and Sort Bar */}
-            <div className="mb-6 flex flex-col md:flex-row gap-4">
+            <div className="mb-8 flex flex-col md:flex-row gap-4">
               {/* Search Input */}
               <div className="flex-1">
                 <input
@@ -213,7 +103,7 @@ const ContentTypes = () => {
                   placeholder="Search content types..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
+                  className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text placeholder-text-muted transition-all"
                 />
               </div>
 
@@ -222,7 +112,7 @@ const ContentTypes = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="sort-select"
+                  className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text transition-all"
                 >
                   <option value="name-asc">Name (A-Z)</option>
                   <option value="name-desc">Name (Z-A)</option>
@@ -233,7 +123,7 @@ const ContentTypes = () => {
             </div>
 
             {/* Results Count */}
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            <div className="mb-4 text-sm text-text-muted">
               Showing {filteredAndSortedTypes.length} of {Object.keys(schema.collections).length}{' '}
               content type{Object.keys(schema.collections).length !== 1 ? 's' : ''}
             </div>
@@ -241,29 +131,35 @@ const ContentTypes = () => {
             {/* No Results */}
             {filteredAndSortedTypes.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400 text-lg">
-                  No content types match your search
-                </p>
+                <p className="text-text-muted text-lg">No content types match your search</p>
               </div>
             )}
 
             {/* Card Grid */}
             {filteredAndSortedTypes.length > 0 && (
-              <div className="content-grid">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAndSortedTypes.map(({ key, label, fieldCount }) => (
-                  <div key={key} className="content-card">
-                    <div className="card-icon">📦</div>
-                    <div className="card-title">{label}</div>
-                    <div className="card-key">{key}</div>
+                  <div
+                    key={key}
+                    className="bg-surface rounded-xl border border-border shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-primary transition-all p-6 flex flex-col"
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl mb-4">
+                      📦
+                    </div>
+                    <div className="text-xl font-semibold text-text mb-1">{label}</div>
+                    <div className="font-mono text-sm text-text-muted mb-4">{key}</div>
 
-                    <div className="card-stats">
+                    <div className="flex items-center gap-2 text-sm text-text-muted mb-6">
                       <span>🏷️</span>
                       <span>
                         {fieldCount} {fieldCount === 1 ? 'field' : 'fields'}
                       </span>
                     </div>
 
-                    <a href={`/admin/content/${key}`} className="card-action">
+                    <a
+                      href={`/admin/content/${key}`}
+                      className="mt-auto pt-4 border-t border-border flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all"
+                    >
                       <span>Manage Content</span>
                       <span>→</span>
                     </a>

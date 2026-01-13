@@ -7,79 +7,6 @@ import { fetchSchema } from '../../api/schema';
 import LoadingState from '../../components/LoadingState';
 import ErrorState from '../../components/ErrorState';
 
-const GlobalStyle = () => (
-  <style
-    dangerouslySetInnerHTML={{
-      __html: `
-    .entry-form-container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      padding: 2.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      border: 1px solid #f3f4f6;
-    }
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    .form-label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 0.5rem;
-      text-transform: capitalize;
-    }
-    .form-input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      transition: all 0.2s;
-    }
-    .form-input:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 2rem;
-      padding-top: 2rem;
-      border-top: 1px solid #f3f4f6;
-    }
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      font-weight: 600;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-    .btn-primary {
-      background: #2563eb;
-      color: white;
-      border: none;
-    }
-    .btn-primary:hover {
-      background: #1d4ed8;
-    }
-    .btn-secondary {
-      background: white;
-      color: #374151;
-      border: 1px solid #d1d5db;
-    }
-    .btn-secondary:hover {
-      background: #f9fafb;
-    }
-  `,
-    }}
-  />
-);
-
 const ContentEntryDetail = () => {
   const { collection, id } = useParams<{ collection: string; id?: string }>();
   const navigate = useNavigate();
@@ -155,43 +82,50 @@ const ContentEntryDetail = () => {
 
   return (
     <AdminLayout>
-      <GlobalStyle />
       {toast && (
         <div
-          className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}
+          className={`fixed bottom-8 right-8 p-4 rounded-xl shadow-2xl z-50 ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-error'
+          } text-white animate-slide-in flex items-center gap-3 min-w-[300px] border border-white/10`}
         >
-          {toast.message}
+          <div className="flex-1 font-medium">{toast.message}</div>
+          <button onClick={() => setToast(null)} className="text-white/80 hover:text-white">
+            ✕
+          </button>
         </div>
       )}
 
-      <div className="p-8">
-        <div className="mb-8">
+      <div className="p-6 md:p-10 max-w-7xl mx-auto">
+        <div className="mb-10">
           <button
             onClick={() => navigate(`/admin/content/${collection}`)}
-            className="text-gray-500 hover:text-gray-700 flex items-center gap-2 mb-4 transition-colors"
+            className="text-text-muted hover:text-text flex items-center gap-2 mb-6 transition-colors group"
           >
-            ← Back to Entries
+            <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to
+            Entries
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-text">
             {isEdit ? 'Edit' : 'Create'} {collectionSchema.label}
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="text-text-muted mt-2">
             {isEdit ? 'Update existing content entry' : 'Add a new entry to this collection'}
           </p>
         </div>
 
-        <div className="entry-form-container">
+        <div className="max-w-3xl mx-auto bg-surface p-8 md:p-12 rounded-2xl shadow-xl border border-border">
           <form onSubmit={handleSubmit}>
             {Object.entries(collectionSchema.fields).map(
               ([fieldName, fieldConfig]: [string, any]) => (
-                <div key={fieldName} className="form-group">
-                  <label className="form-label">{fieldName}</label>
+                <div key={fieldName} className="mb-8">
+                  <label className="block text-sm font-semibold text-text mb-2 capitalize">
+                    {fieldName}
+                  </label>
                   {fieldConfig.type === 'text' && fieldConfig.variant === 'long' ? (
                     <textarea
                       name={fieldName}
                       value={formData[fieldName] || ''}
                       onChange={handleInputChange}
-                      className="form-input"
+                      className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text placeholder-text-muted transition-all"
                       rows={5}
                       placeholder={`Enter ${fieldName}...`}
                     />
@@ -201,7 +135,7 @@ const ContentEntryDetail = () => {
                       name={fieldName}
                       value={formData[fieldName] || ''}
                       onChange={handleInputChange}
-                      className="form-input"
+                      className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text placeholder-text-muted transition-all"
                       placeholder={`Enter ${fieldName}...`}
                     />
                   )}
@@ -209,15 +143,19 @@ const ContentEntryDetail = () => {
               )
             )}
 
-            <div className="form-actions">
+            <div className="flex justify-end gap-4 mt-10 pt-8 border-t border-border">
               <button
                 type="button"
                 onClick={() => navigate(`/admin/content/${collection}`)}
-                className="btn btn-secondary"
+                className="px-6 py-2.5 bg-surface text-text border border-border rounded-lg font-semibold hover:bg-background transition-all shadow-sm"
               >
                 Cancel
               </button>
-              <button type="submit" disabled={mutation.isPending} className="btn btn-primary">
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                className="px-6 py-2.5 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 {mutation.isPending ? 'Saving...' : isEdit ? 'Update Entry' : 'Create Entry'}
               </button>
             </div>
