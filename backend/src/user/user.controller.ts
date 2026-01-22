@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -22,6 +23,8 @@ import { UserDetailsDto } from './user-details.model';
 @ApiTags('user')
 @Controller('user')
 export class UserController {
+  private readonly logger = new Logger(UserController.name);
+
   constructor(private readonly userService: UserService) {}
 
   @Get()
@@ -36,7 +39,7 @@ export class UserController {
       const users = await this.userService.getAll();
       return { data: users ?? [] };
     } catch (error) {
-      console.error('🔥 Failed to fetch users:', error);
+      this.logger.error('🔥 Failed to fetch users', error);
       throw new InternalServerErrorException('Failed to fetch users');
     }
   }
@@ -53,7 +56,7 @@ export class UserController {
     try {
       return await this.userService.getById(id);
     } catch (error) {
-      console.error(`🔥 Failed to fetch user ${id}:`, error);
+      this.logger.error(`🔥 Failed to fetch user ${id}`, error);
       throw new InternalServerErrorException('Failed to fetch user');
     }
   }
@@ -70,7 +73,7 @@ export class UserController {
     try {
       return await this.userService.create(body);
     } catch (error) {
-      console.error('🔥 Failed to create user:', error);
+      this.logger.error('🔥 Failed to create user', error);
       throw new InternalServerErrorException('Failed to create user');
     }
   }
@@ -84,10 +87,7 @@ export class UserController {
     description: 'The user has been successfully updated.',
     type: UserDetailsDto,
   })
-  async update(
-    @Param('id') id: string,
-    @Body() body: any,
-  ): Promise<User> {
+  async update(@Param('id') id: string, @Body() body: any): Promise<User> {
     try {
       const { role, permissions, ...userData } = body;
       const updatedUser = await this.userService.update(id, {
@@ -96,7 +96,7 @@ export class UserController {
       });
       return updatedUser;
     } catch (error) {
-      console.error(`🔥 Failed to update user ${id}:`, error);
+      this.logger.error(`🔥 Failed to update user ${id}`, error);
       throw new InternalServerErrorException('Failed to update user');
     }
   }
@@ -113,7 +113,7 @@ export class UserController {
       const ok = await this.userService.delete(id);
       return { success: ok };
     } catch (error) {
-      console.error(`🔥 Failed to delete user ${id}:`, error);
+      this.logger.error(`🔥 Failed to delete user ${id}`, error);
       throw new InternalServerErrorException('Failed to delete user');
     }
   }

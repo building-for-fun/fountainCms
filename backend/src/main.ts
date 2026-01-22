@@ -2,17 +2,22 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './utils/winston.config';
 
 async function bootstrap() {
+  const logger = WinstonModule.createLogger(winstonConfig);
   const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || '';
   const allowedOrigins = allowedOriginsEnv
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
 
-  console.log('🧩 Allowed Origins:', allowedOrigins);
+  logger.log(`🧩 Allowed Origins: ${allowedOrigins}`);
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger,
+  });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
