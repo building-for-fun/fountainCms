@@ -4,17 +4,15 @@ export const Footer = () => {
   return (
     <footer
       style={{
-        background: 'none',
-        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-        color: 'var(--color-text)',
-        opacity: 0.7,
+        padding: '24px 16px',
         textAlign: 'center',
-        padding: '2rem 0',
-        fontSize: '0.9rem',
-        marginTop: 'auto',
+        fontSize: '0.85rem',
+        color: 'var(--color-text-secondary)',
+        borderTop: '1px solid var(--color-border)',
+        width: '100%',
       }}
     >
-      &copy; {new Date().getFullYear()} FountainCMS. All rights reserved.
+      © {new Date().getFullYear()} FountainCMS. All rights reserved.
     </footer>
   );
 };

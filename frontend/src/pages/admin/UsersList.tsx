@@ -1,40 +1,213 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { Link } from 'react-router-dom';
 import type { User } from '../../types/user';
+import { LoadingState, EmptyState, ErrorState } from '../../components/states';
+import { PrimaryButton } from '../../components/PrimaryButton';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+interface Role {
+  id: string;
+  name: string;
+  description?: string;
+}
 
 export default function UsersList() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  
+  const [newUser, setNewUser] = useState({
+    username: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    roleName: '',
+    isActive: true,
+  });
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`${apiBaseUrl}/user`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (Array.isArray(data?.data)) {
+        setUsers(data.data);
+      } else {
+        setUsers([]);
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Unable to load users. Please check your connection and try again.';
+      setError(errorMessage);
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchRoles = useCallback(async () => {
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/roles`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch roles');
+      }
+      const data = await response.json();
+      setRoles(data.data || []);
+    } catch (err) {
+      console.error('Error fetching roles:', err);
+    }
+  }, []);
 
   useEffect(() => {
-    fetch(`${apiBaseUrl}/api/user`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data?.data)) {
-          setUsers(data.data);
-        } else {
-          setUsers([]);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Failed to fetch users');
-        setLoading(false);
+    fetchUsers();
+    fetchRoles();
+  }, [fetchUsers, fetchRoles]);
+
+  const handleRetry = () => {
+    fetchUsers();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name === 'isActive') {
+      setNewUser((prev) => ({ ...prev, [name]: (e.target as HTMLInputElement).checked }));
+    } else {
+      setNewUser((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError(null);
+    setIsSubmitting(true);
+
+    try {
+      // Validate required fields
+      if (!newUser.username || !newUser.firstName || !newUser.lastName || !newUser.email) {
+        setFormError('Please fill in all required fields');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Prepare the user data
+      const userData: any = {
+        username: newUser.username,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        isActive: newUser.isActive,
+      };
+
+      // Add role connection if a role is selected
+      if (newUser.roleName) {
+        userData.role = {
+          connect: {
+            name: newUser.roleName,
+          },
+        };
+      }
+
+      const response = await fetch(`${apiBaseUrl}/api/user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
       });
-  }, []);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to create user');
+      }
+
+      const createdUser = await response.json();
+      
+      // Reset form
+      setNewUser({
+        username: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        roleName: '',
+        isActive: true,
+      });
+      
+      // Close modal and refresh users list
+      setShowAddModal(false);
+      await fetchUsers();
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to create user. Please try again.';
+      setFormError(errorMessage);
+      console.error('Error creating user:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setFormError(null);
+    setNewUser({
+      username: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      roleName: '',
+      isActive: true,
+    });
+  };
 
   return (
     <AdminLayout>
       <div style={{ padding: '2rem' }}>
-        <h1>Users Directory</h1>
-        {loading && <p>Loading users...</p>}
-        {error && <p style={{ color: 'var(--color-error)' }}>{error}</p>}
-        {!loading && users.length === 0 && <p>No users found.</p>}
-        {!loading && users.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 700 }}>Users Directory</h1>
+          <PrimaryButton onClick={() => setShowAddModal(true)}>+ Add New User</PrimaryButton>
+        </div>
+
+        {/* Loading State */}
+        {loading && <LoadingState message="Loading users..." />}
+
+        {/* Error State */}
+        {!loading && error && (
+          <ErrorState title="Failed to Load Users" message={error} onRetry={handleRetry} />
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && users.length === 0 && (
+          <EmptyState
+            title="No Users Found"
+            message="There are no users in the system yet. Users will appear here once they are created."
+            icon="👥"
+          />
+        )}
+
+        {/* Users Table */}
+        {!loading && !error && users.length > 0 && (
           <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
             <thead>
               <tr style={{ background: 'var(--color-surface)' }}>
@@ -72,6 +245,285 @@ export default function UsersList() {
               ))}
             </tbody>
           </table>
+        )}
+
+        {/* Add User Modal */}
+        {showAddModal && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+            }}
+            onClick={handleCloseModal}
+          >
+            <div
+              style={{
+                backgroundColor: 'var(--color-background)',
+                padding: '2rem',
+                borderRadius: '8px',
+                width: '90%',
+                maxWidth: '500px',
+                maxHeight: '90vh',
+                overflow: 'auto',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>
+                  Add New User
+                </h2>
+                <button
+                  onClick={handleCloseModal}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    color: 'var(--color-text)',
+                    padding: '0.25rem 0.5rem',
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {formError && (
+                <div
+                  style={{
+                    padding: '0.75rem',
+                    marginBottom: '1rem',
+                    backgroundColor: 'var(--color-error)',
+                    color: 'var(--color-surface)',
+                    borderRadius: '4px',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {formError}
+                </div>
+              )}
+
+              <form onSubmit={handleAddUser}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Username <span style={{ color: 'var(--color-error)' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={newUser.username}
+                    onChange={handleInputChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface)',
+                      color: 'var(--color-text)',
+                      fontSize: '0.875rem',
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                    }}
+                  >
+                    First Name <span style={{ color: 'var(--color-error)' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={newUser.firstName}
+                    onChange={handleInputChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface)',
+                      color: 'var(--color-text)',
+                      fontSize: '0.875rem',
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Last Name <span style={{ color: 'var(--color-error)' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={newUser.lastName}
+                    onChange={handleInputChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface)',
+                      color: 'var(--color-text)',
+                      fontSize: '0.875rem',
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Email <span style={{ color: 'var(--color-error)' }}>*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={newUser.email}
+                    onChange={handleInputChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface)',
+                      color: 'var(--color-text)',
+                      fontSize: '0.875rem',
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Role
+                  </label>
+                  <select
+                    name="roleName"
+                    value={newUser.roleName}
+                    onChange={handleInputChange}
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface)',
+                      color: 'var(--color-text)',
+                      fontSize: '0.875rem',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <option value="">No Role</option>
+                    {roles.map((role) => (
+                      <option key={role.id} value={role.name}>
+                        {role.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.875rem',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      name="isActive"
+                      checked={newUser.isActive}
+                      onChange={handleInputChange}
+                      style={{
+                        cursor: 'pointer',
+                      }}
+                    />
+                    <span>Active User</span>
+                  </label>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.75rem',
+                    justifyContent: 'flex-end',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    disabled={isSubmitting}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'transparent',
+                      color: 'var(--color-text)',
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      fontSize: '0.875rem',
+                      opacity: isSubmitting ? 0.6 : 1,
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <PrimaryButton type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Creating...' : 'Create User'}
+                  </PrimaryButton>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
       </div>
     </AdminLayout>

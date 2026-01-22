@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { SchemaModule } from './schema/schema.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SchemaModule } from './schema/schema.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    AuditLogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
