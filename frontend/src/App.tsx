@@ -18,6 +18,7 @@ import UnauthorizedError from './pages/error/UnauthorizedError';
 import ContentEntries from './pages/admin/ContentEntries';
 import ContentEntryDetail from './pages/admin/ContentEntryDetail';
 import Roles from './pages/admin/Roles';
+import RequireAuth from './components/RequireAuth';
 
 export default function App() {
   return (
@@ -25,7 +26,14 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<Outlet />}>
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth requiredRole="Super Admin">
+                <Outlet />
+              </RequireAuth>
+            }
+          >
             <Route index element={<AdminPage />} />
             <Route path="users" element={<UsersList />} />
             <Route path="users/:id" element={<AdminUserDetailPage />} />

@@ -21,7 +21,7 @@ export default function UsersList() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  
+
   const [newUser, setNewUser] = useState({
     username: '',
     firstName: '',
@@ -36,7 +36,7 @@ export default function UsersList() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${apiBaseUrl}/user`);
+      const response = await fetch(`${apiBaseUrl}/api/user`);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
@@ -137,7 +137,7 @@ export default function UsersList() {
       }
 
       const createdUser = await response.json();
-      
+
       // Reset form
       setNewUser({
         username: '',
@@ -147,7 +147,7 @@ export default function UsersList() {
         roleName: '',
         isActive: true,
       });
-      
+
       // Close modal and refresh users list
       setShowAddModal(false);
       await fetchUsers();
@@ -285,9 +285,7 @@ export default function UsersList() {
                   marginBottom: '1.5rem',
                 }}
               >
-                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>
-                  Add New User
-                </h2>
+                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>Add New User</h2>
                 <button
                   onClick={handleCloseModal}
                   style={{
