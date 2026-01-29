@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import AdminLayout from '../components/Layouts/AdminLayout';
-import { useFountainTheme } from '../theme/ThemeProvider';
+import { useFountainTheme } from '../../theme/ThemeProvider';
+import AdminLayout from '../../components/Layouts/AdminLayout';
 
 const defaultSettings = {
   title: 'My Awesome Website',
@@ -9,7 +9,7 @@ const defaultSettings = {
   logoUrl: '',
 };
 
-const AdminSettingsPage = () => {
+const Settings = () => {
   const { mode, setMode } = useFountainTheme();
   const [settings, setSettings] = useState({ ...defaultSettings, theme: mode });
   const [saved, setSaved] = useState(false);
@@ -135,4 +135,4 @@ const AdminSettingsPage = () => {
   );
 };
 
-export default AdminSettingsPage;
+export default Settings;

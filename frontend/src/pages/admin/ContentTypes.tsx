@@ -2,9 +2,7 @@ import React, { useState, useMemo } from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSchema } from '../../api/schema';
-import LoadingState from '../../components/LoadingState';
-import ErrorState from '../../components/ErrorState';
-import EmptyState from '../../components/EmptyState';
+import { LoadingState, ErrorState, EmptyState } from '../../components/states';
 
 type SortOption = 'name-asc' | 'name-desc' | 'fields-asc' | 'fields-desc';
 

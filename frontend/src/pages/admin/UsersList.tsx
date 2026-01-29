@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 import type { User } from '../../types/user';
 import { LoadingState, EmptyState, ErrorState } from '../../components/states';
 import { PrimaryButton } from '../../components/PrimaryButton';
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+import { apiBaseUrl } from '../../lib/api';
 
 interface Role {
   id: string;
@@ -21,7 +20,7 @@ export default function UsersList() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  
+
   const [newUser, setNewUser] = useState({
     username: '',
     firstName: '',
@@ -63,7 +62,7 @@ export default function UsersList() {
 
   const fetchRoles = useCallback(async () => {
     try {
-      const response = await fetch(`${apiBaseUrl}/api/roles`);
+      const response = await fetch(`${apiBaseUrl}/roles`);
       if (!response.ok) {
         throw new Error('Failed to fetch roles');
       }
@@ -123,7 +122,7 @@ export default function UsersList() {
         };
       }
 
-      const response = await fetch(`${apiBaseUrl}/api/user`, {
+      const response = await fetch(`${apiBaseUrl}/user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +136,7 @@ export default function UsersList() {
       }
 
       const createdUser = await response.json();
-      
+
       // Reset form
       setNewUser({
         username: '',
@@ -147,7 +146,7 @@ export default function UsersList() {
         roleName: '',
         isActive: true,
       });
-      
+
       // Close modal and refresh users list
       setShowAddModal(false);
       await fetchUsers();
@@ -224,7 +223,7 @@ export default function UsersList() {
                   <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
                     <Link
                       to={`/admin/users/${user.id}`}
-                      style={{ color: 'var(--color-primary)', textDecoration: 'none' }}
+                      style={{ color: 'var(--color-primary', textDecoration: 'none' }}
                     >
                       {user.username}
                     </Link>
@@ -285,9 +284,7 @@ export default function UsersList() {
                   marginBottom: '1.5rem',
                 }}
               >
-                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>
-                  Add New User
-                </h2>
+                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>Add New User</h2>
                 <button
                   onClick={handleCloseModal}
                   style={{

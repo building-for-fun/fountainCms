@@ -4,9 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { deleteItem, listItems } from '../../api/content';
 import { fetchSchema } from '../../api/schema';
-import LoadingState from '../../components/LoadingState';
-import ErrorState from '../../components/ErrorState';
-import EmptyState from '../../components/EmptyState';
+import { LoadingState, ErrorState, EmptyState } from '../../components/states';
 
 const ContentEntries = () => {
   const { collection } = useParams<{ collection: string }>();
@@ -67,7 +65,7 @@ const ContentEntries = () => {
   if (isError)
     return (
       <AdminLayout>
-        <ErrorState onRetry={() => refetch()} />
+        <ErrorState onRetry={() => refetch()} message={''} />
       </AdminLayout>
     );
 

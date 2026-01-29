@@ -8,7 +8,7 @@ interface LoadingStateProps {
  * LoadingState component displays a loading spinner and optional message
  * Used to indicate data fetching or processing operations
  */
-export default function LoadingState({ message = 'Loading...' }: LoadingStateProps) {
+export default function LoadingState({ message = 'Loading...' }: Readonly<LoadingStateProps>) {
   return (
     <div
       style={{

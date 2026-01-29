@@ -6,6 +6,7 @@ interface EmptyStateProps {
   icon?: string;
   actionLabel?: string;
   onAction?: () => void;
+  description?: string;
 }
 
 /**
@@ -18,7 +19,7 @@ export default function EmptyState({
   icon = '📭',
   actionLabel,
   onAction,
-}: EmptyStateProps) {
+}: Readonly<EmptyStateProps>) {
   return (
     <div
       style={{

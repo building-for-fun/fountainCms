@@ -5,8 +5,6 @@ import Sparkline from '../components/Sparkline';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUsersCount } from '../api/admin.api';
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
-
 export default function AdminPage() {
   const {
     data: usersCount,
