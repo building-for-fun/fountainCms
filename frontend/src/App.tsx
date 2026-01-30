@@ -1,16 +1,12 @@
 import Landing from './pages/public/Landing';
 import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom';
 import Documentation from './pages/public/Documentation';
-import AdminPage from './pages/AdminPage';
 import UsersList from './pages/admin/UsersList';
-import AdminUserDetailPage from './pages/AdminUserDetailPage';
 import Login from './pages/public/Login';
 import { FountainThemeProvider } from './theme/ThemeProvider';
 import ContentTypes from './pages/admin/ContentTypes';
-import AdminEntriesPage from './pages/AdminEntriesPage';
 import MediaLibrary from './pages/admin/MediaLibrary';
 import AuditLogs from './pages/admin/AuditLogs';
-import AdminProfilePage from './pages/AdminProfilePage';
 import NotFoundError from './pages/error/NotFoundError';
 import InternalServerError from './pages/error/InternalServerError';
 import UnauthorizedError from './pages/error/UnauthorizedError';
@@ -19,6 +15,10 @@ import ContentEntryDetail from './pages/admin/ContentEntryDetail';
 import Roles from './pages/admin/Roles';
 import RequireAuth from './components/RequireAuth';
 import Settings from './pages/admin/Settings';
+import Entries from './pages/admin/Entries';
+import ProfilePage from './pages/admin/ProfilePage';
+import Home from './pages/admin/Home';
+import UserDetails from './pages/admin/UserDetails';
 
 export default function App() {
   return (
@@ -34,16 +34,16 @@ export default function App() {
               </RequireAuth>
             }
           >
-            <Route index element={<AdminPage />} />
+            <Route index element={<Home />} />
             <Route path="users" element={<UsersList />} />
-            <Route path="users/:id" element={<AdminUserDetailPage />} />
+            <Route path="users/:id" element={<UserDetails />} />
             <Route path="content-types" element={<ContentTypes />} />
-            <Route path="entries" element={<AdminEntriesPage />} />
+            <Route path="entries" element={<Entries />} />
             <Route path="media" element={<MediaLibrary />} />
             <Route path="settings" element={<Settings />} />
             <Route path="roles" element={<Roles />} />
             <Route path="logs" element={<AuditLogs />} />
-            <Route path="profile" element={<AdminProfilePage />} />
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="content/:collection" element={<ContentEntries />} />
             <Route path="content/:collection/new" element={<ContentEntryDetail />} />
             <Route path="content/:collection/:id" element={<ContentEntryDetail />} />
