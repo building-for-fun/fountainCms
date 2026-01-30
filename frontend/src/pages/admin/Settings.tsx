@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFountainTheme } from '../../theme/ThemeProvider';
 import AdminLayout from '../../components/Layouts/AdminLayout';
+import { cardStyles } from '../../lib/ui';
 
 const defaultSettings = {
   title: 'My Awesome Website',
