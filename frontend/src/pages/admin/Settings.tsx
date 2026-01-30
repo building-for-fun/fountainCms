@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFountainTheme } from '../../theme/ThemeProvider';
 import AdminLayout from '../../components/Layouts/AdminLayout';
+import { cardStyles } from '../../lib/ui';
 
 const defaultSettings = {
   title: 'My Awesome Website',
@@ -46,8 +47,8 @@ const Settings = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center py-8">
-        <div className="w-full max-w-2xl bg-white/90 rounded-2xl shadow-2xl p-10 border border-blue-100">
+    <div className="min-h-screen  flex items-center justify-center py-8">
+         <div style={cardStyles} className="w-full max-w-2xl rounded-2xl shadow-2xl p-10 ">
           <h1 className="text-3xl font-extrabold text-blue-700 mb-6 text-center tracking-tight">
             Website Settings
           </h1>

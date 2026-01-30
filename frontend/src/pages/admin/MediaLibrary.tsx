@@ -30,7 +30,7 @@ const MediaLibrary = () => {
   return (
     <AdminLayout>
       <div
-        className="min-h-screen bg-gradient-to-br from-blue-50 to-white"
+        className="min-h-screen "
         style={{ padding: '24px 32px', margin: '0 auto' }}
       >
         <div className="flex items-center justify-between mb-8">
