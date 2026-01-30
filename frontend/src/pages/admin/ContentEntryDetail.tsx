@@ -4,8 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { createItem, getItem, updateItem } from '../../api/content';
 import { fetchSchema } from '../../api/schema';
-import LoadingState from '../../components/LoadingState';
-import ErrorState from '../../components/ErrorState';
+import { LoadingState, ErrorState } from '../../components/states';
 
 const ContentEntryDetail = () => {
   const { collection, id } = useParams<{ collection: string; id?: string }>();

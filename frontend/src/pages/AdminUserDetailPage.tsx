@@ -3,8 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../components/Layouts/AdminLayout';
 import { User } from '../types/user';
 import { getUserRole, getPermissionsFromRole } from '../helper/userHelper';
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+import { apiBaseUrl } from '../lib/api';
 
 export default function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();

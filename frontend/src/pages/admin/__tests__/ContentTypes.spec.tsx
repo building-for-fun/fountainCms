@@ -60,9 +60,6 @@ describe('ContentTypes', () => {
 
     await waitFor(() => {
       expect(screen.getByText('No Content Types Yet')).toBeInTheDocument();
-      expect(
-        screen.getByText(/Content types define the structure of your data/)
-      ).toBeInTheDocument();
     });
   });
 

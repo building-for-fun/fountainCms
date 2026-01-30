@@ -7,16 +7,12 @@ interface ErrorStateProps {
   retryLabel?: string;
 }
 
-/**
- * ErrorState component displays error information with retry functionality
- * Provides user-friendly error messages and recovery options
- */
 export default function ErrorState({
   title = 'Something Went Wrong',
   message,
   onRetry,
   retryLabel = 'Try Again',
-}: ErrorStateProps) {
+}: Readonly<ErrorStateProps>) {
   return (
     <div
       style={{

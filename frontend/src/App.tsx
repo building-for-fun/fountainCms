@@ -9,7 +9,6 @@ import { FountainThemeProvider } from './theme/ThemeProvider';
 import ContentTypes from './pages/admin/ContentTypes';
 import AdminEntriesPage from './pages/AdminEntriesPage';
 import MediaLibrary from './pages/admin/MediaLibrary';
-import AdminSettingsPage from './pages/AdminSettingsPage';
 import AuditLogs from './pages/admin/AuditLogs';
 import AdminProfilePage from './pages/AdminProfilePage';
 import NotFoundError from './pages/error/NotFoundError';
@@ -19,6 +18,7 @@ import ContentEntries from './pages/admin/ContentEntries';
 import ContentEntryDetail from './pages/admin/ContentEntryDetail';
 import Roles from './pages/admin/Roles';
 import RequireAuth from './components/RequireAuth';
+import Settings from './pages/admin/Settings';
 
 export default function App() {
   return (
@@ -40,7 +40,7 @@ export default function App() {
             <Route path="content-types" element={<ContentTypes />} />
             <Route path="entries" element={<AdminEntriesPage />} />
             <Route path="media" element={<MediaLibrary />} />
-            <Route path="settings" element={<AdminSettingsPage />} />
+            <Route path="settings" element={<Settings />} />
             <Route path="roles" element={<Roles />} />
             <Route path="logs" element={<AuditLogs />} />
             <Route path="profile" element={<AdminProfilePage />} />
