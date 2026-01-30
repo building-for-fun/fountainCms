@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+import { api } from '../../api/client';
 
 interface Role {
   id: string;
@@ -27,9 +26,8 @@ const Roles = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`${apiBaseUrl}/roles`);
-        if (!res.ok) throw new Error('Failed to fetch roles');
-        const data = await res.json();
+
+        const data = await api<{ data: Role[] }>('/roles');
         setRoles(data.data || []);
       } catch (err) {
         setError('Failed to load roles. Please try again.');
@@ -54,15 +52,11 @@ const Roles = () => {
 
     try {
       setIsSubmitting(true);
-      const res = await fetch(`${apiBaseUrl}/roles`, {
+      const createdRole = await api<Role>('/roles', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newRole),
       });
 
-      if (!res.ok) throw new Error('Failed to create role');
-
-      const createdRole = await res.json();
       setRoles((prev) => [...prev, createdRole]);
       setNewRole({ name: '', description: '' });
       setShowCreateForm(false);
@@ -88,15 +82,11 @@ const Roles = () => {
   const handleEditSave = async (id: string) => {
     try {
       setIsSubmitting(true);
-      const res = await fetch(`${apiBaseUrl}/roles/${id}`, {
+      const updatedRole = await api<Role>(`/roles/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editRole),
       });
 
-      if (!res.ok) throw new Error('Failed to update role');
-
-      const updatedRole = await res.json();
       setRoles((prev) => prev.map((role) => (role.id === id ? updatedRole : role)));
       setEditingId(null);
     } catch (err) {
@@ -123,8 +113,7 @@ const Roles = () => {
       return;
 
     try {
-      const res = await fetch(`${apiBaseUrl}/roles/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete role');
+      await api(`/roles/${id}`, { method: 'DELETE' });
       setRoles((prev) => prev.filter((role) => role.id !== id));
     } catch (err) {
       setError('Failed to delete role. Please try again.');
