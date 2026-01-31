@@ -39,7 +39,6 @@ export class UserController {
       const users = await this.userService.getAll();
       return { data: users ?? [] };
     } catch (error) {
-
       this.logger.error('🔥 Failed to fetch users', error);
 
       throw new InternalServerErrorException('Failed to fetch users');
@@ -58,7 +57,6 @@ export class UserController {
     try {
       return await this.userService.getById(id);
     } catch (error) {
-
       this.logger.error(`🔥 Failed to fetch user ${id}`, error);
 
       throw new InternalServerErrorException('Failed to fetch user');
@@ -77,7 +75,6 @@ export class UserController {
     try {
       return await this.userService.create(body);
     } catch (error) {
-
       this.logger.error('🔥 Failed to create user', error);
 
       throw new InternalServerErrorException('Failed to create user');
@@ -116,7 +113,6 @@ export class UserController {
         roleName,
       });
     } catch (error) {
-
       this.logger.error(`🔥 Failed to update user ${id}`, error);
 
       throw new InternalServerErrorException('Failed to update user');

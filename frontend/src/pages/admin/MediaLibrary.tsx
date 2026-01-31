@@ -29,10 +29,7 @@ const MediaLibrary = () => {
 
   return (
     <AdminLayout>
-      <div
-        className="min-h-screen "
-        style={{ padding: '24px 32px', margin: '0 auto' }}
-      >
+      <div className="min-h-screen " style={{ padding: '24px 32px', margin: '0 auto' }}>
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-blue-700">Media Library</h1>
           <button

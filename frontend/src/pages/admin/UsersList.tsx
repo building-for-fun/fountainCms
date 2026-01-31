@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import type { User } from '../../types/user';
 import { LoadingState, EmptyState, ErrorState } from '../../components/states';
 import { PrimaryButton } from '../../components/PrimaryButton';
-import { apiBaseUrl } from '../../lib/api';
+import { api } from '../../api/client';
 
 interface Role {
   id: string;
@@ -35,13 +35,8 @@ export default function UsersList() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${apiBaseUrl}/user`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const data = await api<{ data: User[] }>('/user');
+      setUsers(Array.isArray(data?.data) ? data.data : []);
 
       if (Array.isArray(data?.data)) {
         setUsers(data.data);
@@ -62,11 +57,9 @@ export default function UsersList() {
 
   const fetchRoles = useCallback(async () => {
     try {
-      const response = await fetch(`${apiBaseUrl}/roles`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch roles');
-      }
-      const data = await response.json();
+      const data = await api<{ data: Role[] }>('/roles');
+      setRoles(data.data || []);
+
       setRoles(data.data || []);
     } catch (err) {
       console.error('Error fetching roles:', err);
@@ -100,7 +93,6 @@ export default function UsersList() {
       // Validate required fields
       if (!newUser.username || !newUser.firstName || !newUser.lastName || !newUser.email) {
         setFormError('Please fill in all required fields');
-        setIsSubmitting(false);
         return;
       }
 
@@ -122,20 +114,11 @@ export default function UsersList() {
         };
       }
 
-      const response = await fetch(`${apiBaseUrl}/user`, {
+      // ✅ Centralized API call (handles headers, /api prefix, and errors)
+      await api('/user', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(userData),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to create user');
-      }
-
-      const createdUser = await response.json();
 
       // Reset form
       setNewUser({

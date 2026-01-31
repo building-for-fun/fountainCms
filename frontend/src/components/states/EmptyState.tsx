@@ -3,10 +3,10 @@ import React from 'react';
 interface EmptyStateProps {
   title?: string;
   message?: string;
+  description?: string;
   icon?: string;
   actionLabel?: string;
   onAction?: () => void;
-  description?: string;
 }
 
 /**
@@ -16,6 +16,7 @@ interface EmptyStateProps {
 export default function EmptyState({
   title = 'No Data Available',
   message = 'There are no items to display at this time.',
+  description,
   icon = '📭',
   actionLabel,
   onAction,
@@ -41,6 +42,7 @@ export default function EmptyState({
       >
         {icon}
       </div>
+
       <h3
         style={{
           margin: 0,
@@ -52,17 +54,35 @@ export default function EmptyState({
       >
         {title}
       </h3>
+
+      {/* Primary message */}
       <p
         style={{
           margin: 0,
           fontSize: '1rem',
           color: 'var(--color-text-muted)',
           maxWidth: '400px',
-          marginBottom: '2rem',
+          marginBottom: description ? '0.75rem' : '2rem',
         }}
       >
         {message}
       </p>
+
+      {/* Optional description (needed for ContentTypes tests) */}
+      {description && (
+        <p
+          style={{
+            margin: 0,
+            fontSize: '0.95rem',
+            color: 'var(--color-text-muted)',
+            maxWidth: '400px',
+            marginBottom: '2rem',
+          }}
+        >
+          {description}
+        </p>
+      )}
+
       {actionLabel && onAction && (
         <button
           type="button"
