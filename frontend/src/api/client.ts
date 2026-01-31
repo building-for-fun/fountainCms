@@ -1,22 +1,19 @@
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
-function normalizePath(path: string): string {
-  const p = path.startsWith('/') ? path : `/${path}`;
-  return p.startsWith('/api/') ? p : `/api${p}`;
-}
-
 export async function api<T>(path: string, options?: RequestInit): Promise<T> {
-  const url = `${API_BASE}${normalizePath(path)}`;
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const url = `${API_BASE}${normalizedPath}`;
 
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
+      ...(options?.headers || {}),
     },
     ...options,
   });
 
   if (!res.ok) {
-    let error;
+    let error: unknown;
     try {
       error = await res.json();
     } catch {

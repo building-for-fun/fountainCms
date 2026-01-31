@@ -39,8 +39,10 @@ const Roles = () => {
 
         const data = await api<{ data: Role[] }>('/roles');
         setRoles(data.data || []);
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load roles. Please try again.');
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Failed to load roles. Please try again.';
+        setError(message);
         console.error(err);
       } finally {
         setLoading(false);
@@ -57,7 +59,7 @@ const Roles = () => {
 
     try {
       setIsSubmitting(true);
-      setError(null); // ✅ reset error
+      setError(null);
 
       const createdRole = await api<Role>('/roles', {
         method: 'POST',
@@ -67,8 +69,10 @@ const Roles = () => {
       setRoles((prev) => [...prev, createdRole]);
       setNewRole({ name: '', description: '' });
       setShowCreateForm(false);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to create role. Please try again.');
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to create role. Please try again.';
+      setError(message);
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -79,7 +83,7 @@ const Roles = () => {
   const handleEditSave = async (id: string) => {
     try {
       setIsSubmitting(true);
-      setError(null); // ✅ reset error
+      setError(null);
 
       const updatedRole = await api<Role>(`/roles/${id}`, {
         method: 'PUT',
@@ -88,8 +92,10 @@ const Roles = () => {
 
       setRoles((prev) => prev.map((role) => (role.id === id ? updatedRole : role)));
       setEditingId(null);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to update role. Please try again.');
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to update role. Please try again.';
+      setError(message);
       console.error(err);
     } finally {
       setIsSubmitting(false);
@@ -103,16 +109,19 @@ const Roles = () => {
       !window.confirm(
         `Are you sure you want to delete "${roleName}"? This action cannot be undone.`
       )
-    )
+    ) {
       return;
+    }
 
     try {
-      setError(null); // ✅ reset error
+      setError(null);
       await api(`/roles/${id}`, { method: 'DELETE' });
 
       setRoles((prev) => prev.filter((role) => role.id !== id));
-    } catch (err: any) {
-      setError(err?.message || 'Failed to delete role. Please try again.');
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to delete role. Please try again.';
+      setError(message);
       console.error(err);
     }
   };
