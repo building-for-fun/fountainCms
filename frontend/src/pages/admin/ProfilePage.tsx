@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import AdminLayout from '../components/Layouts/AdminLayout';
-import { getUser } from '../lib/auth';
+import AdminLayout from '../../components/Layouts/AdminLayout';
+import { getUser } from '../../lib/auth';
 
 const InputGroup = ({
   label,
@@ -57,7 +57,7 @@ const InputGroup = ({
   </div>
 );
 
-const AdminProfilePage = () => {
+const ProfilePage = () => {
   const currentUser = getUser();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -303,4 +303,4 @@ const AdminProfilePage = () => {
   );
 };
 
-export default AdminProfilePage;
+export default ProfilePage;

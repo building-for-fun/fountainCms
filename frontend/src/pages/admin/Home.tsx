@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import AdminLayout from '../components/Layouts/AdminLayout';
-import StatCard from '../components/StatCard';
-import Sparkline from '../components/Sparkline';
+import AdminLayout from '../../components/Layouts/AdminLayout';
+import StatCard from '../../components/StatCard';
+import Sparkline from '../../components/Sparkline';
 import { useQuery } from '@tanstack/react-query';
-import { fetchUsersCount } from '../api/admin.api';
+import { fetchUsersCount } from '../../api/admin.api';
 
-export default function AdminPage() {
+export default function Home() {
   const {
     data: usersCount,
     isLoading: loadingUsers,

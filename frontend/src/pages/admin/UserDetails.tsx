@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import AdminLayout from '../components/Layouts/AdminLayout';
-import { User } from '../types/user';
-import { getUserRole, getPermissionsFromRole } from '../helper/userHelper';
-import { apiBaseUrl } from '../lib/api';
+import AdminLayout from '../../components/Layouts/AdminLayout';
+import { User } from '../../types/user';
+import { getUserRole, getPermissionsFromRole } from '../../helper/userHelper';
+import { apiBaseUrl } from '../../lib/api';
 
-export default function AdminUserDetailPage() {
+export default function UserDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);

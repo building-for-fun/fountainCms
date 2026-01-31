@@ -1,7 +1,7 @@
 import React from 'react';
-import AdminLayout from '../components/Layouts/AdminLayout';
+import AdminLayout from '../../components/Layouts/AdminLayout';
 
-const AdminEntriesPage = () => (
+const Entries = () => (
   <AdminLayout>
     <div style={{ padding: '2rem' }}>
       <h1>Entries</h1>
@@ -10,4 +10,4 @@ const AdminEntriesPage = () => (
   </AdminLayout>
 );
 
-export default AdminEntriesPage;
+export default Entries;
