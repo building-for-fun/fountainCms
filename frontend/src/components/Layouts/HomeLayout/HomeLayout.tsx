@@ -9,7 +9,7 @@ const HomeLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        background: 'linear-gradient(135deg, var(--color-bg), var(--color-primary-light))',
+        background: 'linear-gradient(135deg, var(--color-bg), var(--color-primary-dark))',
         overflowX: 'hidden', // ✅ important for mobile
       }}
     >
