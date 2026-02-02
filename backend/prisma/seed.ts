@@ -24,14 +24,15 @@ async function main() {
   });
 
   await prisma.user.upsert({
-    where: { username: 'admin' },
+    where: { username: 'abc@gmail.com' },
     update: {},
     create: {
-      username: 'admin',
+      username: 'abc@gmail.com',
+      password: '*******8',
       role: { connect: { id: admin.id } },
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john.doe@example.com',
+      email: 'abc@gmail.com',
       isActive: false,
     },
   });
