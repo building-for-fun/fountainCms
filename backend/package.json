@@ -38,7 +38,8 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "winston": "^3.19.0"
+    "winston": "^3.19.0",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
