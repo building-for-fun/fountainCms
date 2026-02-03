@@ -101,6 +101,49 @@ npm install
 
 This installs dependencies for both frontend and backend using npm workspaces.
 
+### 🗄 Database Setup (PostgreSQL)
+#### Create DB User & Database
+
+Open psql as postgres superuser:
+```sh
+sudo -u postgres psql
+```
+
+```sh
+CREATE USER fountain_user WITH PASSWORD 'fountain_pass';
+CREATE DATABASE fountain_db OWNER fountain_user;
+ALTER USER fountain_user CREATEDB; -- required for Prisma migrate dev
+\q
+```
+
+### 🔐 Frontend Environment Configuration
+#### Create frontend .env:
+
+```sh
+cd frontend
+nano .env
+```
+Copy the details from `.env.sample` to `.env` and save
+
+### 🔐 Backend Environment Configuration
+#### Create backend .env:
+```sh
+cd backend
+nano .env
+```
+Copy the details from `.env.sample` to `.env` and save
+
+### 🧬 Run Prisma Migrations
+```sh
+cd backend
+npx prisma migrate dev --name init
+```
+
+This will:
+- Create DB tables
+- Generate Prisma Client
+- Sync schema
+
 ---
 
 ## ▶️ Running the Project
