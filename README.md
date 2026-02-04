@@ -146,6 +146,52 @@ This will:
 
 ---
 
+## ▶️ Postgresql on docker
+### Install Docker and Docker Compose:
+
+```sh
+sudo apt update
+sudo apt install docker.io docker-compose-plugin
+```
+
+### Start Docker:
+```sh
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+### Start PostgreSQL Using Docker Compose
+From the project root directory:
+```sh
+docker compose up -d db
+```
+
+### Backend Environment Configuration (Docker Database)
+Ensure your backend/.env contains:
+```sh
+DATABASE_URL=postgresql://fountain_user:fountain_pass@localhost:5432/fountain_db?schema=public
+```
+
+### Run Prisma Migrations
+After the database container starts:
+```sh
+cd backend
+npx prisma migrate dev --name init
+```
+
+### Running Full Stack Using Docker (Backend + Database)
+To start backend and database together:
+```sh
+docker compose up --build
+```
+
+This will:
+- Start PostgreSQL
+- Build and run backend service
+- Expose backend at: `http://localhost:4000`
+
+---
+
 ## ▶️ Running the Project
 
 ### Run frontend + backend together
