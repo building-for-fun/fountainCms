@@ -4,8 +4,8 @@ import HomeLayout from '../../components/Layouts/HomeLayout/HomeLayout';
 import { login as persistLogin, isAuthenticated } from '../../lib/auth';
 
 export default function Login() {
-  const [username, setUsername] = useState('admin@example.com');
-  const [password, setPassword] = useState('password');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,16 +16,9 @@ export default function Login() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === 'admin@example.com' && password === 'password') {
-      persistLogin({
-        email: username,
-        role: 'Super Admin',
-        id: 'local-admin',
-      });
-      navigate('/admin', { replace: true });
-    } else {
-      alert('Invalid credentials');
-    }
+    // TODO: Implement proper API call to backend for authentication
+    // For now, reject login attempts
+    alert('Authentication system not yet configured. Please contact administrator.');
   };
 
   const formInputLabelStyle: React.CSSProperties = {
@@ -150,18 +143,4 @@ export default function Login() {
               padding: '1rem',
               borderRadius: '8px',
               fontSize: '0.9rem',
-              textAlign: 'center',
-              width: '100%',
-              boxSizing: 'border-box',
-              color: 'var(--color-primary)',
-            }}
-          >
-            <p style={{ fontWeight: 600, opacity: 0.9 }}>Login Info</p>
-            <p style={{ opacity: 0.7 }}>admin@example.com</p>
-            <p style={{ opacity: 0.7 }}>password</p>
-          </div>
-        </div>
-      </div>
-    </HomeLayout>
-  );
-}
+        
