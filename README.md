@@ -133,6 +133,15 @@ nano .env
 ```
 Copy the details from `.env.sample` to `.env` and save
 
+### 🔑 Authentication
+Auth is **configurable** via `AUTH_MODE` in backend `.env`:
+
+- **`AUTH_MODE=local`** (default): Email/username + password. Users need a `passwordHash` in the DB (see seed).
+- **`AUTH_MODE=oauth2`**: OAuth 2 / OIDC. Set `OAUTH2_ISSUER`, `OAUTH2_CLIENT_ID`, `OAUTH2_CLIENT_SECRET`, and optionally claim mapping. Login redirects to your IdP, then callback sets a JWT cookie.
+- **`AUTH_MODE=saml`**: SAML 2.0. Set `SAML_ENTRY_POINT`, `SAML_IDP_CERT`, `SAML_ACS_URL`, and optionally attribute mapping.
+
+JWT is issued after any successful login (local or SSO) and sent in an HttpOnly cookie; the frontend also supports Bearer token for API clients. See `backend/.env.sample` for all auth-related variables.
+
 ### 🧬 Run Prisma Migrations
 ```sh
 cd backend

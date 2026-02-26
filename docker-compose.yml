@@ -9,13 +9,13 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '5433:5432'
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: 'postgresql://fountain_user:fountain_pass@postgres:5432/fountain_db?schema=public'
+      DATABASE_URL: 'postgresql://fountain_user:fountain_pass@db:5432/fountain_db?schema=public'
       NODE_ENV: development
     ports:
       - '4000:4000'

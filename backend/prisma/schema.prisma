@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  firstName String   @db.VarChar(255)
-  lastName  String   @db.VarChar(255)
-  email     String   @db.VarChar(255)
-  roleId    String?  @db.Uuid
-  role      Role?    @relation(fields: [roleId], references: [id])
-  username  String   @unique
-  isActive  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName    String   @db.VarChar(255)
+  lastName     String   @db.VarChar(255)
+  email        String   @db.VarChar(255)
+  roleId       String?  @db.Uuid
+  role         Role?    @relation(fields: [roleId], references: [id])
+  username     String   @unique
+  passwordHash String? @db.VarChar(255)
+  isActive     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   auditLogs AuditLog[]
 }

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { AuthModule } from './auth/auth.module';
 import { ContentModule } from './content/content.module';
 import { RolesModule } from './roles/roles.module';
 import { UserModule } from './user/user.module';
@@ -12,6 +13,7 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
 @Module({
   imports: [
     PrismaModule,
+    AuthModule,
     ContentModule,
     RolesModule,
     UserModule,

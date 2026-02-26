@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './utils/winston.config';
 
@@ -19,6 +20,7 @@ async function bootstrap() {
     logger,
   });
   app.setGlobalPrefix('api');
+  app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: allowedOrigins,

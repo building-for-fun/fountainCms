@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { logout as apiLogout } from '../../api/auth';
 import { logout } from '../../lib/auth';
 
 const adminNavItems = [
@@ -32,8 +33,12 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
   }, []);
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    apiLogout()
+      .catch(() => {})
+      .finally(() => {
+        logout();
+        navigate('/login');
+      });
   };
 
   return (

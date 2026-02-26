@@ -5,6 +5,7 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${normalizedPath}`;
 
   const res = await fetch(url, {
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(options?.headers || {}),
