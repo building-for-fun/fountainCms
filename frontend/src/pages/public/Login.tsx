@@ -5,8 +5,8 @@ import { login as persistLogin, isAuthenticated } from '../../lib/auth';
 import { fetchAuthConfig, login as apiLogin, type AuthConfig } from '../../api/auth';
 
 export default function Login() {
-  const [username, setUsername] = useState('admin@example.com');
-  const [password, setPassword] = useState('password');
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
   const [authConfig, setAuthConfig] = useState<AuthConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,7 @@ export default function Login() {
     setError(null);
     setSubmitting(true);
     try {
-      const res = await apiLogin(username, password);
+      const res = await apiLogin(login.trim(), password);
       persistLogin({
         id: res.user.id,
         email: res.user.email,
@@ -194,15 +194,16 @@ export default function Login() {
               }}
             >
               <div>
-                <label htmlFor="email" style={formInputLabelStyle}>
+                <label htmlFor="login" style={formInputLabelStyle}>
                   Email or username
                 </label>
                 <input
-                  id="email"
+                  id="login"
                   type="text"
-                  placeholder="Email or username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                  placeholder="e.g. admin@example.com or admin"
+                  value={login}
+                  onChange={(e) => setLogin(e.target.value)}
                   required
                   style={formInputStyle}
                   className="glass-input"
@@ -215,6 +216,7 @@ export default function Login() {
                 <input
                   id="password"
                   type="password"
+                  autoComplete="current-password"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -258,9 +260,9 @@ export default function Login() {
                 color: 'var(--color-primary)',
               }}
             >
-              <p style={{ fontWeight: 600, opacity: 0.9 }}>Default login</p>
-              <p style={{ opacity: 0.7 }}>admin@example.com or admin</p>
-              <p style={{ opacity: 0.7 }}>password</p>
+              <p style={{ fontWeight: 600, opacity: 0.9 }}>Default credentials (after seed)</p>
+              <p style={{ opacity: 0.7 }}>Email or username: admin@example.com or admin</p>
+              <p style={{ opacity: 0.7 }}>Password: password</p>
             </div>
           )}
         </div>

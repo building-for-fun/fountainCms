@@ -15,16 +15,6 @@ function clientHashThenBcrypt(plainPassword: string): Promise<string> {
 }
 
 async function main() {
-  const admin = await prisma.role.upsert({
-    where: { name: 'admin' },
-    update: {},
-    create: {
-      name: 'admin',
-      description: 'Administrator role',
-      permissions: ['*'],
-    },
-  });
-
   const superAdmin = await prisma.role.upsert({
     where: { name: 'Super Admin' },
     update: {},
