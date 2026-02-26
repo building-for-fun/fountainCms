@@ -1,7 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 const prisma = new PrismaClient();
+
+/**
+ * Match client-side hashing: SHA-256 hex then bcrypt. Raw password never sent or stored.
+ * If you had existing users with the old scheme (bcrypt(plain)), re-run this seed
+ * so the admin user gets the new hash, or have users set a new password via Profile.
+ */
+function clientHashThenBcrypt(plainPassword: string): Promise<string> {
+  const hex = crypto.createHash('sha256').update(plainPassword, 'utf8').digest('hex');
+  return bcrypt.hash(hex, 10);
+}
 
 async function main() {
   const admin = await prisma.role.upsert({
@@ -34,7 +45,7 @@ async function main() {
     },
   });
 
-  const passwordHash = await bcrypt.hash('password', 10);
+  const passwordHash = await clientHashThenBcrypt('password');
 
   await prisma.user.upsert({
     where: { username: 'admin' },

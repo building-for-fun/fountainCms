@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import { OAuth2Service } from './oauth2.service';
 import { SamlService } from './saml.service';
 import { LoginDto } from './dto/login.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { getAuthConfig } from './auth.config';
@@ -112,6 +113,31 @@ export class AuthController {
     };
   }
 
+  @Post('me/password')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Change current user password' })
+  @ApiResponse({ status: 200, description: 'Password updated' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized or wrong current password',
+  })
+  async changePassword(
+    @Req()
+    req: Request & {
+      user?: { sub: string };
+    },
+    @Body() dto: ChangePasswordDto,
+  ): Promise<{ ok: boolean }> {
+    const userId = req.user?.sub;
+    if (!userId) throw new UnauthorizedException();
+    await this.authService.changePassword(
+      userId,
+      dto.currentPassword,
+      dto.newPassword,
+    );
+    return { ok: true };
+  }
+
   @Get('oauth2/redirect')
   @Public()
   @ApiOperation({ summary: 'Start OAuth2 flow (redirect to IdP)' })
@@ -142,8 +168,8 @@ export class AuthController {
     const callbackUrl = `${apiUrl}/api/auth/callback/oauth2?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
     try {
       const result = await this.oauth2Service.handleCallback(
-        code as string,
-        state as string,
+        code,
+        state,
         callbackUrl,
       );
       const cookieName = this.authService.getCookieName();

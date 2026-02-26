@@ -21,7 +21,10 @@ export class AuthService {
     return this.config;
   }
 
-  /** Validate local user by username/email and password; return app user or throw */
+  /**
+   * Validate local user by username/email and password.
+   * Expects client to send SHA-256(plainPassword) hex; we compare with stored bcrypt(clientHash).
+   */
   async validateLocalUser(
     login: string,
     password: string,
@@ -155,5 +158,41 @@ export class AuthService {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
       path: '/',
     };
+  }
+
+  /**
+   * Change password for the given user (current user only via controller).
+   * Expects client to send SHA-256(plain) hex; we store bcrypt(clientHash).
+   */
+  async changePassword(
+    userId: string,
+    currentPassword: string | undefined,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { role: true },
+    });
+    const userWithHash = user as typeof user & { passwordHash?: string | null };
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    if (userWithHash.passwordHash) {
+      if (!currentPassword || !currentPassword.trim()) {
+        throw new UnauthorizedException('Current password is required');
+      }
+      const ok = await bcrypt.compare(
+        currentPassword,
+        userWithHash.passwordHash,
+      );
+      if (!ok) {
+        throw new UnauthorizedException('Current password is incorrect');
+      }
+    }
+    const hash = await bcrypt.hash(newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: hash },
+    });
   }
 }
