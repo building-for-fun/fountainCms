@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Req,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
@@ -16,9 +17,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 import { UserService } from './user.service';
 import { User, Prisma } from '@prisma/client';
 import { UserDetailsDto } from './user-details.model';
+
+type RequestWithUser = Request & { user?: { sub: string } };
 
 @ApiTags('user')
 @Controller('user')
@@ -26,6 +30,17 @@ export class UserController {
   private readonly logger = new Logger(UserController.name);
 
   constructor(private readonly userService: UserService) {}
+
+  private getActor(req: RequestWithUser) {
+    return {
+      userId: req.user?.sub ?? null,
+      ip:
+        (req.ip as string) ??
+        (req.headers['x-forwarded-for'] as string) ??
+        null,
+      userAgent: (req.headers['user-agent'] as string) ?? null,
+    };
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
@@ -71,9 +86,12 @@ export class UserController {
     description: 'The user has been successfully created.',
     type: UserDetailsDto,
   })
-  async create(@Body() body: Prisma.UserCreateInput): Promise<User> {
+  async create(
+    @Body() body: Prisma.UserCreateInput,
+    @Req() req: RequestWithUser,
+  ): Promise<User> {
     try {
-      return await this.userService.create(body);
+      return await this.userService.create(body, this.getActor(req));
     } catch (error) {
       this.logger.error('🔥 Failed to create user', error);
 
@@ -93,14 +111,11 @@ export class UserController {
   async update(
     @Param('id') id: string,
     @Body() body: UserDetailsDto,
+    @Req() req: RequestWithUser,
   ): Promise<User> {
     try {
       const { role, ...userData } = body;
 
-      // Normalize role value: accept either a plain string or an object with a name field.
-      // This dual-format handling exists to support the current frontend payload
-      // where role may be sent as `"admin"` or as `{ name: 'admin' | null }`.
-      // Once all clients consistently send the string form, this logic can be simplified.
       let roleName: string | null | undefined = undefined;
       if (typeof role === 'string' || role === null) {
         roleName = role;
@@ -108,10 +123,11 @@ export class UserController {
         roleName = (role as { name: string | null }).name;
       }
 
-      return await this.userService.update(id, {
-        data: userData,
-        roleName,
-      });
+      return await this.userService.update(
+        id,
+        { data: userData, roleName },
+        this.getActor(req),
+      );
     } catch (error) {
       this.logger.error(`🔥 Failed to update user ${id}`, error);
 
@@ -126,12 +142,15 @@ export class UserController {
     status: 200,
     description: 'The user has been successfully deleted.',
   })
-  async delete(@Param('id') id: string): Promise<{ success: boolean }> {
+  async delete(
+    @Param('id') id: string,
+    @Req() req: RequestWithUser,
+  ): Promise<{ success: boolean }> {
     try {
-      const ok = await this.userService.delete(id);
+      const ok = await this.userService.delete(id, this.getActor(req));
       return { success: ok };
     } catch (error) {
-      this.logger.error('🔥 Failed to delete user ${id}', error);
+      this.logger.error(`🔥 Failed to delete user ${id}`, error);
       throw new InternalServerErrorException('Failed to delete user');
     }
   }

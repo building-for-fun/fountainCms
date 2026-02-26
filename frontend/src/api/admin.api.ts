@@ -16,9 +16,13 @@ export async function fetchUsersCount(): Promise<number> {
   return 0;
 }
 
-export function fetchAuditLogs() {
+export function fetchAuditLogs(params?: { limit?: number; offset?: number }) {
+  const search = new URLSearchParams();
+  if (params?.limit != null) search.set('limit', String(params.limit));
+  if (params?.offset != null) search.set('offset', String(params.offset));
+  const qs = search.toString();
   return api<{
     data: AuditLog[];
-    meta: { total: number };
-  }>('/audit-logs');
+    meta: { total: number; limit?: number; offset?: number };
+  }>(`/audit-logs${qs ? `?${qs}` : ''}`);
 }

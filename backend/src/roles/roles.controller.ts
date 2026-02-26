@@ -12,6 +12,17 @@ import { RolesService } from './roles.service';
 import { Role, Prisma } from '@prisma/client';
 import { Request } from 'express';
 
+type RequestWithUser = Request & { user?: { sub: string } };
+
+function getActor(req: RequestWithUser) {
+  return {
+    userId: req.user?.sub ?? null,
+    ip:
+      (req.ip as string) ?? (req.headers['x-forwarded-for'] as string) ?? null,
+    userAgent: (req.headers['user-agent'] as string) ?? null,
+  };
+}
+
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
@@ -30,50 +41,26 @@ export class RolesController {
   @Post()
   async create(
     @Body() body: Prisma.RoleCreateInput,
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
   ): Promise<Role> {
-    const actor = {
-      userId: (req.headers['x-user-id'] as string) ?? null,
-      ip:
-        (req.ip as string) ??
-        (req.headers['x-forwarded-for'] as string) ??
-        null,
-      userAgent: (req.headers['user-agent'] as string) ?? null,
-    };
-    return await this.rolesService.create(body, actor);
+    return await this.rolesService.create(body, getActor(req));
   }
 
   @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() body: Prisma.RoleUpdateInput,
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
   ): Promise<Role | null> {
-    const actor = {
-      userId: (req.headers['x-user-id'] as string) ?? null,
-      ip:
-        (req.ip as string) ??
-        (req.headers['x-forwarded-for'] as string) ??
-        null,
-      userAgent: (req.headers['user-agent'] as string) ?? null,
-    };
-    return await this.rolesService.update(id, body, actor);
+    return await this.rolesService.update(id, body, getActor(req));
   }
 
   @Delete(':id')
   async delete(
     @Param('id') id: string,
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
   ): Promise<{ success: boolean }> {
-    const actor = {
-      userId: (req.headers['x-user-id'] as string) ?? null,
-      ip:
-        (req.ip as string) ??
-        (req.headers['x-forwarded-for'] as string) ??
-        null,
-      userAgent: (req.headers['user-agent'] as string) ?? null,
-    };
-    const ok = await this.rolesService.delete(id, actor);
+    const ok = await this.rolesService.delete(id, getActor(req));
     return { success: ok };
   }
 }
