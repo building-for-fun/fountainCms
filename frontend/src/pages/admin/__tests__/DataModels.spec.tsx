@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { ToastProvider } from '../../../components/Toast';
 import DataModels from '../DataModels';
 import * as schemaApi from '../../../api/schema';
 import * as contentApi from '../../../api/content';
@@ -16,9 +17,11 @@ const createWrapper = () => {
     },
   });
   return ({ children }: { children: React.ReactNode }) => (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      </BrowserRouter>
+    </ToastProvider>
   );
 };
 

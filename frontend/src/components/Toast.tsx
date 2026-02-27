@@ -19,19 +19,18 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = useCallback((message: string, type: ToastType = 'info') => {
-    const id = Math.random().toString(36).substring(2, 11);
-    setToasts((prev) => [...prev, { id, message, type }]);
-
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      removeToast(id);
-    }, 5000);
-  }, []);
-
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
+
+  const showToast = useCallback(
+    (message: string, type: ToastType = 'info') => {
+      const id = Math.random().toString(36).substring(2, 11);
+      setToasts((prev) => [...prev, { id, message, type }]);
+      setTimeout(() => removeToast(id), 5000);
+    },
+    [removeToast]
+  );
 
   return (
     <ToastContext.Provider value={{ toasts, showToast, removeToast }}>
@@ -55,36 +54,62 @@ interface ToastContainerProps {
 }
 
 const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) => {
-  const getToastStyles = (type: ToastType) => {
-    const baseStyles = 'px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-80';
-    const typeStyles = {
-      success: 'bg-green-500 text-white',
-      error: 'bg-red-500 text-white',
-      info: 'bg-blue-500 text-white',
-      warning: 'bg-yellow-500 text-white',
-    };
-    return `${baseStyles} ${typeStyles[type]}`;
+  const getBg = (type: ToastType) => {
+    switch (type) {
+      case 'success':
+        return 'var(--color-success, #22c55e)';
+      case 'error':
+        return 'var(--color-error, #ef4444)';
+      case 'warning':
+        return 'var(--color-warning, #eab308)';
+      default:
+        return 'var(--color-primary)';
+    }
   };
-
-  const getToastIcon = (type: ToastType) => {
-    const icons = {
-      success: '✓',
-      error: '✕',
-      info: 'ℹ',
-      warning: '⚠',
-    };
-    return icons[type];
-  };
+  const getIcon = (type: ToastType) =>
+    type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '⚠' : 'ℹ';
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 space-y-2">
+    <div
+      style={{
+        position: 'fixed',
+        top: '1.5rem',
+        right: '1.5rem',
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.5rem',
+        maxWidth: 'min(400px, calc(100vw - 2rem))',
+      }}
+    >
       {toasts.map((toast) => (
-        <div key={toast.id} className={getToastStyles(toast.type)}>
-          <span className="text-2xl font-bold">{getToastIcon(toast.type)}</span>
-          <span className="flex-1">{toast.message}</span>
+        <div
+          key={toast.id}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            padding: '1rem 1.25rem',
+            borderRadius: '12px',
+            background: getBg(toast.type),
+            color: 'var(--color-surface, #fff)',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+            fontSize: '0.9375rem',
+          }}
+        >
+          <span style={{ fontWeight: 700, fontSize: '1.25rem' }}>{getIcon(toast.type)}</span>
+          <span style={{ flex: 1 }}>{toast.message}</span>
           <button
+            type="button"
             onClick={() => removeToast(toast.id)}
-            className="text-white hover:opacity-75 transition-opacity"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'inherit',
+              cursor: 'pointer',
+              opacity: 0.9,
+              padding: '0.25rem',
+            }}
             aria-label="Close notification"
           >
             ✕

@@ -4,6 +4,7 @@ import Documentation from './pages/public/Documentation';
 import UsersList from './pages/admin/UsersList';
 import Login from './pages/public/Login';
 import { FountainThemeProvider } from './theme/ThemeProvider';
+import { ToastProvider } from './components/Toast';
 import DataModels from './pages/admin/DataModels';
 import MediaLibrary from './pages/admin/MediaLibrary';
 import AuditLogs from './pages/admin/AuditLogs';
@@ -23,39 +24,41 @@ import UserDetails from './pages/admin/UserDetails';
 export default function App() {
   return (
     <FountainThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/admin"
-            element={
-              <RequireAuth requiredRole="Super Admin">
-                <Outlet />
-              </RequireAuth>
-            }
-          >
-            <Route index element={<Home />} />
-            <Route path="users" element={<UsersList />} />
-            <Route path="users/:id" element={<UserDetails />} />
-            <Route path="data" element={<DataModels />} />
-            <Route path="content-types" element={<Navigate to="/admin/data" replace />} />
-            <Route path="entries" element={<Navigate to="/admin/data" replace />} />
-            <Route path="media" element={<MediaLibrary />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="roles" element={<Roles />} />
-            <Route path="logs" element={<AuditLogs />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="content/:collection" element={<ContentEntries />} />
-            <Route path="content/:collection/new" element={<ContentEntryDetail />} />
-            <Route path="content/:collection/:id" element={<ContentEntryDetail />} />
-          </Route>
-          <Route path="/" element={<Landing />} />
-          <Route path="/docs" element={<Documentation />} />
-          <Route path="/401" element={<UnauthorizedError />} />
-          <Route path="/500" element={<InternalServerError />} />
-          <Route path="*" element={<NotFoundError />} />
-        </Routes>
-      </BrowserRouter>
+      <ToastProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/admin"
+              element={
+                <RequireAuth requiredRole="Super Admin">
+                  <Outlet />
+                </RequireAuth>
+              }
+            >
+              <Route index element={<Home />} />
+              <Route path="users" element={<UsersList />} />
+              <Route path="users/:id" element={<UserDetails />} />
+              <Route path="data" element={<DataModels />} />
+              <Route path="content-types" element={<Navigate to="/admin/data" replace />} />
+              <Route path="entries" element={<Navigate to="/admin/data" replace />} />
+              <Route path="media" element={<MediaLibrary />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="roles" element={<Roles />} />
+              <Route path="logs" element={<AuditLogs />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="content/:collection" element={<ContentEntries />} />
+              <Route path="content/:collection/new" element={<ContentEntryDetail />} />
+              <Route path="content/:collection/:id" element={<ContentEntryDetail />} />
+            </Route>
+            <Route path="/" element={<Landing />} />
+            <Route path="/docs" element={<Documentation />} />
+            <Route path="/401" element={<UnauthorizedError />} />
+            <Route path="/500" element={<InternalServerError />} />
+            <Route path="*" element={<NotFoundError />} />
+          </Routes>
+        </BrowserRouter>
+      </ToastProvider>
     </FountainThemeProvider>
   );
 }

@@ -4,14 +4,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { deleteItem, listItems } from '../../api/content';
 import { fetchSchema } from '../../api/schema';
-import { LoadingState, ErrorState, EmptyState } from '../../components/states';
+import { useToast } from '../../components/Toast';
+import { LoadingSkeleton, ErrorState, EmptyState, ApiErrorState } from '../../components/states';
 
 const ContentEntries = () => {
   const { collection } = useParams<{ collection: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   if (!collection) {
     return (
@@ -37,11 +38,11 @@ const ContentEntries = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteItem(collection, id),
     onSuccess: () => {
-      setToast({ message: 'Entry deleted successfully', type: 'success' });
+      showToast('Entry deleted successfully', 'success');
       queryClient.invalidateQueries({ queryKey: ['content', collection] });
     },
     onError: () => {
-      setToast({ message: 'Failed to delete entry', type: 'error' });
+      showToast('Failed to delete entry', 'error');
     },
   });
 
@@ -59,13 +60,21 @@ const ContentEntries = () => {
   if (isLoading || schemaLoading)
     return (
       <AdminLayout>
-        <LoadingState />
+        <LoadingSkeleton
+          variant="table"
+          message="Loading entries..."
+          tableRows={6}
+          tableColumns={4}
+        />
       </AdminLayout>
     );
   if (isError)
     return (
       <AdminLayout>
-        <ErrorState onRetry={() => refetch()} message={''} />
+        <ApiErrorState
+          onRetry={() => refetch()}
+          message="We couldn't load entries for this collection. Please try again."
+        />
       </AdminLayout>
     );
 
@@ -179,19 +188,6 @@ const ContentEntries = () => {
 
   return (
     <AdminLayout>
-      {toast && (
-        <div
-          className={`fixed bottom-8 right-8 p-4 rounded-xl shadow-2xl z-50 ${
-            toast.type === 'success' ? 'bg-green-600' : 'bg-error'
-          } text-white animate-slide-in flex items-center gap-3 min-w-[300px] border border-white/10`}
-        >
-          <div className="flex-1 font-medium">{toast.message}</div>
-          <button onClick={() => setToast(null)} className="text-white/80 hover:text-white">
-            ✕
-          </button>
-        </div>
-      )}
-
       <div className="p-6 md:p-10 max-w-7xl mx-auto">
         <div className="mb-8">
           <button

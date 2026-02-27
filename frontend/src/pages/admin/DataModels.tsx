@@ -1,19 +1,19 @@
 import React, { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSchema } from '../../api/schema';
 import { listItems } from '../../api/content';
-import { LoadingState, ErrorState, EmptyState } from '../../components/states';
+import { useToast } from '../../components/Toast';
+import { LoadingSkeleton, ErrorState, EmptyState } from '../../components/states';
 import type { AppSchema } from '../../types/contentTypes';
 
 type SortOption = 'name-asc' | 'name-desc' | 'fields-asc' | 'fields-desc';
 
 const DataModels = () => {
-  const navigate = useNavigate();
+  const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
-  const [toast, setToast] = useState<{ message: string } | null>(null);
 
   const {
     data: schema,
@@ -58,22 +58,15 @@ const DataModels = () => {
   }, [schema, searchTerm, sortBy]);
 
   const handleAddDataModel = () => {
-    setToast({
-      message:
-        'Add new data model (content type) via API is coming soon. Use the backend seed or API to create types for now.',
-    });
-    setTimeout(() => setToast(null), 5000);
+    showToast(
+      'Add new data model (content type) via API is coming soon. Use the backend seed or API to create types for now.',
+      'info'
+    );
   };
 
   return (
     <AdminLayout>
       <div className="p-6 md:p-10 max-w-7xl mx-auto">
-        {toast && (
-          <div className="fixed bottom-8 right-8 p-4 rounded-xl shadow-2xl z-50 bg-primary text-white max-w-md animate-slide-in border border-white/10">
-            {toast.message}
-          </div>
-        )}
-
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-text mb-2">Data modeling</h1>
@@ -90,7 +83,9 @@ const DataModels = () => {
           </button>
         </div>
 
-        {isLoading && <LoadingState message="Loading data models..." />}
+        {isLoading && (
+          <LoadingSkeleton variant="cards" message="Loading data models..." cardCount={6} />
+        )}
 
         {isError && (
           <ErrorState

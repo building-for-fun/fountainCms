@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains reusable state components for handling common UI states in the FountainCMS application.
+This directory contains reusable state components for handling common UI states: loading (spinner + skeletons), errors, empty states, and inline error messages. The app also uses a global **Snackbar (Toast)** for success/error alerts via `ToastProvider` and `useToast()` in `components/Toast.tsx`.
 
 ## Components
 
@@ -10,17 +10,39 @@ This directory contains reusable state components for handling common UI states 
 
 Displays a loading spinner with an optional message during data fetching operations.
 
+**Props:** `message` (optional). Default: "Loading..."
+
+---
+
+### LoadingSkeleton
+
+Full-page loading state with optional **skeleton** or **spinner** variant. Use for consistent loading UX.
+
 **Props:**
 
-- `message` (optional): Custom loading message. Default: "Loading..."
+- `variant`: `'cards'` | `'table'` | `'spinner'`. Default: `'cards'`
+- `message` (optional): Shown above skeleton
+- `cardCount`, `tableRows`, `tableColumns`: For cards/table variants
 
 **Usage:**
 
 ```tsx
-import { LoadingState } from '../../components/states';
+import { LoadingSkeleton } from '../../components/states';
 
-<LoadingState message="Loading users..." />;
+<LoadingSkeleton variant="cards" message="Loading data models..." cardCount={6} />;
+<LoadingSkeleton variant="table" tableRows={6} tableColumns={4} />;
+<LoadingSkeleton variant="spinner" message="Loading..." />;
 ```
+
+---
+
+### Skeleton / CardSkeleton / TableSkeleton
+
+- **Skeleton**: Base shimmer block (width, height, borderRadius).
+- **CardSkeleton**: Grid of card-shaped placeholders (`count`).
+- **TableSkeleton**: Table with header + rows (`rows`, `columns`).
+
+Use for inline loading placeholders or build custom layouts with `Skeleton`.
 
 ---
 
@@ -56,23 +78,44 @@ import { EmptyState } from '../../components/states';
 
 Displays error information with optional retry functionality.
 
-**Props:**
+**Props:** `title`, `message` (required), `onRetry`, `retryLabel`
 
-- `title` (optional): Error title. Default: "Something Went Wrong"
-- `message` (required): Error description
-- `onRetry` (optional): Callback function for retry button
-- `retryLabel` (optional): Text for retry button. Default: "Try Again"
+---
+
+### ApiErrorState
+
+Placeholder for when an **API request fails** (e.g. list failed to load). Same as ErrorState with defaults: title "Something went wrong", message about loading content, and "Try again" button.
+
+**Props:** `message` (optional), `onRetry` (optional)
 
 **Usage:**
 
 ```tsx
-import { ErrorState } from '../../components/states';
+import { ApiErrorState } from '../../components/states';
 
-<ErrorState
-  title="Failed to Load Data"
-  message="Unable to connect to the server. Please try again."
-  onRetry={handleRetry}
-/>;
+<ApiErrorState onRetry={() => refetch()} message="We couldn't load entries. Please try again." />;
+```
+
+---
+
+### ErrorMessage
+
+**Inline** error message (e.g. under a form field). Not a full-page state.
+
+**Props:** `message` (required), `className`, `style`
+
+---
+
+### Snackbar (Toast)
+
+Use `useToast()` from `components/Toast` for success/error alerts. App must be wrapped with `ToastProvider` (see `App.tsx`).
+
+```tsx
+import { useToast } from '../../components/Toast';
+
+const { showToast } = useToast();
+showToast('Saved successfully', 'success');
+showToast('Something went wrong', 'error');
 ```
 
 ---

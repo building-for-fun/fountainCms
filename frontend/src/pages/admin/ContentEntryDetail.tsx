@@ -4,14 +4,15 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { createItem, getItem, updateItem } from '../../api/content';
 import { fetchSchema } from '../../api/schema';
-import { LoadingState, ErrorState } from '../../components/states';
+import { useToast } from '../../components/Toast';
+import { LoadingSkeleton, ErrorState } from '../../components/states';
 
 const ContentEntryDetail = () => {
   const { collection, id } = useParams<{ collection: string; id?: string }>();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const isEdit = !!id;
   const [formData, setFormData] = useState<Record<string, any>>({});
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const {
     data: schema,
@@ -54,21 +55,18 @@ const ContentEntryDetail = () => {
     mutationFn: (payload: Record<string, any>) =>
       isEdit ? updateItem(collection!, id!, payload) : createItem(collection!, payload),
     onSuccess: () => {
-      setToast({
-        message: `Entry ${isEdit ? 'updated' : 'created'} successfully!`,
-        type: 'success',
-      });
+      showToast(`Entry ${isEdit ? 'updated' : 'created'} successfully!`, 'success');
       setTimeout(() => navigate(`/admin/content/${collection}`), 1500);
     },
-    onError: (error: any) => {
-      setToast({ message: error.message || 'Something went wrong', type: 'error' });
+    onError: (error: Error) => {
+      showToast(error?.message || 'Something went wrong', 'error');
     },
   });
 
   if (schemaLoading || (isEdit && dataLoading))
     return (
       <AdminLayout>
-        <LoadingState />
+        <LoadingSkeleton variant="spinner" message="Loading..." />
       </AdminLayout>
     );
   if (schemaError || !collectionSchema)
@@ -99,19 +97,6 @@ const ContentEntryDetail = () => {
 
   return (
     <AdminLayout>
-      {toast && (
-        <div
-          className={`fixed bottom-8 right-8 p-4 rounded-xl shadow-2xl z-50 ${
-            toast.type === 'success' ? 'bg-green-600' : 'bg-error'
-          } text-white animate-slide-in flex items-center gap-3 min-w-[300px] border border-white/10`}
-        >
-          <div className="flex-1 font-medium">{toast.message}</div>
-          <button onClick={() => setToast(null)} className="text-white/80 hover:text-white">
-            ✕
-          </button>
-        </div>
-      )}
-
       <div className="p-6 md:p-10 max-w-7xl mx-auto">
         <div className="mb-10">
           <button
