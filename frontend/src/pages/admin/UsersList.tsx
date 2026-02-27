@@ -20,6 +20,8 @@ export default function UsersList() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const [newUser, setNewUser] = useState({
     username: '',
@@ -156,6 +158,29 @@ export default function UsersList() {
     });
   };
 
+  const handleDeleteUser = async (user: User) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete "${user.username}"? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setDeleteError(null);
+    setDeletingId(user.id);
+    try {
+      await api(`/user/${user.id}`, { method: 'DELETE' });
+      await fetchUsers();
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to delete user. Please try again.';
+      setDeleteError(errorMessage);
+      console.error('Error deleting user:', err);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <AdminLayout>
       <div style={{ padding: '2rem' }}>
@@ -188,6 +213,39 @@ export default function UsersList() {
           />
         )}
 
+        {/* Delete error */}
+        {deleteError && (
+          <div
+            style={{
+              padding: '0.75rem 1rem',
+              marginBottom: '1rem',
+              backgroundColor: 'var(--color-error)',
+              color: 'var(--color-surface)',
+              borderRadius: '4px',
+              fontSize: '0.875rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span>{deleteError}</span>
+            <button
+              type="button"
+              onClick={() => setDeleteError(null)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+                fontSize: '1.25rem',
+                padding: '0 0.25rem',
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Users Table */}
         {!loading && !error && users.length > 0 && (
           <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
@@ -198,6 +256,7 @@ export default function UsersList() {
                 <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Last Name</th>
                 <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Email</th>
                 <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Role</th>
+                <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -206,7 +265,7 @@ export default function UsersList() {
                   <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
                     <Link
                       to={`/admin/users/${user.id}`}
-                      style={{ color: 'var(--color-primary', textDecoration: 'none' }}
+                      style={{ color: 'var(--color-primary)', textDecoration: 'none' }}
                     >
                       {user.username}
                     </Link>
@@ -222,6 +281,25 @@ export default function UsersList() {
                   </td>
                   <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
                     {user.role?.name ?? '-'}
+                  </td>
+                  <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteUser(user)}
+                      disabled={deletingId === user.id}
+                      style={{
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: '4px',
+                        border: '1px solid var(--color-error)',
+                        backgroundColor: 'transparent',
+                        color: 'var(--color-error)',
+                        cursor: deletingId === user.id ? 'not-allowed' : 'pointer',
+                        fontSize: '0.875rem',
+                        opacity: deletingId === user.id ? 0.6 : 1,
+                      }}
+                    >
+                      {deletingId === user.id ? 'Deleting...' : 'Delete'}
+                    </button>
                   </td>
                 </tr>
               ))}
