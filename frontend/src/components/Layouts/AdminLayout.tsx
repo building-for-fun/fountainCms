@@ -128,7 +128,10 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
             {adminNavItems.map((item) => {
-              const isActive = location.pathname === item.to;
+              const isActive =
+                location.pathname === item.to ||
+                (item.to === '/admin/content-types' &&
+                  location.pathname.startsWith('/admin/content/'));
               return (
                 <Link
                   key={item.to}

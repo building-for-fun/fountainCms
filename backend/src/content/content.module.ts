@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { ContentController } from './content.controller';
 import { ContentService } from './content.service';
 import { ContentRepository } from './content.repository';
-import { PrismaService } from '../prisma/prisma.service';
-import { SchemaService } from '../schema/schema.service';
+import { PrismaModule } from '../prisma/prisma.module';
+import { SchemaModule } from '../schema/schema.module';
 
 @Module({
-  imports: [],
+  imports: [PrismaModule, SchemaModule],
   controllers: [ContentController],
-  providers: [ContentService, ContentRepository, PrismaService, SchemaService],
+  providers: [ContentService, ContentRepository],
 })
 export class ContentModule {}

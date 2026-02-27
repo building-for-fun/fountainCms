@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { loadSchema } from '../../schema/schema.loader';
 import { ContentRepository } from './content.repository';
 import { SchemaService } from '../schema/schema.service';
 import { Prisma } from '@prisma/client';
@@ -12,14 +11,15 @@ import { assertObject, validatePayload } from '../utils/content.util';
 
 @Injectable()
 export class ContentService {
-  private readonly schema = loadSchema();
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly contentRepository: ContentRepository,
     private readonly schemaService: SchemaService,
-  ) {
-    this.schema = this.schemaService.getSchema();
+  ) {}
+
+  /** Schema is loaded at app startup via APP_INITIALIZER; first use is after that. */
+  private get schema() {
+    return this.schemaService.getSchema();
   }
 
   async findMany(collection: string) {

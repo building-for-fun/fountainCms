@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSchema } from '../../api/schema';
@@ -154,13 +155,13 @@ const ContentTypes = () => {
                       </span>
                     </div>
 
-                    <a
-                      href={`/admin/content/${key}`}
+                    <Link
+                      to={`/admin/content/${key}`}
                       className="mt-auto pt-4 border-t border-border flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all"
                     >
                       <span>Manage Content</span>
                       <span>→</span>
-                    </a>
+                    </Link>
                   </div>
                 ))}
               </div>

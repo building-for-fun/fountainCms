@@ -36,6 +36,20 @@ const ContentEntryDetail = () => {
     }
   }, [existingData]);
 
+  // Apply schema defaults for new entries so booleans etc. are sent correctly
+  useEffect(() => {
+    if (isEdit || !collectionSchema) return;
+    const defaults: Record<string, unknown> = {};
+    for (const [fieldName, fieldConfig] of Object.entries(collectionSchema.fields)) {
+      if (fieldConfig.default !== undefined && fieldConfig.default !== null) {
+        defaults[fieldName] = fieldConfig.default;
+      }
+    }
+    if (Object.keys(defaults).length > 0) {
+      setFormData((prev) => ({ ...defaults, ...prev }));
+    }
+  }, [isEdit, collectionSchema]);
+
   const mutation = useMutation({
     mutationFn: (payload: Record<string, any>) =>
       isEdit ? updateItem(collection!, id!, payload) : createItem(collection!, payload),
@@ -64,12 +78,16 @@ const ContentEntryDetail = () => {
       </AdminLayout>
     );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'number' ? Number(value) : value,
-    }));
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    fieldType?: string
+  ) => {
+    const { name, value } = e.target;
+    const type = fieldType ?? (e.target as HTMLInputElement).type;
+    let next: any = value;
+    if (type === 'number') next = value === '' ? undefined : Number(value);
+    else if (fieldType === 'boolean') next = value === 'true';
+    setFormData((prev) => ({ ...prev, [name]: next }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -119,11 +137,39 @@ const ContentEntryDetail = () => {
                   <label className="block text-sm font-semibold text-text mb-2 capitalize">
                     {fieldName}
                   </label>
-                  {fieldConfig.type === 'text' && fieldConfig.variant === 'long' ? (
+                  {fieldConfig.type === 'boolean' ? (
+                    <select
+                      name={fieldName}
+                      value={
+                        formData[fieldName] === true || formData[fieldName] === 'true'
+                          ? 'true'
+                          : 'false'
+                      }
+                      onChange={(e) => handleInputChange(e, 'boolean')}
+                      className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text transition-all"
+                    >
+                      <option value="false">No</option>
+                      <option value="true">Yes</option>
+                    </select>
+                  ) : fieldConfig.type === 'enum' && Array.isArray(fieldConfig.options) ? (
+                    <select
+                      name={fieldName}
+                      value={formData[fieldName] ?? ''}
+                      onChange={(e) => handleInputChange(e)}
+                      className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text transition-all"
+                    >
+                      <option value="">Select...</option>
+                      {fieldConfig.options.map((opt: string) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  ) : fieldConfig.type === 'text' && fieldConfig.variant === 'long' ? (
                     <textarea
                       name={fieldName}
                       value={formData[fieldName] || ''}
-                      onChange={handleInputChange}
+                      onChange={(e) => handleInputChange(e)}
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text placeholder-text-muted transition-all"
                       rows={5}
                       placeholder={`Enter ${fieldName}...`}
@@ -132,8 +178,8 @@ const ContentEntryDetail = () => {
                     <input
                       type={fieldConfig.type === 'number' ? 'number' : 'text'}
                       name={fieldName}
-                      value={formData[fieldName] || ''}
-                      onChange={handleInputChange}
+                      value={formData[fieldName] ?? ''}
+                      onChange={(e) => handleInputChange(e)}
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text placeholder-text-muted transition-all"
                       placeholder={`Enter ${fieldName}...`}
                     />

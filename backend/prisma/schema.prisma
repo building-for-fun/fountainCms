@@ -31,6 +31,32 @@ model Role {
   users       User[]
 }
 
+model ContentTypeDefinition {
+  id    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name  String   @unique @db.VarChar(255)
+  label String?  @db.VarChar(255)
+  fields ContentTypeField[]
+
+  @@map("content_type_definitions")
+}
+
+model ContentTypeField {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contentTypeDefId String   @db.Uuid
+  name             String   @db.VarChar(255)
+  type             String   @db.VarChar(50)
+  required         Boolean  @default(false)
+  defaultValue    Json?
+  options         Json?
+  readonly        Boolean  @default(false)
+
+  contentTypeDef ContentTypeDefinition @relation(fields: [contentTypeDefId], references: [id], onDelete: Cascade)
+
+  @@unique([contentTypeDefId, name])
+  @@index([contentTypeDefId])
+  @@map("content_type_fields")
+}
+
 model ContentItem {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   collection String   @db.VarChar(255)
