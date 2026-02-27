@@ -1,0 +1,243 @@
+/* =========================
+   Header.css
+   ========================= */
+
+/* =========================
+   THEME VARIABLES
+   ========================= */
+
+:root {
+  /* ===== DARK MODE (Default) ===== */
+
+  --header-bg:
+    radial-gradient(1200px 120px at 15% 0%, rgba(56, 189, 248, 0.30), transparent 60%),
+    radial-gradient(900px 120px at 85% 0%, rgba(99, 102, 241, 0.26), transparent 55%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(16, 44, 120, 0.85));
+
+  --header-text: rgba(255, 255, 255, 0.92);
+  --header-border: rgba(255, 255, 255, 0.10);
+
+  --nav-text: rgba(255, 255, 255, 0.88);
+  --nav-hover-bg: rgba(255, 255, 255, 0.10);
+  --nav-hover-border: rgba(255, 255, 255, 0.10);
+}
+
+/* ===== LIGHT MODE (Premium Sky Gradient) ===== */
+
+html[data-theme="light"],
+body.light {
+
+  --header-bg:
+    radial-gradient(900px 120px at 20% -10%, rgba(255,255,255,0.55), transparent 60%),
+    radial-gradient(1000px 140px at 85% -20%, rgba(56,189,248,0.35), transparent 60%),
+    linear-gradient(135deg, #3b82f6 0%, #38bdf8 50%, #60a5fa 100%);
+
+  --header-text: #0f172a;
+  --header-border: rgba(0, 0, 0, 0.08);
+
+  --nav-text: #0f172a;
+  --nav-hover-bg: rgba(255, 255, 255, 0.35);
+  --nav-hover-border: rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  background: var(--header-bg);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--header-border);
+
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+  overflow: hidden; /* needed for sweep */
+}
+
+/* =========================
+   Subtle Light Sweep (Both Modes)
+   ========================= */
+
+.main-header::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -60%;
+  width: 55%;
+  height: 180%;
+
+  transform: rotate(18deg);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+}
+
+/* Light mode sweep (glossy white) */
+html[data-theme="light"] .main-header::before,
+body.light .main-header::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+}
+
+/* Dark mode sweep (subtle blue glow) */
+html[data-theme="dark"] .main-header::before,
+body.dark .main-header::before,
+.main-header::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(56, 189, 248, 0.25),
+    transparent
+  );
+}
+
+/* Trigger sweep on hover */
+.main-header:hover::before {
+  opacity: 0.6;
+  animation: headerSweep 1.2s ease-in-out forwards;
+}
+
+@keyframes headerSweep {
+  0% {
+    transform: translateX(0) rotate(18deg);
+  }
+  100% {
+    transform: translateX(320%) rotate(18deg);
+  }
+}
+
+/* =========================
+   Layout
+   ========================= */
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  position: relative;
+  z-index: 1; /* above sweep */
+}
+
+/* =========================
+   Logo
+   ========================= */
+
+.logo {
+  flex: 0 0 auto;
+
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+
+  color: var(--header-text);
+  text-decoration: none;
+  white-space: nowrap;
+
+  transition: transform 0.25s ease, text-shadow 0.25s ease, color 0.25s ease;
+}
+
+.logo:hover {
+  transform: translateY(-1px);
+  text-shadow:
+    0 0 10px rgba(56, 189, 248, 0.45),
+    0 0 18px rgba(99, 102, 241, 0.30);
+}
+
+/* =========================
+   Mobile Toggle
+   ========================= */
+
+.mobile-toggle {
+  display: none;
+  margin-left: auto;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--header-text);
+}
+
+/* =========================
+   Overlay
+   ========================= */
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 60;
+}
+
+/* =========================
+   Mobile Drawer
+   ========================= */
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 85%;
+  max-width: 320px;
+
+  background: var(--color-bg);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+  z-index: 70;
+
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.mobile-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.drawer-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 768px) {
+  .mobile-toggle {
+    display: block;
+  }
+}
