@@ -6,8 +6,7 @@ import { logout } from '../../lib/auth';
 const adminNavItems = [
   { to: '/admin', icon: '🛠️', label: 'Dashboard' },
   { to: '/admin/users', icon: '👥', label: 'Users' },
-  { to: '/admin/content-types', icon: '📦', label: 'Content Types' },
-  { to: '/admin/entries', icon: '📝', label: 'Entries' },
+  { to: '/admin/data', icon: '📦', label: 'Data' },
   { to: '/admin/media', icon: '🖼️', label: 'Media' },
   { to: '/admin/settings', icon: '⚙️', label: 'Settings' },
   { to: '/admin/roles', icon: '🔑', label: 'Roles' },
@@ -130,8 +129,9 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
             {adminNavItems.map((item) => {
               const isActive =
                 location.pathname === item.to ||
-                (item.to === '/admin/content-types' &&
-                  location.pathname.startsWith('/admin/content/'));
+                (item.to === '/admin/data' &&
+                  (location.pathname.startsWith('/admin/content/') ||
+                    location.pathname === '/admin/data'));
               return (
                 <Link
                   key={item.to}

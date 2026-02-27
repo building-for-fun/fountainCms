@@ -195,7 +195,7 @@ const ContentEntries = () => {
       <div className="p-6 md:p-10 max-w-7xl mx-auto">
         <div className="mb-8">
           <button
-            onClick={() => navigate('/admin/content-types')}
+            onClick={() => navigate('/admin/data')}
             className="text-text-muted hover:text-text flex items-center gap-2 mb-6 transition-colors group"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to

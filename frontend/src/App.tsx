@@ -4,7 +4,7 @@ import Documentation from './pages/public/Documentation';
 import UsersList from './pages/admin/UsersList';
 import Login from './pages/public/Login';
 import { FountainThemeProvider } from './theme/ThemeProvider';
-import ContentTypes from './pages/admin/ContentTypes';
+import DataModels from './pages/admin/DataModels';
 import MediaLibrary from './pages/admin/MediaLibrary';
 import AuditLogs from './pages/admin/AuditLogs';
 import NotFoundError from './pages/error/NotFoundError';
@@ -15,7 +15,7 @@ import ContentEntryDetail from './pages/admin/ContentEntryDetail';
 import Roles from './pages/admin/Roles';
 import RequireAuth from './components/RequireAuth';
 import Settings from './pages/admin/Settings';
-import Entries from './pages/admin/Entries';
+import { Navigate } from 'react-router-dom';
 import ProfilePage from './pages/admin/ProfilePage';
 import Home from './pages/admin/Home';
 import UserDetails from './pages/admin/UserDetails';
@@ -37,8 +37,9 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="users" element={<UsersList />} />
             <Route path="users/:id" element={<UserDetails />} />
-            <Route path="content-types" element={<ContentTypes />} />
-            <Route path="entries" element={<Entries />} />
+            <Route path="data" element={<DataModels />} />
+            <Route path="content-types" element={<Navigate to="/admin/data" replace />} />
+            <Route path="entries" element={<Navigate to="/admin/data" replace />} />
             <Route path="media" element={<MediaLibrary />} />
             <Route path="settings" element={<Settings />} />
             <Route path="roles" element={<Roles />} />
