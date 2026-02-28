@@ -1,19 +1,47 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/Layouts/AdminLayout';
-import { useQuery } from '@tanstack/react-query';
-import { fetchSchema } from '../../api/schema';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  fetchSchema,
+  createContentType,
+  updateContentType,
+  deleteContentType,
+  type CreateContentTypeInput,
+  type ContentTypeFieldInput,
+  type FieldType,
+} from '../../api/schema';
 import { listItems } from '../../api/content';
 import { useToast } from '../../components/Toast';
 import { LoadingSkeleton, ErrorState, EmptyState } from '../../components/states';
 import type { AppSchema } from '../../types/contentTypes';
 
+const FIELD_TYPES: FieldType[] = [
+  'string',
+  'text',
+  'number',
+  'boolean',
+  'enum',
+  'datetime',
+  'relation',
+];
+
 type SortOption = 'name-asc' | 'name-desc' | 'fields-asc' | 'fields-desc';
+type ModalMode = 'create' | 'edit' | null;
 
 const DataModels = () => {
+  const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
+  const [modalMode, setModalMode] = useState<ModalMode>(null);
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [deleteConfirmKey, setDeleteConfirmKey] = useState<string | null>(null);
+  const [form, setForm] = useState<CreateContentTypeInput>({
+    name: '',
+    label: '',
+    fields: [{ name: 'title', type: 'string', required: true }],
+  });
 
   const {
     data: schema,
@@ -24,6 +52,45 @@ const DataModels = () => {
   } = useQuery({
     queryKey: ['schema'],
     queryFn: fetchSchema,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createContentType,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['schema'] });
+      showToast('Content type created successfully', 'success');
+      setModalMode(null);
+      setForm({ name: '', label: '', fields: [{ name: 'title', type: 'string', required: true }] });
+    },
+    onError: (e: { message?: string }) => {
+      showToast(e?.message ?? 'Failed to create content type', 'error');
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ name, data }: { name: string; data: Parameters<typeof updateContentType>[1] }) =>
+      updateContentType(name, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['schema'] });
+      showToast('Content type updated successfully', 'success');
+      setModalMode(null);
+      setEditingKey(null);
+    },
+    onError: (e: { message?: string }) => {
+      showToast(e?.message ?? 'Failed to update content type', 'error');
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteContentType,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['schema'] });
+      showToast('Content type deleted', 'success');
+      setDeleteConfirmKey(null);
+    },
+    onError: (e: { message?: string }) => {
+      showToast(e?.message ?? 'Failed to delete content type', 'error');
+    },
   });
 
   const collections = useMemo(() => {
@@ -57,11 +124,78 @@ const DataModels = () => {
     return list;
   }, [schema, searchTerm, sortBy]);
 
-  const handleAddDataModel = () => {
-    showToast(
-      'Add new data model (content type) via API is coming soon. Use the backend seed or API to create types for now.',
-      'info'
-    );
+  const openCreate = () => {
+    setForm({
+      name: '',
+      label: '',
+      fields: [{ name: 'title', type: 'string', required: true }],
+    });
+    setModalMode('create');
+  };
+
+  const openEdit = (key: string) => {
+    const col = (schema as AppSchema)?.collections?.[key];
+    if (!col) return;
+    setEditingKey(key);
+    setForm({
+      name: key,
+      label: col.label ?? '',
+      fields: Object.entries(col.fields).map(([name, f]) => ({
+        name,
+        type: f.type as FieldType,
+        required: f.required,
+        default: f.default,
+        options: f.options,
+        readonly: f.readonly,
+      })),
+    });
+    setModalMode('edit');
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (modalMode === 'create') {
+      createMutation.mutate({
+        ...form,
+        name: form.name.trim(),
+        label: form.label?.trim() || undefined,
+        fields: form.fields.filter((f) => f.name.trim()),
+      });
+    } else if (modalMode === 'edit' && editingKey) {
+      updateMutation.mutate({
+        name: editingKey,
+        data: {
+          label: form.label?.trim() || undefined,
+          fields: form.fields
+            .filter((f) => f.name.trim())
+            .map((f) => ({
+              ...f,
+              name: f.name.trim(),
+            })),
+        },
+      });
+    }
+  };
+
+  const addField = () => {
+    setForm((prev) => ({
+      ...prev,
+      fields: [...prev.fields, { name: '', type: 'string', required: false }],
+    }));
+  };
+
+  const removeField = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      fields: prev.fields.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateField = (index: number, patch: Partial<ContentTypeFieldInput>) => {
+    setForm((prev) => ({
+      ...prev,
+      fields: prev.fields.map((f, i) => (i === index ? { ...f, ...patch } : f)),
+    }));
   };
 
   return (
@@ -76,7 +210,7 @@ const DataModels = () => {
           </div>
           <button
             type="button"
-            onClick={handleAddDataModel}
+            onClick={openCreate}
             className="shrink-0 px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-all shadow-md"
           >
             + Add new data model
@@ -97,7 +231,7 @@ const DataModels = () => {
         {schema && Object.keys((schema as AppSchema).collections).length === 0 && (
           <EmptyState
             message="No data models yet"
-            description="Add a content type (e.g. via backend seed or API), or use “Add new data model” when available."
+            description='Click "Add new data model" to create your first content type.'
             icon="📦"
           />
         )}
@@ -144,6 +278,8 @@ const DataModels = () => {
                     collectionKey={key}
                     label={label}
                     fieldCount={fieldCount}
+                    onEdit={() => openEdit(key)}
+                    onDelete={() => setDeleteConfirmKey(key)}
                   />
                 ))}
               </div>
@@ -151,6 +287,172 @@ const DataModels = () => {
           </>
         )}
       </div>
+
+      {/* Create / Edit modal */}
+      {modalMode && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setModalMode(null)}
+        >
+          <div
+            className="bg-surface rounded-xl shadow-xl border border-border max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-border flex justify-between items-center">
+              <h2 className="text-xl font-bold text-text">
+                {modalMode === 'create' ? 'New content type' : 'Edit content type'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setModalMode(null)}
+                className="text-text-muted hover:text-text text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Name (API key)</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm((p) => ({
+                      ...p,
+                      name: e.target.value.toLowerCase().replace(/\s+/g, '_'),
+                    }))
+                  }
+                  placeholder="e.g. posts"
+                  pattern="^[a-z][a-z0-9_]*$"
+                  required
+                  disabled={modalMode === 'edit'}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background text-text font-mono text-sm disabled:opacity-60"
+                />
+                <p className="text-xs text-text-muted mt-1">
+                  Lowercase letters, numbers, underscores. Cannot change when editing.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Label</label>
+                <input
+                  type="text"
+                  value={form.label ?? ''}
+                  onChange={(e) => setForm((p) => ({ ...p, label: e.target.value }))}
+                  placeholder="e.g. Blog Posts"
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background text-text"
+                />
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-text">Fields</label>
+                  <button
+                    type="button"
+                    onClick={addField}
+                    className="text-sm text-primary font-medium"
+                  >
+                    + Add field
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {form.fields.map((field, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-wrap items-start gap-2 p-3 border border-border rounded-lg bg-background"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Field name"
+                        value={field.name}
+                        onChange={(e) => updateField(idx, { name: e.target.value })}
+                        className="flex-1 min-w-[100px] px-3 py-2 border border-border rounded text-sm font-mono"
+                      />
+                      <select
+                        value={field.type}
+                        onChange={(e) => updateField(idx, { type: e.target.value as FieldType })}
+                        className="px-3 py-2 border border-border rounded text-sm"
+                      >
+                        {FIELD_TYPES.map((t) => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
+                      </select>
+                      <label className="flex items-center gap-1 text-sm text-text-muted whitespace-nowrap">
+                        <input
+                          type="checkbox"
+                          checked={field.required ?? false}
+                          onChange={(e) => updateField(idx, { required: e.target.checked })}
+                        />
+                        Required
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => removeField(idx)}
+                        className="text-error text-sm"
+                        aria-label="Remove field"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setModalMode(null)}
+                  className="px-4 py-2 border border-border rounded-lg text-text hover:bg-background"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  className="px-4 py-2 bg-primary text-white rounded-lg font-medium disabled:opacity-50"
+                >
+                  {modalMode === 'create' ? 'Create' : 'Update'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirm */}
+      {deleteConfirmKey && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setDeleteConfirmKey(null)}
+        >
+          <div
+            className="bg-surface rounded-xl shadow-xl border border-border p-6 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-text mb-2">Delete content type?</h3>
+            <p className="text-text-muted text-sm mb-4">
+              Deleting <strong>{deleteConfirmKey}</strong> will remove the type definition. You can
+              only delete if there are no entries. This cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmKey(null)}
+                className="px-4 py-2 border border-border rounded-lg text-text"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => deleteMutation.mutate(deleteConfirmKey)}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 bg-error text-white rounded-lg font-medium disabled:opacity-50"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };
@@ -159,10 +461,14 @@ function DataModelCard({
   collectionKey,
   label,
   fieldCount,
+  onEdit,
+  onDelete,
 }: {
   collectionKey: string;
   label: string;
   fieldCount: number;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
   const { data, isLoading } = useQuery({
     queryKey: ['content', collectionKey, 'meta'],
@@ -192,19 +498,33 @@ function DataModelCard({
         )}
         {isLoading && <span className="text-text-muted">…</span>}
       </div>
-      <div className="mt-auto pt-4 border-t border-border flex flex-col sm:flex-row gap-2">
-        <Link
-          to={`/admin/content/${collectionKey}`}
-          className="flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all"
-        >
-          Manage content
-        </Link>
-        <Link
-          to={`/admin/content/${collectionKey}/new`}
-          className="flex items-center gap-2 text-text-muted hover:text-primary font-medium transition-all"
-        >
-          + Add entry
-        </Link>
+      <div className="mt-auto pt-4 border-t border-border flex flex-col gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to={`/admin/content/${collectionKey}`}
+            className="text-primary font-medium hover:underline"
+          >
+            Manage content
+          </Link>
+          <Link
+            to={`/admin/content/${collectionKey}/new`}
+            className="text-text-muted hover:text-primary font-medium"
+          >
+            + Add entry
+          </Link>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="text-sm text-text-muted hover:text-primary"
+          >
+            Edit type
+          </button>
+          <button type="button" onClick={onDelete} className="text-sm text-error hover:underline">
+            Delete type
+          </button>
+        </div>
       </div>
     </div>
   );

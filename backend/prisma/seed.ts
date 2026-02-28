@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
@@ -44,8 +44,8 @@ async function seedSchema() {
         update: {
           type: field.type,
           required: field.required ?? false,
-          defaultValue: field.defaultValue,
-          options: field.options,
+          defaultValue: field.defaultValue as Prisma.InputJsonValue | undefined,
+          options: field.options as Prisma.InputJsonValue | undefined,
           readonly: field.readonly ?? false,
         },
         create: {
@@ -53,8 +53,8 @@ async function seedSchema() {
           name: field.name,
           type: field.type,
           required: field.required ?? false,
-          defaultValue: field.defaultValue,
-          options: field.options,
+          defaultValue: field.defaultValue as Prisma.InputJsonValue | undefined,
+          options: field.options as Prisma.InputJsonValue | undefined,
           readonly: field.readonly ?? false,
         },
       });
