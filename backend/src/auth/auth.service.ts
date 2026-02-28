@@ -206,4 +206,17 @@ export class AuthService {
     if (user.role.name === 'Super Admin') return ['*:*'];
     return Array.isArray(user.role.permissions) ? user.role.permissions : [];
   }
+
+  /** Load full current user profile (for /auth/me) without password hash. */
+  async getMeProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { role: true },
+    });
+    if (!user) return null;
+    const { passwordHash: _, ...rest } = user as typeof user & {
+      passwordHash?: string;
+    };
+    return rest;
+  }
 }

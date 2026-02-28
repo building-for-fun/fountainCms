@@ -16,6 +16,11 @@ export interface MeResponse {
   email: string;
   role: string | null;
   permissions?: string[];
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  isActive?: boolean;
+  roleId?: string | null;
 }
 
 export function fetchAuthConfig() {

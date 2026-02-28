@@ -8,6 +8,7 @@ import {
   Param,
   Req,
   InternalServerErrorException,
+  NotFoundException,
   Logger,
 } from '@nestjs/common';
 import {
@@ -114,7 +115,14 @@ export class UserController {
     @Req() req: RequestWithUser,
   ): Promise<User> {
     try {
-      const { role, ...userData } = body;
+      const { role, ...rest } = body;
+      const userData: Prisma.UserUpdateInput = {
+        firstName: rest.firstName,
+        lastName: rest.lastName,
+        email: rest.email,
+        username: rest.username,
+      };
+      if (rest.isActive !== undefined) userData.isActive = rest.isActive;
 
       let roleName: string | null | undefined = undefined;
       if (typeof role === 'string' || role === null) {
@@ -129,9 +137,15 @@ export class UserController {
         this.getActor(req),
       );
     } catch (error) {
-      this.logger.error(`🔥 Failed to update user ${id}`, error);
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`🔥 Failed to update user ${id} - ${message}`, error);
 
-      throw new InternalServerErrorException('Failed to update user');
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : 'Failed to update user',
+      );
     }
   }
 

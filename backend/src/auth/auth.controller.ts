@@ -106,13 +106,27 @@ export class AuthController {
   ) {
     const payload = req.user;
     if (!payload) throw new UnauthorizedException();
+    const profile = await this.authService.getMeProfile(payload.sub);
     const permissions = await this.authService.getPermissionsForUser(
       payload.sub,
     );
+    if (!profile) {
+      return {
+        id: payload.sub,
+        email: payload.email,
+        role: payload.role ?? null,
+        permissions,
+      };
+    }
     return {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role ?? null,
+      id: profile.id,
+      email: profile.email,
+      username: profile.username,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      isActive: profile.isActive,
+      role: profile.role?.name ?? null,
+      roleId: profile.roleId,
       permissions,
     };
   }

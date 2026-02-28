@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
@@ -92,7 +92,7 @@ export class UserService {
       include: { role: true },
     });
     if (!before) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const updated = await this.prisma.user.update({

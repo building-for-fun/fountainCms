@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { getUser, login as persistLogin } from '../../lib/auth';
 import { api } from '../../api/client';
-import { changePassword as apiChangePassword } from '../../api/auth';
+import { changePassword as apiChangePassword, fetchMe } from '../../api/auth';
 import { getUserRole } from '../../helper/userHelper';
 import type { User } from '../../types/user';
 
@@ -64,6 +64,29 @@ const InputGroup = ({
   </div>
 );
 
+const ReadOnlyField = ({ label, value }: { label: string; value: string }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <span
+      style={{
+        fontSize: 13,
+        fontWeight: 500,
+        color: 'var(--color-text-muted)',
+      }}
+    >
+      {label}
+    </span>
+    <span
+      style={{
+        fontSize: 16,
+        color: 'var(--color-text)',
+        fontWeight: 500,
+      }}
+    >
+      {value || '—'}
+    </span>
+  </div>
+);
+
 const ProfilePage = () => {
   const currentUser = getUser();
   const [profile, setProfile] = useState<User | null>(null);
@@ -96,16 +119,24 @@ const ProfilePage = () => {
     }
     setLoading(true);
     setError(null);
-    api<User>(`/user/${userId}`)
-      .then((user) => {
-        setProfile(user);
-        const roleName = getUserRole(user);
+    fetchMe()
+      .then((me) => {
+        const profileUser: User = {
+          id: me.id,
+          email: me.email,
+          username: me.username ?? '',
+          firstName: me.firstName ?? '',
+          lastName: me.lastName ?? '',
+          role: me.role ? { name: me.role } : { name: null },
+          permissions: me.permissions ?? [],
+        };
+        setProfile(profileUser);
         setFormData({
-          firstName: user.firstName ?? '',
-          lastName: user.lastName ?? '',
-          email: user.email ?? '',
-          username: user.username ?? '',
-          role: roleName,
+          firstName: me.firstName ?? '',
+          lastName: me.lastName ?? '',
+          email: me.email ?? '',
+          username: me.username ?? '',
+          role: me.role ?? '',
           currentPassword: '',
           newPassword: '',
         });
@@ -132,7 +163,8 @@ const ProfilePage = () => {
   };
 
   const handleSave = async () => {
-    if (!userId || !profile) return;
+    const idToUpdate = profile?.id ?? userId;
+    if (!idToUpdate || !profile) return;
     if (!validate()) return;
 
     setSaving(true);
@@ -140,7 +172,7 @@ const ProfilePage = () => {
     setSuccessMessage(null);
 
     try {
-      const updated = await api<User>(`/user/${userId}`, {
+      const updated = await api<User>(`/user/${idToUpdate}`, {
         method: 'PUT',
         body: JSON.stringify({
           firstName: formData.firstName.trim(),
@@ -318,13 +350,18 @@ const ProfilePage = () => {
                 boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
               }}
             >
-              {(formData.firstName[0] || '?').toUpperCase()}
-              {(formData.lastName[0] || '?').toUpperCase()}
+              {(() => {
+                const f = formData.firstName?.trim()[0] || '';
+                const l = formData.lastName?.trim()[0] || '';
+                const e = formData.email?.trim()[0] || '';
+                const initial = f && l ? `${f}${l}` : f || l || e || 'U';
+                return String(initial).toUpperCase();
+              })()}
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 600, margin: 0, color: 'var(--color-text)' }}>
-              {formData.firstName || formData.lastName
-                ? `${formData.firstName} ${formData.lastName}`.trim()
-                : '—'}
+              {[formData.firstName, formData.lastName].filter(Boolean).join(' ').trim() ||
+                formData.email ||
+                'Profile'}
             </h2>
             <span
               style={{
@@ -338,7 +375,7 @@ const ProfilePage = () => {
                 fontWeight: 600,
               }}
             >
-              {formData.role || '—'}
+              {formData.role || currentUser?.role || 'No role'}
             </span>
           </div>
 
@@ -428,46 +465,58 @@ const ProfilePage = () => {
                 gap: 20,
               }}
             >
-              <InputGroup
-                label="First Name"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                disabled={!isEditing}
-                error={fieldErrors.firstName}
-              />
-              <InputGroup
-                label="Last Name"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                disabled={!isEditing}
-                error={fieldErrors.lastName}
-              />
-              <InputGroup
-                label="Email Address"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                disabled={!isEditing}
-                type="email"
-                error={fieldErrors.email}
-              />
-              <InputGroup
-                label="Username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                disabled={!isEditing}
-                error={fieldErrors.username}
-              />
-              <InputGroup
-                label="Role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                disabled={true}
-              />
+              {isEditing ? (
+                <>
+                  <InputGroup
+                    label="First Name"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    disabled={false}
+                    error={fieldErrors.firstName}
+                  />
+                  <InputGroup
+                    label="Last Name"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    disabled={false}
+                    error={fieldErrors.lastName}
+                  />
+                  <InputGroup
+                    label="Email Address"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={false}
+                    type="email"
+                    error={fieldErrors.email}
+                  />
+                  <InputGroup
+                    label="Username"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    disabled={false}
+                    error={fieldErrors.username}
+                  />
+                  <InputGroup
+                    label="Role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    disabled={true}
+                  />
+                </>
+              ) : (
+                <>
+                  <ReadOnlyField label="First Name" value={formData.firstName} />
+                  <ReadOnlyField label="Last Name" value={formData.lastName} />
+                  <ReadOnlyField label="Email Address" value={formData.email} />
+                  <ReadOnlyField label="Username" value={formData.username} />
+                  <ReadOnlyField label="Role" value={formData.role} />
+                </>
+              )}
             </div>
 
             <div style={{ marginTop: 32 }}>
