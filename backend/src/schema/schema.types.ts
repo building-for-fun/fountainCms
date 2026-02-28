@@ -5,7 +5,8 @@ export type FieldType =
   | 'boolean'
   | 'enum'
   | 'datetime'
-  | 'relation';
+  | 'relation'
+  | 'media';
 
 export interface FieldSchema {
   type: FieldType;

@@ -47,6 +47,24 @@ export class ContentService {
     };
   }
 
+  private async validateMediaReferences(
+    data: Record<string, unknown>,
+    fields: Record<string, { type: string }>,
+  ): Promise<void> {
+    for (const [fieldName, fieldSchema] of Object.entries(fields)) {
+      if (fieldSchema.type !== 'media') continue;
+      const value = data[fieldName];
+      if (value === null || value === undefined) continue;
+      const id = String(value);
+      const media = await this.prisma.media.findUnique({ where: { id } });
+      if (!media) {
+        throw new BadRequestException(
+          `Field '${fieldName}' references non-existent media ID`,
+        );
+      }
+    }
+  }
+
   async create(collection: string, payload: Record<string, unknown>) {
     const collectionSchema = this.schema.collections[collection];
 
@@ -58,6 +76,11 @@ export class ContentService {
       payload,
       collectionSchema.fields,
     ) as Prisma.InputJsonValue;
+
+    await this.validateMediaReferences(
+      validated as Record<string, unknown>,
+      collectionSchema.fields,
+    );
 
     const item = await this.contentRepository.create(collection, validated);
 
@@ -127,6 +150,11 @@ export class ContentService {
       merged,
       collectionSchema.fields,
     ) as Prisma.InputJsonValue;
+
+    await this.validateMediaReferences(
+      validated as Record<string, unknown>,
+      collectionSchema.fields,
+    );
 
     const updated = await this.contentRepository.update(
       collection,

@@ -1,14 +1,18 @@
 import React from 'react';
+import { PermissionMatrix } from './PermissionMatrix';
 
 interface CreateRoleFormProps {
-  newRole: { name: string; description: string };
-  setNewRole: React.Dispatch<React.SetStateAction<{ name: string; description: string }>>;
+  newRole: { name: string; description: string; permissions: string[] };
+  setNewRole: React.Dispatch<
+    React.SetStateAction<{ name: string; description: string; permissions: string[] }>
+  >;
   setShowCreateForm: React.Dispatch<React.SetStateAction<boolean>>;
   isSubmitting: boolean;
   handleAddRole: (e: React.FormEvent) => void;
   inputStyles: React.CSSProperties;
   buttonStyles: (variant: 'primary' | 'secondary' | 'danger' | 'success') => React.CSSProperties;
   cardStyles: React.CSSProperties;
+  collections: Array<{ key: string; label: string }>;
 }
 
 const CreateRoleForm: React.FC<CreateRoleFormProps> = ({
@@ -20,6 +24,7 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({
   inputStyles,
   buttonStyles,
   cardStyles,
+  collections,
 }) => (
   <div style={cardStyles}>
     <div
@@ -43,7 +48,7 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({
       <button
         onClick={() => {
           setShowCreateForm(false);
-          setNewRole({ name: '', description: '' });
+          setNewRole({ name: '', description: '', permissions: [] });
         }}
         style={{
           background: 'none',
@@ -125,12 +130,30 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({
           }}
         />
       </div>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <div
+          style={{
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            color: 'var(--color-text)',
+            marginBottom: '0.5rem',
+          }}
+        >
+          Content permissions
+        </div>
+        <PermissionMatrix
+          collections={collections}
+          permissions={newRole.permissions}
+          onChange={(permissions) => setNewRole((prev) => ({ ...prev, permissions }))}
+          disabled={isSubmitting}
+        />
+      </div>
       <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
         <button
           type="button"
           onClick={() => {
             setShowCreateForm(false);
-            setNewRole({ name: '', description: '' });
+            setNewRole({ name: '', description: '', permissions: [] });
           }}
           style={buttonStyles('secondary')}
           disabled={isSubmitting}

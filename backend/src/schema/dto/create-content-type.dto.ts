@@ -19,6 +19,7 @@ const FIELD_TYPES: FieldType[] = [
   'enum',
   'datetime',
   'relation',
+  'media',
 ];
 
 export class CreateContentTypeFieldDto {

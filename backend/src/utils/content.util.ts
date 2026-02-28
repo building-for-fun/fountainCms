@@ -82,6 +82,17 @@ export function validatePayload(
 
         break;
       }
+
+      case 'media':
+        if (value !== null && value !== undefined) {
+          if (typeof value !== 'string') {
+            throw new BadRequestException(
+              `Field '${fieldName}' must be a media ID (string) or null`,
+            );
+          }
+          // Existence check is done in ContentService (needs Prisma)
+        }
+        break;
     }
 
     result[fieldName] = value;

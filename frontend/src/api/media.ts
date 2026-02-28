@@ -31,6 +31,23 @@ export interface UploadResponse {
   size: number;
 }
 
+export async function getMedia(id: string): Promise<MediaItem> {
+  const res = await fetch(`${API_BASE}/media/${id}`, {
+    credentials: 'include',
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) {
+    let err: unknown;
+    try {
+      err = await res.json();
+    } catch {
+      err = { message: res.statusText };
+    }
+    throw err;
+  }
+  return res.json();
+}
+
 export async function listMedia(): Promise<MediaItem[]> {
   const res = await fetch(`${API_BASE}/media`, {
     credentials: 'include',

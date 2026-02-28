@@ -106,10 +106,14 @@ export class AuthController {
   ) {
     const payload = req.user;
     if (!payload) throw new UnauthorizedException();
+    const permissions = await this.authService.getPermissionsForUser(
+      payload.sub,
+    );
     return {
       id: payload.sub,
       email: payload.email,
       role: payload.role ?? null,
+      permissions,
     };
   }
 

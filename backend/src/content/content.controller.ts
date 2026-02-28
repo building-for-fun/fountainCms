@@ -6,10 +6,13 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ContentService } from './content.service';
+import { ContentPermissionGuard } from './guards/content-permission.guard';
 
 @Controller('content/collections')
+@UseGuards(ContentPermissionGuard)
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 

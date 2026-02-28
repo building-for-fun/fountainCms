@@ -6,6 +6,7 @@ import { createItem, getItem, updateItem } from '../../api/content';
 import { fetchSchema } from '../../api/schema';
 import { useToast } from '../../components/Toast';
 import { LoadingSkeleton, ErrorState } from '../../components/states';
+import { MediaPicker } from '../../components/MediaPicker/MediaPicker';
 
 const ContentEntryDetail = () => {
   const { collection, id } = useParams<{ collection: string; id?: string }>();
@@ -150,6 +151,13 @@ const ContentEntryDetail = () => {
                         </option>
                       ))}
                     </select>
+                  ) : fieldConfig.type === 'media' ? (
+                    <MediaPicker
+                      value={formData[fieldName] ?? null}
+                      onChange={(mediaId) =>
+                        setFormData((prev) => ({ ...prev, [fieldName]: mediaId }))
+                      }
+                    />
                   ) : fieldConfig.type === 'text' && fieldConfig.variant === 'long' ? (
                     <textarea
                       name={fieldName}

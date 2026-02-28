@@ -12,9 +12,22 @@ import {
   type FieldType,
 } from '../../api/schema';
 import { listItems } from '../../api/content';
+import { fetchMe } from '../../api/auth';
 import { useToast } from '../../components/Toast';
 import { LoadingSkeleton, ErrorState, EmptyState } from '../../components/states';
 import type { AppSchema } from '../../types/contentTypes';
+
+function canSchema(
+  permissions: string[] = [],
+  op: 'read' | 'create' | 'update' | 'delete'
+): boolean {
+  const required = `schema:${op}`;
+  return (
+    permissions.includes(required) ||
+    permissions.includes('schema:*') ||
+    permissions.includes('*:*')
+  );
+}
 
 const FIELD_TYPES: FieldType[] = [
   'string',
@@ -24,6 +37,7 @@ const FIELD_TYPES: FieldType[] = [
   'enum',
   'datetime',
   'relation',
+  'media',
 ];
 
 type SortOption = 'name-asc' | 'name-desc' | 'fields-asc' | 'fields-desc';
@@ -42,6 +56,16 @@ const DataModels = () => {
     label: '',
     fields: [{ name: 'title', type: 'string', required: true }],
   });
+
+  const { data: me } = useQuery({
+    queryKey: ['me'],
+    queryFn: fetchMe,
+  });
+
+  const permissions = me?.permissions ?? [];
+  const canCreateSchema = canSchema(permissions, 'create');
+  const canUpdateSchema = canSchema(permissions, 'update');
+  const canDeleteSchema = canSchema(permissions, 'delete');
 
   const {
     data: schema,
@@ -208,13 +232,15 @@ const DataModels = () => {
               Define data models (content types) and manage content entries
             </p>
           </div>
-          <button
-            type="button"
-            onClick={openCreate}
-            className="shrink-0 px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-all shadow-md"
-          >
-            + Add new data model
-          </button>
+          {canCreateSchema && (
+            <button
+              type="button"
+              onClick={openCreate}
+              className="shrink-0 px-5 py-2.5 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-all shadow-md"
+            >
+              + Add new data model
+            </button>
+          )}
         </div>
 
         {isLoading && (
@@ -223,7 +249,12 @@ const DataModels = () => {
 
         {isError && (
           <ErrorState
-            message={(error as Error)?.message ?? 'Failed to load schema'}
+            message={
+              (error as { statusCode?: number })?.statusCode === 403 ||
+              (error as { message?: string })?.message?.toLowerCase().includes('permission')
+                ? "You don't have permission to view data models."
+                : ((error as Error)?.message ?? 'Failed to load schema')
+            }
             onRetry={() => refetch()}
           />
         )}
@@ -280,6 +311,8 @@ const DataModels = () => {
                     fieldCount={fieldCount}
                     onEdit={() => openEdit(key)}
                     onDelete={() => setDeleteConfirmKey(key)}
+                    canEdit={canUpdateSchema}
+                    canDelete={canDeleteSchema}
                   />
                 ))}
               </div>
@@ -463,12 +496,16 @@ function DataModelCard({
   fieldCount,
   onEdit,
   onDelete,
+  canEdit,
+  canDelete,
 }: {
   collectionKey: string;
   label: string;
   fieldCount: number;
   onEdit: () => void;
   onDelete: () => void;
+  canEdit: boolean;
+  canDelete: boolean;
 }) {
   const { data, isLoading } = useQuery({
     queryKey: ['content', collectionKey, 'meta'],
@@ -513,18 +550,28 @@ function DataModelCard({
             + Add entry
           </Link>
         </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-sm text-text-muted hover:text-primary"
-          >
-            Edit type
-          </button>
-          <button type="button" onClick={onDelete} className="text-sm text-error hover:underline">
-            Delete type
-          </button>
-        </div>
+        {(canEdit || canDelete) && (
+          <div className="flex gap-2">
+            {canEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                className="text-sm text-text-muted hover:text-primary"
+              >
+                Edit type
+              </button>
+            )}
+            {canDelete && (
+              <button
+                type="button"
+                onClick={onDelete}
+                className="text-sm text-error hover:underline"
+              >
+                Delete type
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

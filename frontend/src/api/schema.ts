@@ -5,7 +5,15 @@ export async function fetchSchema(): Promise<AppSchema> {
   return api<AppSchema>('/schema');
 }
 
-export type FieldType = 'string' | 'text' | 'number' | 'boolean' | 'enum' | 'datetime' | 'relation';
+export type FieldType =
+  | 'string'
+  | 'text'
+  | 'number'
+  | 'boolean'
+  | 'enum'
+  | 'datetime'
+  | 'relation'
+  | 'media';
 
 export interface ContentTypeFieldInput {
   name: string;

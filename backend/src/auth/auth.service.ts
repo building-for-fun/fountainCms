@@ -195,4 +195,15 @@ export class AuthService {
       data: { passwordHash: hash },
     });
   }
+
+  /** Load current user's permissions from their role (for /auth/me and UI). */
+  async getPermissionsForUser(userId: string): Promise<string[]> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { role: true },
+    });
+    if (!user?.role) return [];
+    if (user.role.name === 'Super Admin') return ['*:*'];
+    return Array.isArray(user.role.permissions) ? user.role.permissions : [];
+  }
 }

@@ -48,9 +48,7 @@ export class MediaService implements OnModuleInit {
     return normalized;
   }
 
-  async create(
-    file: UploadedFileDto,
-  ): Promise<{
+  async create(file: UploadedFileDto): Promise<{
     id: string;
     url: string;
     filename: string;

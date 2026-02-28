@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import CreateRoleForm from '../../components/CreateRoleForm';
 import RoleCard from '../../components/RoleCard';
+import { PermissionMatrix } from '../../components/PermissionMatrix';
 import { api } from '../../api/client';
+import { fetchSchema } from '../../api/schema';
+import { useQuery } from '@tanstack/react-query';
 import {
   pageStyles,
   headerStyles,
@@ -11,11 +14,13 @@ import {
   cardStyles,
   inputStyles,
 } from '../../lib/ui';
+import type { AppSchema } from '../../types/contentTypes';
 
 interface Role {
   id: string;
   name: string;
   description: string;
+  permissions?: string[];
 }
 
 const Roles = () => {
@@ -25,10 +30,34 @@ const Roles = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Form states
-  const [newRole, setNewRole] = useState({ name: '', description: '' });
+  const [newRole, setNewRole] = useState({
+    name: '',
+    description: '',
+    permissions: [] as string[],
+  });
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editRole, setEditRole] = useState({ name: '', description: '' });
+  const [editRole, setEditRole] = useState({
+    name: '',
+    description: '',
+    permissions: [] as string[],
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: schema } = useQuery({
+    queryKey: ['schema'],
+    queryFn: fetchSchema,
+  });
+
+  const collections = React.useMemo(() => {
+    const schemaRow = { key: 'schema', label: 'Schema (data models)' };
+    if (!schema || !('collections' in schema)) return [schemaRow];
+    const col = (schema as AppSchema).collections ?? {};
+    const contentTypes = Object.entries(col).map(([key, c]) => ({
+      key,
+      label: c?.label ?? key,
+    }));
+    return [schemaRow, ...contentTypes];
+  }, [schema]);
 
   // FETCH ROLES
   useEffect(() => {
@@ -63,11 +92,15 @@ const Roles = () => {
 
       const createdRole = await api<Role>('/roles', {
         method: 'POST',
-        body: JSON.stringify(newRole),
+        body: JSON.stringify({
+          name: newRole.name,
+          description: newRole.description,
+          permissions: newRole.permissions,
+        }),
       });
 
       setRoles((prev) => [...prev, createdRole]);
-      setNewRole({ name: '', description: '' });
+      setNewRole({ name: '', description: '', permissions: [] });
       setShowCreateForm(false);
     } catch (err: unknown) {
       const message =
@@ -87,7 +120,11 @@ const Roles = () => {
 
       const updatedRole = await api<Role>(`/roles/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(editRole),
+        body: JSON.stringify({
+          name: editRole.name,
+          description: editRole.description,
+          permissions: editRole.permissions,
+        }),
       });
 
       setRoles((prev) => prev.map((role) => (role.id === id ? updatedRole : role)));
@@ -131,6 +168,7 @@ const Roles = () => {
     setEditRole({
       name: role.name,
       description: role.description || '',
+      permissions: Array.isArray(role.permissions) ? role.permissions : [],
     });
   };
 
@@ -141,8 +179,25 @@ const Roles = () => {
 
   const handleEditCancel = () => {
     setEditingId(null);
-    setEditRole({ name: '', description: '' });
+    setEditRole({ name: '', description: '', permissions: [] });
   };
+
+  const formatPermissionsSummary = (permissions: string[] = []) => {
+    if (!permissions.length) return 'No content permissions';
+    const byCollection: Record<string, string[]> = {};
+    for (const p of permissions) {
+      const [col, op] = p.split(':');
+      if (!col || !op) continue;
+      if (!byCollection[col]) byCollection[col] = [];
+      byCollection[col].push(op);
+    }
+    return (
+      Object.entries(byCollection)
+        .map(([col, ops]) => `${col} (${ops.join(', ')})`)
+        .join(' · ') || 'No content permissions'
+    );
+  };
+
   // Render helper to avoid nested ternaries for roles list
   const renderRolesContent = () => {
     if (loading) {
@@ -236,6 +291,24 @@ const Roles = () => {
                     }}
                   />
                 </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <div
+                    style={{
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      color: 'var(--color-text)',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
+                    Content permissions
+                  </div>
+                  <PermissionMatrix
+                    collections={collections}
+                    permissions={editRole.permissions}
+                    onChange={(permissions) => setEditRole((prev) => ({ ...prev, permissions }))}
+                    disabled={isSubmitting}
+                  />
+                </div>
                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                   <button
                     onClick={handleEditCancel}
@@ -289,6 +362,15 @@ const Roles = () => {
                         No description provided
                       </span>
                     )}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--color-text-muted)',
+                      marginTop: '0.5rem',
+                    }}
+                  >
+                    {formatPermissionsSummary(role.permissions)}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
@@ -408,6 +490,7 @@ const Roles = () => {
             inputStyles={inputStyles}
             buttonStyles={buttonStyles}
             cardStyles={cardStyles}
+            collections={collections}
           />
         )}
 
