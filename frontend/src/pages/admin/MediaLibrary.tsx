@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { LoadingState, EmptyState, ErrorState } from '../../components/states';
+import { useToast } from '../../components/Toast';
 import {
   listMedia,
   uploadMedia,
@@ -10,6 +11,7 @@ import {
 } from '../../api/media';
 
 const MediaLibrary = () => {
+  const { showToast } = useToast();
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,9 +61,10 @@ const MediaLibrary = () => {
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
+  const handleDelete = async (e: React.MouseEvent, id: string, name: string) => {
     e.stopPropagation();
     if (deletingId) return;
+    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
     setDeletingId(id);
     try {
       await deleteMedia(id);
@@ -74,8 +77,13 @@ const MediaLibrary = () => {
         if (idx > item) return idx - 1;
         return idx;
       });
-    } catch {
-      // could set delete error state
+      showToast('Media deleted.', 'success');
+    } catch (e) {
+      const msg =
+        e && typeof e === 'object' && 'message' in e
+          ? String((e as { message: string }).message)
+          : 'Delete failed';
+      showToast(msg, 'error');
     } finally {
       setDeletingId(null);
     }
@@ -211,7 +219,7 @@ const MediaLibrary = () => {
                   </div>
                   <button
                     type="button"
-                    onClick={(e) => handleDelete(e, item.id)}
+                    onClick={(e) => handleDelete(e, item.id, item.originalName)}
                     disabled={deletingId === item.id}
                     className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm hover:bg-red-600 disabled:opacity-50 transition"
                     aria-label={`Delete ${item.originalName}`}
