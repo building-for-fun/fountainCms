@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ContentService } from './content.service';
@@ -17,8 +18,12 @@ export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
   @Get(':collection')
-  getMany(@Param('collection') collection: string) {
-    return this.contentService.findMany(collection);
+  getMany(
+    @Param('collection') collection: string,
+    @Query('status') status?: string,
+  ) {
+    const publishedOnly = status === 'published';
+    return this.contentService.findMany(collection, publishedOnly);
   }
 
   @Get(':collection/:id')

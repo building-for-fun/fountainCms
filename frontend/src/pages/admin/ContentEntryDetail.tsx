@@ -32,24 +32,24 @@ const ContentEntryDetail = () => {
 
   const collectionSchema = schema?.collections?.[collection || ''];
 
+  const entryData = (existingData as { data?: Record<string, unknown> })?.data ?? existingData;
+
   useEffect(() => {
-    if (existingData) {
-      setFormData(existingData);
+    if (entryData && typeof entryData === 'object') {
+      setFormData({ ...entryData });
     }
   }, [existingData]);
 
-  // Apply schema defaults for new entries so booleans etc. are sent correctly
+  // Apply schema defaults and draft status for new entries
   useEffect(() => {
     if (isEdit || !collectionSchema) return;
-    const defaults: Record<string, unknown> = {};
+    const defaults: Record<string, unknown> = { status: 'draft' };
     for (const [fieldName, fieldConfig] of Object.entries(collectionSchema.fields)) {
       if (fieldConfig.default !== undefined && fieldConfig.default !== null) {
         defaults[fieldName] = fieldConfig.default;
       }
     }
-    if (Object.keys(defaults).length > 0) {
-      setFormData((prev) => ({ ...defaults, ...prev }));
-    }
+    setFormData((prev) => ({ ...defaults, ...prev }));
   }, [isEdit, collectionSchema]);
 
   const mutation = useMutation({
@@ -91,10 +91,12 @@ const ContentEntryDetail = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Exclude technical fields if necessary, though backend usually handles it
-    const { id: _, ...payload } = formData;
+    const { id: _id, ...payload } = formData;
     mutation.mutate(payload);
   };
+
+  const status = formData.status === 'published' ? 'published' : 'draft';
+  const publishedAt = formData.published_at ?? formData.publishedAt ?? null;
 
   return (
     <AdminLayout>
@@ -180,6 +182,28 @@ const ContentEntryDetail = () => {
                 </div>
               )
             )}
+
+            <div className="mb-8 pt-6 border-t border-border">
+              <label className="block text-sm font-semibold text-text mb-2">Status</label>
+              <select
+                value={status}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: e.target.value as 'draft' | 'published',
+                  }))
+                }
+                className="w-full max-w-xs px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text"
+              >
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+              {status === 'published' && publishedAt && (
+                <p className="text-sm text-text-muted mt-2">
+                  Published on {new Date(publishedAt).toLocaleString()}
+                </p>
+              )}
+            </div>
 
             <div className="flex justify-end gap-4 mt-10 pt-8 border-t border-border">
               <button

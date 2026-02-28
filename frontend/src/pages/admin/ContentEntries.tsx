@@ -13,6 +13,7 @@ const ContentEntries = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'published'>('all');
 
   if (!collection) {
     return (
@@ -30,8 +31,8 @@ const ContentEntries = () => {
   const collectionSchema = schema?.collections?.[collection];
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['content', collection],
-    queryFn: () => listItems(collection),
+    queryKey: ['content', collection, statusFilter],
+    queryFn: () => listItems(collection, statusFilter === 'all' ? undefined : statusFilter),
     enabled: !!collection,
   });
 
@@ -103,6 +104,9 @@ const ContentEntries = () => {
               <th className="px-6 py-4 font-semibold text-text text-sm uppercase tracking-wider border-b border-border">
                 ID
               </th>
+              <th className="px-6 py-4 font-semibold text-text text-sm uppercase tracking-wider border-b border-border">
+                Status
+              </th>
               {Object.keys(collectionSchema.fields).map((field) => (
                 <th
                   key={field}
@@ -125,7 +129,17 @@ const ContentEntries = () => {
                 <td className="px-6 py-4 font-mono text-xs text-text-muted">
                   {item.id.substring(0, 8)}...
                 </td>
-
+                <td className="px-6 py-4">
+                  <span
+                    className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+                      item.status === 'published'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    {item.status === 'published' ? 'Published' : 'Draft'}
+                  </span>
+                </td>
                 {Object.keys(collectionSchema.fields).map((field) => (
                   <td key={field} className="px-6 py-4 text-text">
                     <div className="max-w-xs truncate">{String(item[field] ?? '—')}</div>
@@ -216,14 +230,25 @@ const ContentEntries = () => {
           </div>
         </div>
 
-        <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-          <input
-            type="text"
-            placeholder="Search entries..."
-            className="w-full max-w-md px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text placeholder-text-muted transition-all"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="mb-8 flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
+            <input
+              type="text"
+              placeholder="Search entries..."
+              className="w-full max-w-md px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text placeholder-text-muted transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'draft' | 'published')}
+              className="px-4 py-2.5 border border-border rounded-lg bg-surface text-text focus:ring-2 focus:ring-primary sm:w-40"
+            >
+              <option value="all">All statuses</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
           <div className="text-sm text-text-muted">
             Showing {filteredEntries.length} of {data?.data.length ?? 0} entries
           </div>

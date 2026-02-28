@@ -1,10 +1,13 @@
 import { api } from './client';
 
-export function listItems(collection: string) {
+export function listItems(collection: string, status?: 'draft' | 'published') {
+  const qs = status ? `?status=${status}` : '';
   return api<{
-    data: Array<{ id: string } & Record<string, unknown>>;
+    data: Array<
+      { id: string; status?: string; published_at?: string | null } & Record<string, unknown>
+    >;
     meta: { total: number };
-  }>(`/content/collections/${collection}`);
+  }>(`/content/collections/${collection}${qs}`);
 }
 
 export function getItem(collection: string, id: string) {

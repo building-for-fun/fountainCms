@@ -4,10 +4,25 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ContentRepository } from './content.repository';
+import { ContentRepository, type ContentStatus } from './content.repository';
 import { SchemaService } from '../schema/schema.service';
 import { Prisma } from '@prisma/client';
 import { assertObject, validatePayload } from '../utils/content.util';
+
+const SYSTEM_KEYS = ['status', 'published_at', 'publishedAt'];
+
+function stripSystemFields(
+  payload: Record<string, unknown>,
+): Record<string, unknown> {
+  const out = { ...payload };
+  for (const k of SYSTEM_KEYS) delete out[k];
+  return out;
+}
+
+function parseStatus(v: unknown): ContentStatus | null {
+  if (v === 'draft' || v === 'published') return v;
+  return null;
+}
 
 @Injectable()
 export class ContentService {
@@ -22,27 +37,38 @@ export class ContentService {
     return this.schemaService.getSchema();
   }
 
-  async findMany(collection: string) {
+  private toItemResponse(item: {
+    id: string;
+    data: Prisma.JsonValue;
+    status: string;
+    publishedAt: Date | null;
+  }) {
+    const data = assertObject(item.data);
+    return {
+      id: item.id,
+      ...data,
+      status: item.status,
+      published_at: item.publishedAt?.toISOString() ?? null,
+    };
+  }
+
+  async findMany(collection: string, publishedOnly?: boolean) {
     const collectionSchema = this.schema.collections[collection];
 
     if (!collectionSchema) {
       throw new NotFoundException('Collection not found');
     }
 
+    const statusFilter = publishedOnly
+      ? ('published' as ContentStatus)
+      : undefined;
     const [items, total] = await Promise.all([
-      this.contentRepository.findMany(collection),
-      this.contentRepository.count(collection),
+      this.contentRepository.findMany(collection, statusFilter),
+      this.contentRepository.count(collection, statusFilter),
     ]);
 
     return {
-      data: items.map((item) => {
-        const data = assertObject(item.data);
-
-        return {
-          id: item.id,
-          ...data,
-        };
-      }),
+      data: items.map((item) => this.toItemResponse(item)),
       meta: { total },
     };
   }
@@ -72,8 +98,10 @@ export class ContentService {
       throw new NotFoundException('Collection not found');
     }
 
+    const status = parseStatus(payload.status) ?? 'draft';
+    const payloadWithoutSystem = stripSystemFields(payload);
     const validated = validatePayload(
-      payload,
+      payloadWithoutSystem,
       collectionSchema.fields,
     ) as Prisma.InputJsonValue;
 
@@ -82,15 +110,16 @@ export class ContentService {
       collectionSchema.fields,
     );
 
-    const item = await this.contentRepository.create(collection, validated);
-
-    const data = assertObject(item.data);
+    const publishedAt = status === 'published' ? new Date() : null;
+    const item = await this.contentRepository.create(
+      collection,
+      validated,
+      status,
+      publishedAt,
+    );
 
     return {
-      data: {
-        id: item.id,
-        ...data,
-      },
+      data: this.toItemResponse(item),
     };
   }
 
@@ -107,13 +136,8 @@ export class ContentService {
       throw new NotFoundException('Content item not found');
     }
 
-    const data = assertObject(item.data);
-
     return {
-      data: {
-        id: item.id,
-        ...data,
-      },
+      data: this.toItemResponse(item),
     };
   }
 
@@ -138,12 +162,20 @@ export class ContentService {
       throw new NotFoundException('Content item not found');
     }
 
-    const existingData = assertObject(existing.data);
+    const incomingStatus = parseStatus(payload.status);
+    const status = incomingStatus ?? (existing.status as ContentStatus);
+    let publishedAt: Date | null = existing.publishedAt;
+    if (status === 'published' && !existing.publishedAt) {
+      publishedAt = new Date();
+    } else if (status === 'draft' && incomingStatus === 'draft') {
+      publishedAt = null;
+    }
 
-    // Merge existing + incoming (PATCH semantics)
+    const payloadWithoutSystem = stripSystemFields(payload);
+    const existingData = assertObject(existing.data);
     const merged = {
       ...existingData,
-      ...payload,
+      ...payloadWithoutSystem,
     };
 
     const validated = validatePayload(
@@ -160,15 +192,12 @@ export class ContentService {
       collection,
       id,
       validated,
+      status,
+      publishedAt,
     );
 
-    const data = assertObject(updated.data);
-
     return {
-      data: {
-        id: updated.id,
-        ...data,
-      },
+      data: this.toItemResponse(updated),
     };
   }
 
