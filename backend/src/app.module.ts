@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { SchemaModule } from './schema/schema.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
       isGlobal: true,
     }),
     AuditLogsModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
