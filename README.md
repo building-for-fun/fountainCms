@@ -84,6 +84,69 @@ fountaincms/
 
 ---
 
+## Architecture
+
+**A. System Architecture Diagram**
+This diagram shows the physical flow of the monorepo components.
+
+```mermaid
+graph LR
+    subgraph Client
+        A[React Frontend <br/> Vite] 
+    end
+    subgraph Server
+        B[NestJS Backend <br/> REST API]
+    end
+    subgraph Database
+        C[Prisma ORM]
+        D[(PostgreSQL)]
+    end
+    A <-->|HTTP/JSON| B
+    B <--> C
+    C <--> D
+```
+
+**B. Content Modeling Workflow**
+A sequence diagram showing the "data-first" lifecycle of a single request.
+
+```mermaid
+sequenceDiagram
+    participant FE as Frontend (React)
+    participant CN as NestJS Controller
+    participant SR as Service Logic
+    participant PR as Prisma Client
+    participant DB as Database (PostgreSQL)
+
+    FE->>CN: GET /api/content/:id
+    CN->>SR: Request Data Validation
+    SR->>PR: Query Execution
+    PR->>DB: SQL Select
+    DB-->>PR: Raw Data
+    PR-->>SR: Typed Object
+    SR-->>CN: Processed Content
+    CN-->>FE: JSON Response
+```
+
+**C. Modular Backend Structure**
+A flowchart to help contributors navigate the `backend/src` directory logic.
+
+```mermaid
+graph TD
+    Root[backend/src] --> Auth[Auth Module]
+    Root --> Content[Content Module]
+    Root --> User[User Module]
+    Root --> Roles[Roles Module]
+
+    Content --> C_Ctrl[Controllers]
+    Content --> C_Srv[Services]
+    Content --> C_Ent[Entities/DTOs]
+    
+    Auth -.->|Guards| Content
+    Roles -.->|Permissions| Content
+```
+
+---
+
 ## 🏁 Getting Started
 
 ### Prerequisites
