@@ -17,6 +17,56 @@ import { useToast } from '../../components/Toast';
 import { LoadingSkeleton, ErrorState, EmptyState } from '../../components/states';
 import type { AppSchema } from '../../types/contentTypes';
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+const CONTENT_API_ENDPOINTS = [
+  {
+    method: 'GET',
+    path: (c: string) => `/content/collections/${c}`,
+    body: false,
+    label: 'List entries',
+  },
+  {
+    method: 'GET',
+    path: (c: string) => `/content/collections/${c}/:id`,
+    body: false,
+    label: 'Get entry',
+  },
+  {
+    method: 'POST',
+    path: (c: string) => `/content/collections/${c}`,
+    body: true,
+    label: 'Create entry',
+  },
+  {
+    method: 'PATCH',
+    path: (c: string) => `/content/collections/${c}/:id`,
+    body: true,
+    label: 'Update entry',
+  },
+  {
+    method: 'DELETE',
+    path: (c: string) => `/content/collections/${c}/:id`,
+    body: false,
+    label: 'Delete entry',
+  },
+] as const;
+
+function buildCurl(method: string, path: string, body?: boolean): string {
+  const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
+  const parts = [`curl -X ${method} '${url}'`];
+  if (body) {
+    parts.push("-H 'Content-Type: application/json'");
+    parts.push("-d '{}'");
+  }
+  parts.push("--cookie 'YOUR_SESSION_COOKIE'  # optional, if authenticated");
+  return parts.join(' \\\n  ');
+}
+
+function copyCurlToClipboard(curl: string): Promise<void> {
+  return navigator.clipboard.writeText(curl);
+}
+
 function canSchema(
   permissions: string[] = [],
   op: 'read' | 'create' | 'update' | 'delete'
@@ -507,12 +557,28 @@ function DataModelCard({
   canEdit: boolean;
   canDelete: boolean;
 }) {
+  const [apisExpanded, setApisExpanded] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { showToast } = useToast();
+
   const { data, isLoading } = useQuery({
     queryKey: ['content', collectionKey, 'meta'],
     queryFn: () => listItems(collectionKey),
     staleTime: 60_000,
   });
   const total = data?.meta?.total ?? null;
+
+  const handleCopyCurl = (endpoint: (typeof CONTENT_API_ENDPOINTS)[number], id: string) => {
+    const path = endpoint.path(collectionKey);
+    const curl = buildCurl(endpoint.method, path, endpoint.body);
+    copyCurlToClipboard(curl)
+      .then(() => {
+        setCopiedId(id);
+        showToast('cURL copied to clipboard', 'success');
+        setTimeout(() => setCopiedId(null), 2000);
+      })
+      .catch(() => showToast('Failed to copy', 'error'));
+  };
 
   return (
     <div className="bg-surface rounded-xl border border-border shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-primary transition-all p-6 flex flex-col">
@@ -521,7 +587,7 @@ function DataModelCard({
       </div>
       <div className="text-xl font-semibold text-text mb-1">{label}</div>
       <div className="font-mono text-sm text-text-muted mb-4">{collectionKey}</div>
-      <div className="flex items-center gap-2 text-sm text-text-muted mb-6 flex-wrap">
+      <div className="flex items-center gap-2 text-sm text-text-muted mb-4 flex-wrap">
         <span>
           🏷️ {fieldCount} field{fieldCount !== 1 ? 's' : ''}
         </span>
@@ -535,6 +601,53 @@ function DataModelCard({
         )}
         {isLoading && <span className="text-text-muted">…</span>}
       </div>
+
+      {/* API endpoints */}
+      <div className="mb-4">
+        <button
+          type="button"
+          onClick={() => setApisExpanded((v) => !v)}
+          className="flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+        >
+          {apisExpanded ? '▼' : '▶'} APIs for this collection
+        </button>
+        {apisExpanded && (
+          <div className="mt-2 pl-4 border-l-2 border-border space-y-2">
+            {CONTENT_API_ENDPOINTS.map((ep) => {
+              const path = ep.path(collectionKey);
+              const id = `${collectionKey}-${ep.method}-${path}`;
+              return (
+                <div key={id} className="flex flex-wrap items-center gap-2 text-sm group">
+                  <span
+                    className={`font-mono font-semibold px-1.5 py-0.5 rounded text-xs ${
+                      ep.method === 'GET'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                        : ep.method === 'POST'
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                          : ep.method === 'PATCH'
+                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                    }`}
+                  >
+                    {ep.method}
+                  </span>
+                  <span className="font-mono text-text-muted break-all">{path}</span>
+                  <span className="text-text-muted text-xs">{ep.label}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyCurl(ep, id)}
+                    className="opacity-70 group-hover:opacity-100 text-primary text-xs font-medium hover:underline shrink-0"
+                    title="Copy cURL"
+                  >
+                    {copiedId === id ? '✓ Copied' : 'Copy cURL'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       <div className="mt-auto pt-4 border-t border-border flex flex-col gap-2">
         <div className="flex flex-wrap gap-2">
           <Link
