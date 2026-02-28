@@ -10,34 +10,45 @@ export const SETUP_STEPS_TEXT = [
   'Clone the repo: git clone https://github.com/building-for-fun/fountainCms',
   'Install dependencies: npm install',
   'Start the server: npm run dev',
-  'Access API at http://localhost:4000/api/content',
+  'Access API at http://localhost:4000/api/content/collections/<your-content-type>',
 ];
 
 export const GETTING_STARTED = `
-FountainCMS lets you manage content via APIs for JAMstack and modern web apps.
+FountainCMS lets you manage content via REST APIs for JAMstack and modern web apps.
+Content is exposed under /api/content/collections/:collection — use your content type name (e.g. posts, pages) as the collection. All content APIs require JWT authentication.
 `;
 
 export const INSTALLATION_STEPS = [
   'Clone the repo: git clone https://github.com/building-for-fun/fountainCms',
   'Install dependencies: npm install',
   'Start the server: npm run dev',
-  'Access API at http://localhost:4000/api/content',
+  'Access API at http://localhost:4000/api/content/collections/<your-content-type>',
 ];
 
 export const API_REFERENCES = [
   {
     method: 'GET',
-    endpoint: '/api/content',
-    description: 'List all content items',
+    endpoint: '/api/content/collections/:collection',
+    description: 'List entries for a content type (e.g. posts, pages)',
   },
   {
     method: 'GET',
-    endpoint: '/api/content/:id',
-    description: 'Get a single content item by ID',
+    endpoint: '/api/content/collections/:collection/:id',
+    description: 'Get a single entry by ID',
   },
   {
     method: 'POST',
-    endpoint: '/api/content',
-    description: 'Create a new content item',
+    endpoint: '/api/content/collections/:collection',
+    description: 'Create a new entry',
+  },
+  {
+    method: 'PATCH',
+    endpoint: '/api/content/collections/:collection/:id',
+    description: 'Update an entry',
+  },
+  {
+    method: 'DELETE',
+    endpoint: '/api/content/collections/:collection/:id',
+    description: 'Delete an entry',
   },
 ];

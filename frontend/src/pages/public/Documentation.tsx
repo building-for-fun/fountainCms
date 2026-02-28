@@ -2,6 +2,21 @@ import React from 'react';
 import { API_REFERENCES, GETTING_STARTED, INSTALLATION_STEPS } from '../../helper/constant';
 import HomeLayout from '../../components/Layouts/HomeLayout/HomeLayout';
 
+const METHOD_STYLES: Record<string, { background: string; color: string }> = {
+  GET: { background: 'rgba(59,130,246,0.15)', color: '#3B82F6' },
+  POST: { background: 'rgba(34,197,94,0.15)', color: '#22C55E' },
+  PATCH: { background: 'rgba(245,158,11,0.15)', color: '#D97706' },
+  DELETE: { background: 'rgba(239,68,68,0.15)', color: '#DC2626' },
+};
+
+function getMethodBadgeStyle(method: string): React.CSSProperties {
+  const s = METHOD_STYLES[method] ?? {
+    background: 'rgba(148,163,184,0.2)',
+    color: 'var(--color-text)',
+  };
+  return { ...s, padding: '4px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700 };
+}
+
 const Documentation: React.FC = () => {
   return (
     <HomeLayout>
@@ -155,18 +170,7 @@ const Documentation: React.FC = () => {
                           borderRadius: 999,
                           fontSize: 12,
                           fontWeight: 700,
-                          background:
-                            api.method === 'GET'
-                              ? 'rgba(59,130,246,0.15)'
-                              : api.method === 'POST'
-                                ? 'rgba(34,197,94,0.15)'
-                                : 'rgba(148,163,184,0.2)',
-                          color:
-                            api.method === 'GET'
-                              ? '#3B82F6'
-                              : api.method === 'POST'
-                                ? '#22C55E'
-                                : 'var(--color-text)',
+                          ...getMethodBadgeStyle(api.method),
                         }}
                       >
                         {api.method}

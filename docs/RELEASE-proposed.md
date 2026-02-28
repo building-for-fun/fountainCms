@@ -91,18 +91,18 @@ Enable CRUD operations on dynamic content types.
 * Basic filtering
 * Sorting
 
-### Draft/Publish Model
-
-Each entry includes:
-
-* status: draft | published
-* published_at timestamp
-
-### Definition of Done
+### Definition of Done (v1 current)
 
 * CRUD works for all dynamic content types
 * Validation tied to schema
-* Draft content not publicly accessible
+* Entries stored as JSONB per collection; admin API requires JWT
+
+### Draft/Publish (planned)
+
+To be added in a follow-up:
+
+* Each entry: `status: draft | published`, `published_at` timestamp
+* Draft content not exposed on public read-only API; only published content returned there
 
 ---
 
@@ -114,26 +114,29 @@ Provide predictable, structured API access.
 
 ### API Structure
 
+Content is exposed under a fixed path prefix; the collection name is the dynamic segment:
+
 ```
-GET    /api/{contentType}
-GET    /api/{contentType}/{id}
-POST   /api/{contentType}
-PATCH  /api/{contentType}/{id}
-DELETE /api/{contentType}/{id}
+GET    /api/content/collections/:collection
+GET    /api/content/collections/:collection/:id
+POST   /api/content/collections/:collection
+PATCH  /api/content/collections/:collection/:id
+DELETE /api/content/collections/:collection/:id
 ```
 
-### Features
+All content types defined in the schema are available at the same path pattern (e.g. `posts`, `pages`).
 
-* JWT-based authentication
-* API key support (single-tenant global key)
-* Role-based route guards
+### Features (v1 current)
+
+* JWT-based authentication for admin and content APIs (global guard; selected routes are `@Public()`)
+* All content types auto-exposed via REST at the paths above
+* Unauthorized access blocked for protected routes
+
+### Planned
+
+* API key support for public read-only access (single-tenant global key)
+* Role-based route guards per content type / operation
 * Swagger/OpenAPI documentation
-
-### Definition of Done
-
-* All content types auto-exposed via REST
-* API documentation auto-generated
-* Unauthorized access blocked
 
 ---
 
