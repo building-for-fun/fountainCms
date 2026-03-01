@@ -61,8 +61,6 @@ export default function UsersList() {
     try {
       const data = await api<{ data: Role[] }>('/roles');
       setRoles(data.data || []);
-
-      setRoles(data.data || []);
     } catch (err) {
       console.error('Error fetching roles:', err);
     }
@@ -92,13 +90,11 @@ export default function UsersList() {
     setIsSubmitting(true);
 
     try {
-      // Validate required fields
       if (!newUser.username || !newUser.firstName || !newUser.lastName || !newUser.email) {
         setFormError('Please fill in all required fields');
         return;
       }
 
-      // Prepare the user data
       const userData: any = {
         username: newUser.username,
         firstName: newUser.firstName,
@@ -107,7 +103,6 @@ export default function UsersList() {
         isActive: newUser.isActive,
       };
 
-      // Add role connection if a role is selected
       if (newUser.roleName) {
         userData.role = {
           connect: {
@@ -116,13 +111,11 @@ export default function UsersList() {
         };
       }
 
-      // ✅ Centralized API call (handles headers, /api prefix, and errors)
       await api('/user', {
         method: 'POST',
         body: JSON.stringify(userData),
       });
 
-      // Reset form
       setNewUser({
         username: '',
         firstName: '',
@@ -132,7 +125,6 @@ export default function UsersList() {
         isActive: true,
       });
 
-      // Close modal and refresh users list
       setShowAddModal(false);
       await fetchUsers();
     } catch (err) {
@@ -181,6 +173,21 @@ export default function UsersList() {
     }
   };
 
+  // ─── Shared input style (uses theme-aware CSS variables) ──────────────────
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.5rem 0.75rem',
+    borderRadius: '6px',
+    border: '1.5px solid var(--color-border)',
+    // FIX: use --color-input-bg so inputs stay readable in both themes
+    backgroundColor: 'var(--color-input-bg, var(--color-background))',
+    color: 'var(--color-text)',
+    fontSize: '0.875rem',
+    outline: 'none',
+    boxSizing: 'border-box',
+    transition: 'border-color 0.2s',
+  };
+
   return (
     <AdminLayout>
       <div style={{ padding: '2rem' }}>
@@ -221,7 +228,7 @@ export default function UsersList() {
               marginBottom: '1rem',
               backgroundColor: 'var(--color-error)',
               color: 'var(--color-surface)',
-              borderRadius: '4px',
+              borderRadius: '6px',
               fontSize: '0.875rem',
               display: 'flex',
               justifyContent: 'space-between',
@@ -248,63 +255,80 @@ export default function UsersList() {
 
         {/* Users Table */}
         {!loading && !error && users.length > 0 && (
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
-            <thead>
-              <tr style={{ background: 'var(--color-surface)' }}>
-                <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Username</th>
-                <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>First Name</th>
-                <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Last Name</th>
-                <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Email</th>
-                <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Role</th>
-                <th style={{ padding: 8, border: '1px solid var(--color-border)' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
-                    <Link
-                      to={`/admin/users/${user.id}`}
-                      style={{ color: 'var(--color-primary)', textDecoration: 'none' }}
-                    >
-                      {user.username}
-                    </Link>
-                  </td>
-                  <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
-                    {user.firstName ?? '-'}
-                  </td>
-                  <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
-                    {user.lastName ?? '-'}
-                  </td>
-                  <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
-                    {user.email ?? '-'}
-                  </td>
-                  <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
-                    {user.role?.name ?? '-'}
-                  </td>
-                  <td style={{ padding: 8, border: '1px solid var(--color-border)' }}>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteUser(user)}
-                      disabled={deletingId === user.id}
+          <div
+            style={{
+              borderRadius: '8px',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden',
+              marginTop: '1.5rem',
+            }}
+          >
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr
+                  style={{
+                    // FIX: use --color-surface for table header (consistent with modal)
+                    background: 'var(--color-surface)',
+                    borderBottom: '1px solid var(--color-border)',
+                  }}
+                >
+                  {['Username', 'First Name', 'Last Name', 'Email', 'Role', 'Actions'].map((h) => (
+                    <th
+                      key={h}
                       style={{
-                        padding: '0.35rem 0.75rem',
-                        borderRadius: '4px',
-                        border: '1px solid var(--color-error)',
-                        backgroundColor: 'transparent',
-                        color: 'var(--color-error)',
-                        cursor: deletingId === user.id ? 'not-allowed' : 'pointer',
-                        fontSize: '0.875rem',
-                        opacity: deletingId === user.id ? 0.6 : 1,
+                        padding: '10px 14px',
+                        textAlign: 'left',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.04em',
+                        textTransform: 'uppercase',
+                        color: 'var(--color-text-muted, var(--color-text))',
                       }}
                     >
-                      {deletingId === user.id ? 'Deleting...' : 'Delete'}
-                    </button>
-                  </td>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                    <td style={{ padding: '10px 14px' }}>
+                      <Link
+                        to={`/admin/users/${user.id}`}
+                        style={{ color: 'var(--color-primary)', textDecoration: 'none' }}
+                      >
+                        {user.username}
+                      </Link>
+                    </td>
+                    <td style={{ padding: '10px 14px' }}>{user.firstName ?? '-'}</td>
+                    <td style={{ padding: '10px 14px' }}>{user.lastName ?? '-'}</td>
+                    <td style={{ padding: '10px 14px' }}>{user.email ?? '-'}</td>
+                    <td style={{ padding: '10px 14px' }}>{user.role?.name ?? '-'}</td>
+                    <td style={{ padding: '10px 14px' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteUser(user)}
+                        disabled={deletingId === user.id}
+                        style={{
+                          padding: '0.35rem 0.75rem',
+                          borderRadius: '4px',
+                          border: '1px solid var(--color-error)',
+                          backgroundColor: 'transparent',
+                          color: 'var(--color-error)',
+                          cursor: deletingId === user.id ? 'not-allowed' : 'pointer',
+                          fontSize: '0.875rem',
+                          opacity: deletingId === user.id ? 0.6 : 1,
+                        }}
+                      >
+                        {deletingId === user.id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {/* Add User Modal */}
@@ -316,27 +340,33 @@ export default function UsersList() {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              // FIX: was hardcoded rgba(0,0,0,0.5) — now theme-aware via CSS variable
+              backgroundColor: 'var(--color-overlay, rgba(0, 0, 0, 0.5))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1000,
+              backdropFilter: 'blur(2px)',
             }}
             onClick={handleCloseModal}
           >
             <div
               style={{
-                backgroundColor: 'var(--color-background)',
+                // FIX: was --color-background (page bg) — switched to --color-surface
+                // so the modal sits visually "above" the page in both themes
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
                 padding: '2rem',
-                borderRadius: '8px',
+                borderRadius: '10px',
                 width: '90%',
-                maxWidth: '500px',
+                maxWidth: '480px',
                 maxHeight: '90vh',
                 overflow: 'auto',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.18)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Modal Header */}
               <div
                 style={{
                   display: 'flex',
@@ -345,7 +375,7 @@ export default function UsersList() {
                   marginBottom: '1.5rem',
                 }}
               >
-                <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>Add New User</h2>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>Add New User</h2>
                 <button
                   onClick={handleCloseModal}
                   style={{
@@ -355,12 +385,14 @@ export default function UsersList() {
                     cursor: 'pointer',
                     color: 'var(--color-text)',
                     padding: '0.25rem 0.5rem',
+                    lineHeight: 1,
                   }}
                 >
                   ×
                 </button>
               </div>
 
+              {/* Form Error Banner */}
               {formError && (
                 <div
                   style={{
@@ -368,7 +400,7 @@ export default function UsersList() {
                     marginBottom: '1rem',
                     backgroundColor: 'var(--color-error)',
                     color: 'var(--color-surface)',
-                    borderRadius: '4px',
+                    borderRadius: '6px',
                     fontSize: '0.875rem',
                   }}
                 >
@@ -377,6 +409,7 @@ export default function UsersList() {
               )}
 
               <form onSubmit={handleAddUser}>
+                {/* Username */}
                 <div style={{ marginBottom: '1rem' }}>
                   <label
                     style={{
@@ -394,18 +427,11 @@ export default function UsersList() {
                     value={newUser.username}
                     onChange={handleInputChange}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      borderRadius: '4px',
-                      border: '1px solid var(--color-border)',
-                      backgroundColor: 'var(--color-surface)',
-                      color: 'var(--color-text)',
-                      fontSize: '0.875rem',
-                    }}
+                    style={inputStyle}
                   />
                 </div>
 
+                {/* First Name */}
                 <div style={{ marginBottom: '1rem' }}>
                   <label
                     style={{
@@ -423,18 +449,11 @@ export default function UsersList() {
                     value={newUser.firstName}
                     onChange={handleInputChange}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      borderRadius: '4px',
-                      border: '1px solid var(--color-border)',
-                      backgroundColor: 'var(--color-surface)',
-                      color: 'var(--color-text)',
-                      fontSize: '0.875rem',
-                    }}
+                    style={inputStyle}
                   />
                 </div>
 
+                {/* Last Name */}
                 <div style={{ marginBottom: '1rem' }}>
                   <label
                     style={{
@@ -452,18 +471,11 @@ export default function UsersList() {
                     value={newUser.lastName}
                     onChange={handleInputChange}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      borderRadius: '4px',
-                      border: '1px solid var(--color-border)',
-                      backgroundColor: 'var(--color-surface)',
-                      color: 'var(--color-text)',
-                      fontSize: '0.875rem',
-                    }}
+                    style={inputStyle}
                   />
                 </div>
 
+                {/* Email */}
                 <div style={{ marginBottom: '1rem' }}>
                   <label
                     style={{
@@ -481,18 +493,11 @@ export default function UsersList() {
                     value={newUser.email}
                     onChange={handleInputChange}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      borderRadius: '4px',
-                      border: '1px solid var(--color-border)',
-                      backgroundColor: 'var(--color-surface)',
-                      color: 'var(--color-text)',
-                      fontSize: '0.875rem',
-                    }}
+                    style={inputStyle}
                   />
                 </div>
 
+                {/* Role */}
                 <div style={{ marginBottom: '1rem' }}>
                   <label
                     style={{
@@ -508,16 +513,7 @@ export default function UsersList() {
                     name="roleName"
                     value={newUser.roleName}
                     onChange={handleInputChange}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      borderRadius: '4px',
-                      border: '1px solid var(--color-border)',
-                      backgroundColor: 'var(--color-surface)',
-                      color: 'var(--color-text)',
-                      fontSize: '0.875rem',
-                      cursor: 'pointer',
-                    }}
+                    style={{ ...inputStyle, cursor: 'pointer' }}
                   >
                     <option value="">No Role</option>
                     {roles.map((role) => (
@@ -528,6 +524,7 @@ export default function UsersList() {
                   </select>
                 </div>
 
+                {/* Active User */}
                 <div style={{ marginBottom: '1.5rem' }}>
                   <label
                     style={{
@@ -545,26 +542,24 @@ export default function UsersList() {
                       onChange={handleInputChange}
                       style={{
                         cursor: 'pointer',
+                        accentColor: 'var(--color-primary)',
+                        width: '15px',
+                        height: '15px',
                       }}
                     />
                     <span>Active User</span>
                   </label>
                 </div>
 
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '0.75rem',
-                    justifyContent: 'flex-end',
-                  }}
-                >
+                {/* Actions */}
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                   <button
                     type="button"
                     onClick={handleCloseModal}
                     disabled={isSubmitting}
                     style={{
                       padding: '0.5rem 1rem',
-                      borderRadius: '4px',
+                      borderRadius: '6px',
                       border: '1px solid var(--color-border)',
                       backgroundColor: 'transparent',
                       color: 'var(--color-text)',
