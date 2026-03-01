@@ -1,15 +1,15 @@
 // header.styles.ts
 export const headerStyles = {
-  // header.styles.ts
   header: [
     'sticky top-0 z-50 relative',
 
     // ✅ STRIPE-STYLE SKY BLUE METALLIC
     'bg-gradient-to-r from-[#3b82f6] via-[#38bdf8] to-[#6366f1]',
 
-    // subtle vertical polish layer
+    // subtle vertical polish layer (✅ must not block clicks)
     'before:content-[""] before:absolute before:inset-0',
     'before:bg-gradient-to-b before:from-white/30 before:via-white/10 before:to-transparent',
+    'before:pointer-events-none',
 
     'border-b border-white/30 dark:border-white/10',
 
@@ -18,7 +18,8 @@ export const headerStyles = {
     'backdrop-blur-xl',
   ].join(' '),
 
-  inner: 'mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6',
+  // ✅ ensure header content stays above the ::before layer
+  inner: 'relative z-10 mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6',
 
   logoWrap: 'relative inline-flex items-center gap-2 select-none',
 
@@ -31,6 +32,7 @@ export const headerStyles = {
     'dark:bg-gradient-to-r dark:from-white dark:via-white/70 dark:to-white',
     'dark:bg-[length:200%_200%] dark:animate-shimmer',
   ].join(' '),
+
   spark: 'h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_14px_rgba(56,189,248,0.9)] animate-glowPulse',
 
   logoHover: 'hover:-translate-y-[1px] transition-transform duration-200',
