@@ -173,15 +173,12 @@ export default function UsersList() {
     }
   };
 
-  // ─── Shared input style (uses theme-aware CSS variables) ──────────────────
+  // Shared input style for sizing/spacing; colors come from Tailwind dark mode classes.
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '0.5rem 0.75rem',
     borderRadius: '6px',
     border: '1.5px solid var(--color-border)',
-    // FIX: use --color-input-bg so inputs stay readable in both themes
-    backgroundColor: 'var(--color-input-bg, var(--color-background))',
-    color: 'var(--color-text)',
     fontSize: '0.875rem',
     outline: 'none',
     boxSizing: 'border-box',
@@ -334,14 +331,13 @@ export default function UsersList() {
         {/* Add User Modal */}
         {showAddModal && (
           <div
+            className="bg-slate-900/35 dark:bg-black/65"
             style={{
               position: 'fixed',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              // FIX: was hardcoded rgba(0,0,0,0.5) — now theme-aware via CSS variable
-              backgroundColor: 'var(--color-overlay, rgba(0, 0, 0, 0.5))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -422,6 +418,7 @@ export default function UsersList() {
                     Username <span style={{ color: 'var(--color-error)' }}>*</span>
                   </label>
                   <input
+                    className="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100"
                     type="text"
                     name="username"
                     value={newUser.username}
@@ -444,6 +441,7 @@ export default function UsersList() {
                     First Name <span style={{ color: 'var(--color-error)' }}>*</span>
                   </label>
                   <input
+                    className="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100"
                     type="text"
                     name="firstName"
                     value={newUser.firstName}
@@ -466,6 +464,7 @@ export default function UsersList() {
                     Last Name <span style={{ color: 'var(--color-error)' }}>*</span>
                   </label>
                   <input
+                    className="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100"
                     type="text"
                     name="lastName"
                     value={newUser.lastName}
@@ -488,6 +487,7 @@ export default function UsersList() {
                     Email <span style={{ color: 'var(--color-error)' }}>*</span>
                   </label>
                   <input
+                    className="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100"
                     type="email"
                     name="email"
                     value={newUser.email}
@@ -510,14 +510,24 @@ export default function UsersList() {
                     Role
                   </label>
                   <select
+                    className="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100"
                     name="roleName"
                     value={newUser.roleName}
                     onChange={handleInputChange}
                     style={{ ...inputStyle, cursor: 'pointer' }}
                   >
-                    <option value="">No Role</option>
+                    <option
+                      value=""
+                      className="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100"
+                    >
+                      No Role
+                    </option>
                     {roles.map((role) => (
-                      <option key={role.id} value={role.name}>
+                      <option
+                        key={role.id}
+                        value={role.name}
+                        className="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100"
+                      >
                         {role.name}
                       </option>
                     ))}
