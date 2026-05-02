@@ -9,7 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
-import { Role, Prisma } from '@prisma/client';
+import { Role, Prisma } from '../generated/prisma/client';
 import { Request } from 'express';
 
 type RequestWithUser = Request & { user?: { sub: string } };

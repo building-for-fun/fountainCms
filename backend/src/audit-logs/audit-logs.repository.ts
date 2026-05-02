@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import type { AuditLog } from '@prisma/client';
+import type { AuditLog } from '../generated/prisma/client';
 
 @Injectable()
 export class AuditLogsRepository {

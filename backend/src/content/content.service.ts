@@ -6,7 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { ContentRepository, type ContentStatus } from './content.repository';
 import { SchemaService } from '../schema/schema.service';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../generated/prisma/client';
 import { assertObject, validatePayload } from '../utils/content.util';
 
 const SYSTEM_KEYS = ['status', 'published_at', 'publishedAt'];

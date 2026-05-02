@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma } from '../generated/prisma/client';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 /** Omit sensitive fields from user when writing to audit payload */

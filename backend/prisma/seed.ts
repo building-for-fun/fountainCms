@@ -1,21 +1,44 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { resolve } from 'node:path';
+import { config as loadEnv } from 'dotenv';
+import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { Prisma, PrismaClient } from '../src/generated/prisma/client';
 
-const prisma = new PrismaClient();
+loadEnv({ path: resolve(__dirname, '../.env') });
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL is required for seeding');
+}
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
+});
 
 /** Default content types seeded when DB is empty. Schema is now DB-driven. */
 const DEFAULT_CONTENT_TYPES: Array<{
   name: string;
   label: string | null;
-  fields: Array<{ name: string; type: string; required: boolean; defaultValue?: unknown; options?: string[]; readonly?: boolean }>;
+  fields: Array<{
+    name: string;
+    type: string;
+    required: boolean;
+    defaultValue?: unknown;
+    options?: string[];
+    readonly?: boolean;
+  }>;
 }> = [
   {
     name: 'posts',
     label: 'Posts',
     fields: [
       { name: 'title', type: 'string', required: true },
-      { name: 'published', type: 'boolean', required: false, defaultValue: false },
+      {
+        name: 'published',
+        type: 'boolean',
+        required: false,
+        defaultValue: false,
+      },
     ],
   },
 ];
@@ -24,7 +47,10 @@ const DEFAULT_CONTENT_TYPES: Array<{
  * Match client-side hashing: SHA-256 hex then bcrypt. Raw password never sent or stored.
  */
 function clientHashThenBcrypt(plainPassword: string): Promise<string> {
-  const hex = crypto.createHash('sha256').update(plainPassword, 'utf8').digest('hex');
+  const hex = crypto
+    .createHash('sha256')
+    .update(plainPassword, 'utf8')
+    .digest('hex');
   return bcrypt.hash(hex, 10);
 }
 
@@ -89,7 +115,11 @@ async function main() {
 
   await prisma.user.upsert({
     where: { username: 'admin' },
-    update: { passwordHash, isActive: true, roleId: superAdmin.id } as Parameters<typeof prisma.user.upsert>[0]['update'],
+    update: {
+      passwordHash,
+      isActive: true,
+      roleId: superAdmin.id,
+    } as Parameters<typeof prisma.user.upsert>[0]['update'],
     create: {
       username: 'admin',
       role: { connect: { id: superAdmin.id } },

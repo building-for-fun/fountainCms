@@ -92,7 +92,7 @@ This diagram shows the physical flow of the monorepo components.
 ```mermaid
 graph LR
     subgraph Client
-        A[React Frontend <br/> Vite] 
+        A[React Frontend <br/> Vite]
     end
     subgraph Server
         B[NestJS Backend <br/> REST API]
@@ -140,7 +140,7 @@ graph TD
     Content --> C_Ctrl[Controllers]
     Content --> C_Srv[Services]
     Content --> C_Ent[Entities/DTOs]
-    
+
     Auth -.->|Guards| Content
     Roles -.->|Permissions| Content
 ```
@@ -165,9 +165,11 @@ npm install
 This installs dependencies for both frontend and backend using npm workspaces.
 
 ### 🗄 Database Setup (PostgreSQL)
+
 #### Create DB User & Database
 
 Open psql as postgres superuser:
+
 ```sh
 sudo -u postgres psql
 ```
@@ -180,23 +182,29 @@ ALTER USER fountain_user CREATEDB; -- required for Prisma migrate dev
 ```
 
 ### 🔐 Frontend Environment Configuration
+
 #### Create frontend .env:
 
 ```sh
 cd frontend
 nano .env
 ```
+
 Copy the details from `.env.sample` to `.env` and save
 
 ### 🔐 Backend Environment Configuration
+
 #### Create backend .env:
+
 ```sh
 cd backend
 nano .env
 ```
+
 Copy the details from `.env.sample` to `.env` and save
 
 ### 🔑 Authentication
+
 Auth is **configurable** via `AUTH_MODE` in backend `.env`:
 
 - **`AUTH_MODE=local`** (default): Email/username + password. Users need a `passwordHash` in the DB (see seed).
@@ -206,12 +214,14 @@ Auth is **configurable** via `AUTH_MODE` in backend `.env`:
 JWT is issued after any successful login (local or SSO) and sent in an HttpOnly cookie; the frontend also supports Bearer token for API clients. See `backend/.env.sample` for all auth-related variables.
 
 ### 🧬 Run Prisma Migrations
+
 ```sh
 cd backend
 npx prisma migrate dev --name init
 ```
 
 This will:
+
 - Create DB tables
 - Generate Prisma Client
 - Sync schema
@@ -219,6 +229,7 @@ This will:
 ---
 
 ## ▶️ Postgresql on docker
+
 ### Install Docker and Docker Compose:
 
 ```sh
@@ -227,37 +238,47 @@ sudo apt install docker.io docker-compose-plugin
 ```
 
 ### Start Docker:
+
 ```sh
 sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
 ### Start PostgreSQL Using Docker Compose
+
 From the project root directory:
+
 ```sh
 docker compose up -d db
 ```
 
 ### Backend Environment Configuration (Docker Database)
+
 Ensure your backend/.env contains:
+
 ```sh
 DATABASE_URL=postgresql://fountain_user:fountain_pass@localhost:5432/fountain_db?schema=public
 ```
 
 ### Run Prisma Migrations
+
 After the database container starts:
+
 ```sh
 cd backend
 npx prisma migrate dev --name init
 ```
 
 ### Running Full Stack Using Docker (Backend + Database)
+
 To start backend and database together:
+
 ```sh
 docker compose up --build
 ```
 
 This will:
+
 - Start PostgreSQL
 - Build and run backend service
 - Expose backend at: `http://localhost:4000`

@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UserService } from './user.service';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma } from '../generated/prisma/client';
 import { UserDetailsDto } from './user-details.model';
 
 type RequestWithUser = Request & { user?: { sub: string } };

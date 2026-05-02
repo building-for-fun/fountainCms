@@ -24,11 +24,9 @@ export default {
         md: 'var(--shadow-md)',
 
         /* Metallic / premium shadows */
-        metallic:
-          '0 8px 25px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)',
+        metallic: '0 8px 25px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)',
 
-        glow:
-          '0 0 20px rgba(255,255,255,0.25), 0 8px 30px rgba(0,0,0,0.4)',
+        glow: '0 0 20px rgba(255,255,255,0.25), 0 8px 30px rgba(0,0,0,0.4)',
       },
 
       /* Animations */

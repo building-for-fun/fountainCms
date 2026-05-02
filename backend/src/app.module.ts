@@ -13,15 +13,15 @@ import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     PrismaModule,
     AuthModule,
     ContentModule,
     RolesModule,
     UserModule,
     SchemaModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     AuditLogsModule,
     MediaModule,
   ],
