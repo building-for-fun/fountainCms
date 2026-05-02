@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import {
   BadRequestException,
   Injectable,
@@ -16,7 +17,17 @@ import {
   firstQueryValue,
 } from './content-query.util';
 
-const SYSTEM_KEYS = ['status', 'published_at', 'publishedAt'];
+const SYSTEM_KEYS = [
+  'status',
+  'published_at',
+  'publishedAt',
+  'locale',
+  'translation_group_id',
+  'translationGroupId',
+];
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function stripSystemFields(
   payload: Record<string, unknown>,
@@ -24,6 +35,34 @@ function stripSystemFields(
   const out = { ...payload };
   for (const k of SYSTEM_KEYS) delete out[k];
   return out;
+}
+
+function parseLocaleInput(v: unknown): string | undefined {
+  if (v === undefined) return undefined;
+  if (v === null) {
+    throw new BadRequestException('locale cannot be null');
+  }
+  if (typeof v !== 'string') {
+    throw new BadRequestException('locale must be a string');
+  }
+  const s = v.trim();
+  if (!s) return undefined;
+  if (s.length > 32) {
+    throw new BadRequestException('locale must be at most 32 characters');
+  }
+  return s;
+}
+
+function parseTranslationGroupIdInput(v: unknown): string | undefined {
+  if (v === undefined || v === null || v === '') return undefined;
+  if (typeof v !== 'string' || !v.trim()) {
+    throw new BadRequestException('translation_group_id must be a UUID string');
+  }
+  const s = v.trim();
+  if (!UUID_RE.test(s)) {
+    throw new BadRequestException('translation_group_id must be a valid UUID');
+  }
+  return s;
 }
 
 function parseStatus(v: unknown): ContentStatus | null {
@@ -44,8 +83,31 @@ export class ContentService {
     return this.schemaService.getSchema();
   }
 
+  private getAllowedLocales(): Set<string> | null {
+    const raw = process.env.CONTENT_LOCALES?.trim();
+    if (!raw) return null;
+    const set = new Set(
+      raw
+        .split(',')
+        .map((x) => x.trim())
+        .filter(Boolean),
+    );
+    return set.size ? set : null;
+  }
+
+  private assertLocaleAllowed(locale: string) {
+    const allowed = this.getAllowedLocales();
+    if (allowed && !allowed.has(locale)) {
+      throw new BadRequestException(
+        `locale must be one of: ${[...allowed].sort().join(', ')}`,
+      );
+    }
+  }
+
   private toItemResponse(item: {
     id: string;
+    locale: string;
+    translationGroupId: string;
     data: Prisma.JsonValue;
     status: string;
     publishedAt: Date | null;
@@ -54,6 +116,8 @@ export class ContentService {
     return {
       id: item.id,
       ...data,
+      locale: item.locale,
+      translation_group_id: item.translationGroupId,
       status: item.status,
       published_at: item.publishedAt?.toISOString() ?? null,
     };
@@ -89,10 +153,17 @@ export class ContentService {
 
     const dataAnd = parsed.filterAnd.length > 0 ? parsed.filterAnd : undefined;
 
+    let localeFilter: string | undefined;
+    if (parsed.localeFilter !== undefined) {
+      this.assertLocaleAllowed(parsed.localeFilter);
+      localeFilter = parsed.localeFilter;
+    }
+
     const [items, total] = await Promise.all([
       this.contentRepository.findMany({
         collection,
         status: statusFilter,
+        locale: localeFilter,
         skip: parsed.offset,
         take: parsed.limit,
         orderBy,
@@ -101,6 +172,7 @@ export class ContentService {
       this.contentRepository.count({
         collection,
         status: statusFilter,
+        locale: localeFilter,
         dataFilterAnd: dataAnd,
       }),
     ]);
@@ -249,6 +321,35 @@ export class ContentService {
       throw new NotFoundException('Collection not found');
     }
 
+    const locale = parseLocaleInput(payload.locale) ?? 'default';
+    this.assertLocaleAllowed(locale);
+
+    const tgInput = parseTranslationGroupIdInput(
+      payload.translation_group_id ?? payload.translationGroupId,
+    );
+    const translationGroupId = tgInput ?? randomUUID();
+
+    if (tgInput) {
+      const sibling = await this.prisma.contentItem.findFirst({
+        where: { collection, translationGroupId: tgInput },
+        select: { id: true },
+      });
+      if (!sibling) {
+        throw new BadRequestException(
+          'translation_group_id must reference an existing entry in this collection',
+        );
+      }
+      const clash = await this.prisma.contentItem.findFirst({
+        where: { collection, translationGroupId: tgInput, locale },
+        select: { id: true },
+      });
+      if (clash) {
+        throw new BadRequestException(
+          'This translation group already has an entry for this locale',
+        );
+      }
+    }
+
     const status = parseStatus(payload.status) ?? 'draft';
     const payloadWithoutSystem = stripSystemFields(payload);
     const validated = validatePayload(
@@ -272,6 +373,8 @@ export class ContentService {
       validated,
       status,
       publishedAt,
+      locale,
+      translationGroupId,
     );
 
     return {
@@ -328,6 +431,7 @@ export class ContentService {
     collection: string,
     id: string,
     payload: Record<string, unknown>,
+    opts?: { editorUserId?: string | null },
   ) {
     const collectionSchema = this.schema.collections[collection];
 
@@ -343,6 +447,62 @@ export class ContentService {
 
     if (!existing) {
       throw new NotFoundException('Content item not found');
+    }
+
+    let locale = existing.locale;
+    if (payload.locale !== undefined) {
+      const parsed = parseLocaleInput(payload.locale);
+      if (parsed !== undefined) {
+        locale = parsed;
+      } else {
+        locale = 'default';
+      }
+      this.assertLocaleAllowed(locale);
+    }
+
+    let translationGroupId = existing.translationGroupId;
+    if (
+      payload.translation_group_id !== undefined ||
+      payload.translationGroupId !== undefined
+    ) {
+      const tgPayload = parseTranslationGroupIdInput(
+        payload.translation_group_id ?? payload.translationGroupId,
+      );
+      if (tgPayload === undefined) {
+        throw new BadRequestException(
+          'translation_group_id must be a valid UUID when provided',
+        );
+      }
+      translationGroupId = tgPayload;
+      const anySibling = await this.prisma.contentItem.findFirst({
+        where: { collection, translationGroupId: tgPayload },
+        select: { id: true },
+      });
+      if (!anySibling) {
+        throw new BadRequestException(
+          'translation_group_id must reference an existing entry in this collection',
+        );
+      }
+    }
+
+    if (
+      locale !== existing.locale ||
+      translationGroupId !== existing.translationGroupId
+    ) {
+      const clash = await this.prisma.contentItem.findFirst({
+        where: {
+          collection,
+          translationGroupId,
+          locale,
+          NOT: { id: existing.id },
+        },
+        select: { id: true },
+      });
+      if (clash) {
+        throw new BadRequestException(
+          'An entry already exists for this locale in the translation group',
+        );
+      }
     }
 
     const incomingStatus = parseStatus(payload.status);
@@ -376,13 +536,145 @@ export class ContentService {
       collectionSchema.fields,
     );
 
-    const updated = await this.contentRepository.update(
-      collection,
-      id,
-      validated,
-      status,
-      publishedAt,
+    const editorUserId = opts?.editorUserId ?? undefined;
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const max = await tx.contentItemRevision.aggregate({
+        where: { itemId: existing.id },
+        _max: { version: true },
+      });
+      const nextVersion = (max._max.version ?? 0) + 1;
+      await tx.contentItemRevision.create({
+        data: {
+          itemId: existing.id,
+          version: nextVersion,
+          collection: existing.collection,
+          locale: existing.locale,
+          translationGroupId: existing.translationGroupId,
+          data: existing.data as Prisma.InputJsonValue,
+          status: existing.status,
+          publishedAt: existing.publishedAt,
+          createdById: editorUserId,
+        },
+      });
+
+      return tx.contentItem.update({
+        where: { id: existing.id },
+        data: {
+          data: validated,
+          status,
+          publishedAt,
+          locale,
+          translationGroupId,
+        },
+      });
+    });
+
+    return {
+      data: this.toItemResponse(updated),
+    };
+  }
+
+  async listRevisions(collection: string, id: string) {
+    const existing = await this.contentRepository.findById(collection, id);
+
+    if (!existing) {
+      throw new NotFoundException('Content item not found');
+    }
+
+    const rows = await this.prisma.contentItemRevision.findMany({
+      where: { itemId: id },
+      orderBy: { version: 'desc' },
+      select: {
+        version: true,
+        createdAt: true,
+        createdById: true,
+        locale: true,
+        status: true,
+      },
+    });
+
+    return { data: rows };
+  }
+
+  async restoreRevision(
+    collection: string,
+    id: string,
+    version: number,
+    opts?: { editorUserId?: string | null },
+  ) {
+    const collectionSchema = this.schema.collections[collection];
+
+    if (!collectionSchema) {
+      throw new NotFoundException('Collection not found');
+    }
+
+    const existing = await this.contentRepository.findById(collection, id);
+
+    if (!existing) {
+      throw new NotFoundException('Content item not found');
+    }
+
+    const revision = await this.prisma.contentItemRevision.findFirst({
+      where: {
+        itemId: id,
+        version,
+        collection,
+      },
+    });
+
+    if (!revision) {
+      throw new NotFoundException('Revision not found');
+    }
+
+    const validated = validatePayload(
+      assertObject(revision.data),
+      collectionSchema.fields,
+    ) as Prisma.InputJsonValue;
+
+    await this.validateMediaReferences(
+      validated as Record<string, unknown>,
+      collectionSchema.fields,
     );
+
+    await this.validateRelationReferences(
+      validated as Record<string, unknown>,
+      collectionSchema.fields,
+    );
+
+    const editorUserId = opts?.editorUserId ?? undefined;
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const max = await tx.contentItemRevision.aggregate({
+        where: { itemId: existing.id },
+        _max: { version: true },
+      });
+      const nextVersion = (max._max.version ?? 0) + 1;
+      await tx.contentItemRevision.create({
+        data: {
+          itemId: existing.id,
+          version: nextVersion,
+          collection: existing.collection,
+          locale: existing.locale,
+          translationGroupId: existing.translationGroupId,
+          data: existing.data as Prisma.InputJsonValue,
+          status: existing.status,
+          publishedAt: existing.publishedAt,
+          createdById: editorUserId,
+        },
+      });
+
+      return tx.contentItem.update({
+        where: { id: existing.id },
+        data: {
+          data: validated,
+          status: revision.status,
+          publishedAt: revision.publishedAt,
+          locale: revision.locale,
+          translationGroupId: revision.translationGroupId,
+        },
+      });
+    });
 
     return {
       data: this.toItemResponse(updated),

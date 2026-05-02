@@ -17,6 +17,8 @@ export interface ParsedListQuery {
   fieldPick: string[] | null;
   /** Relation field names to expand (`*` / `all` = every relation field). */
   populate: string[] | null;
+  /** When set, only entries with this locale are returned. */
+  localeFilter?: string;
 }
 
 export function firstQueryValue(
@@ -252,7 +254,21 @@ export function parseContentListQuery(
     schemaFields,
   );
 
-  return { limit, offset, sort, filterAnd, fieldPick, populate };
+  const localeRaw = firstQueryValue(raw, 'locale');
+  const localeFilter =
+    localeRaw !== undefined && String(localeRaw).trim() !== ''
+      ? String(localeRaw).trim()
+      : undefined;
+
+  return {
+    limit,
+    offset,
+    sort,
+    filterAnd,
+    fieldPick,
+    populate,
+    localeFilter,
+  };
 }
 
 export function pickContentFields(
@@ -264,6 +280,8 @@ export function pickContentFields(
     id: row.id,
     status: row.status,
     published_at: row.published_at,
+    locale: row.locale,
+    translation_group_id: row.translation_group_id,
   };
   for (const k of pick) {
     if (k in row) out[k] = row[k];

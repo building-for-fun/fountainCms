@@ -7,6 +7,7 @@ export type ContentStatus = 'draft' | 'published';
 export interface FindManyContentParams {
   collection: string;
   status?: ContentStatus;
+  locale?: string;
   skip: number;
   /** Omit or undefined = no limit (all rows after skip). */
   take?: number;
@@ -17,6 +18,7 @@ export interface FindManyContentParams {
 export interface CountContentParams {
   collection: string;
   status?: ContentStatus;
+  locale?: string;
   dataFilterAnd?: Prisma.ContentItemWhereInput[];
 }
 
@@ -27,10 +29,12 @@ export class ContentRepository {
   private buildWhere(
     collection: string,
     status?: ContentStatus,
+    locale?: string,
     dataFilterAnd?: Prisma.ContentItemWhereInput[],
   ): Prisma.ContentItemWhereInput {
     const where: Prisma.ContentItemWhereInput = { collection };
     if (status) where.status = status;
+    if (locale !== undefined) where.locale = locale;
     if (dataFilterAnd?.length) {
       where.AND = dataFilterAnd;
     }
@@ -42,10 +46,14 @@ export class ContentRepository {
     data: Prisma.InputJsonValue,
     status: ContentStatus = 'draft',
     publishedAt: Date | null = null,
+    locale = 'default',
+    translationGroupId: string,
   ) {
     return this.prisma.contentItem.create({
       data: {
         collection,
+        locale,
+        translationGroupId,
         data,
         status,
         publishedAt,
@@ -57,6 +65,7 @@ export class ContentRepository {
     const where = this.buildWhere(
       params.collection,
       params.status,
+      params.locale,
       params.dataFilterAnd,
     );
     return this.prisma.contentItem.findMany({
@@ -71,6 +80,7 @@ export class ContentRepository {
     const where = this.buildWhere(
       params.collection,
       params.status,
+      params.locale,
       params.dataFilterAnd,
     );
     return this.prisma.contentItem.count({ where });
@@ -82,22 +92,6 @@ export class ContentRepository {
         id,
         collection,
       },
-    });
-  }
-
-  async update(
-    collection: string,
-    id: string,
-    data: Prisma.InputJsonValue,
-    status?: ContentStatus,
-    publishedAt?: Date | null,
-  ) {
-    const updateData: Prisma.ContentItemUpdateInput = { data };
-    if (status !== undefined) updateData.status = status;
-    if (publishedAt !== undefined) updateData.publishedAt = publishedAt;
-    return this.prisma.contentItem.update({
-      where: { id },
-      data: updateData,
     });
   }
 

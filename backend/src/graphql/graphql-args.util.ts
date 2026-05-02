@@ -3,6 +3,7 @@
  */
 export function gqlListArgsToQueryRecord(args: {
   status?: string;
+  locale?: string;
   limit?: number;
   offset?: number;
   sort?: string;
@@ -12,6 +13,7 @@ export function gqlListArgsToQueryRecord(args: {
 }): Record<string, string | string[] | undefined> {
   const q: Record<string, string | string[] | undefined> = {};
   if (args.status != null && args.status !== '') q.status = args.status;
+  if (args.locale != null && args.locale !== '') q.locale = args.locale;
   if (args.limit != null) q.limit = String(args.limit);
   if (args.offset != null) q.offset = String(args.offset);
   if (args.sort != null && args.sort !== '') q.sort = args.sort;

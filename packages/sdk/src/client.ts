@@ -33,7 +33,7 @@ export class FountainClient {
   };
 
   content = {
-    /** Query params: status, limit, offset, sort, filter (JSON string), fields */
+    /** Query params: status, locale, limit, offset, sort, filter (JSON string), fields, populate */
     getMany: async (
       collection: string,
       params?: Record<string, string | number | boolean | null | undefined>,

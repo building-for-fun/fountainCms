@@ -58,16 +58,43 @@ model ContentTypeField {
 }
 
 model ContentItem {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  collection  String    @db.VarChar(255)
-  data        Json      @db.Json
-  status      String    @default("draft") @db.VarChar(20)
-  publishedAt DateTime? @db.Timestamp(6)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  collection         String    @db.VarChar(255)
+  locale             String    @default("default") @db.VarChar(32)
+  translationGroupId String    @db.Uuid
+  data               Json      @db.Json
+  status             String    @default("draft") @db.VarChar(20)
+  publishedAt        DateTime? @db.Timestamp(6)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
+  revisions ContentItemRevision[]
+
+  @@unique([collection, translationGroupId, locale])
   @@index([collection])
   @@index([collection, status])
+  @@index([collection, locale])
+}
+
+/// Snapshot before each PATCH (version increments per entry).
+model ContentItemRevision {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  itemId             String    @db.Uuid
+  version            Int
+  collection         String    @db.VarChar(255)
+  locale             String    @db.VarChar(32)
+  translationGroupId String    @db.Uuid
+  data               Json      @db.Json
+  status             String    @db.VarChar(20)
+  publishedAt        DateTime? @db.Timestamp(6)
+  createdAt          DateTime  @default(now())
+  createdById        String?   @db.Uuid
+
+  item ContentItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, version])
+  @@index([itemId])
+  @@map("content_item_revisions")
 }
 
 model Media {

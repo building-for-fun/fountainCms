@@ -3,6 +3,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import { deleteItem, listItems } from '../../api/content';
+
+const LOCALE_FILTER_OPTIONS = (import.meta.env.VITE_CONTENT_LOCALES as string | undefined)
+  ?.split(',')
+  .map((s) => s.trim())
+  .filter(Boolean) ?? ['default'];
 import { fetchSchema } from '../../api/schema';
 import { useToast } from '../../components/Toast';
 import { LoadingSkeleton, ErrorState, EmptyState, ApiErrorState } from '../../components/states';
@@ -14,6 +19,7 @@ const ContentEntries = () => {
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'published'>('all');
+  const [localeFilter, setLocaleFilter] = useState<string>('all');
 
   if (!collection) {
     return (
@@ -31,8 +37,11 @@ const ContentEntries = () => {
   const collectionSchema = schema?.collections?.[collection];
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['content', collection, statusFilter],
-    queryFn: () => listItems(collection, statusFilter === 'all' ? undefined : statusFilter),
+    queryKey: ['content', collection, statusFilter, localeFilter],
+    queryFn: () =>
+      listItems(collection, statusFilter === 'all' ? undefined : statusFilter, {
+        locale: localeFilter === 'all' ? undefined : localeFilter,
+      }),
     enabled: !!collection,
   });
 
@@ -107,6 +116,9 @@ const ContentEntries = () => {
               <th className="px-6 py-4 font-semibold text-text text-sm uppercase tracking-wider border-b border-border">
                 Status
               </th>
+              <th className="px-6 py-4 font-semibold text-text text-sm uppercase tracking-wider border-b border-border">
+                Locale
+              </th>
               {Object.keys(collectionSchema.fields).map((field) => (
                 <th
                   key={field}
@@ -139,6 +151,9 @@ const ContentEntries = () => {
                   >
                     {item.status === 'published' ? 'Published' : 'Draft'}
                   </span>
+                </td>
+                <td className="px-6 py-4 text-text font-mono text-sm">
+                  {String((item as { locale?: string }).locale ?? '—')}
                 </td>
                 {Object.keys(collectionSchema.fields).map((field) => (
                   <td key={field} className="px-6 py-4 text-text">
@@ -247,6 +262,19 @@ const ContentEntries = () => {
               <option value="all">All statuses</option>
               <option value="draft">Draft</option>
               <option value="published">Published</option>
+            </select>
+            <select
+              value={localeFilter}
+              onChange={(e) => setLocaleFilter(e.target.value)}
+              className="px-4 py-2.5 border border-border rounded-lg bg-surface text-text focus:ring-2 focus:ring-primary sm:w-44"
+              title="Filter by entry locale"
+            >
+              <option value="all">All locales</option>
+              {LOCALE_FILTER_OPTIONS.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc}
+                </option>
+              ))}
             </select>
           </div>
           <div className="text-sm text-text-muted">

@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '../../components/Layouts/AdminLayout';
-import { createItem, getItem, updateItem } from '../../api/content';
+import { createItem, getItem, updateItem, listRevisions, restoreRevision } from '../../api/content';
 import { fetchSchema } from '../../api/schema';
 import { useToast } from '../../components/Toast';
 import { LoadingSkeleton, ErrorState } from '../../components/states';
 import { MediaPicker } from '../../components/MediaPicker/MediaPicker';
 
+const ENTRY_LOCALE_OPTIONS = (import.meta.env.VITE_CONTENT_LOCALES as string | undefined)
+  ?.split(',')
+  .map((s) => s.trim())
+  .filter(Boolean) ?? ['default'];
+
 const ContentEntryDetail = () => {
   const { collection, id } = useParams<{ collection: string; id?: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { showToast } = useToast();
   const isEdit = !!id;
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -34,6 +40,24 @@ const ContentEntryDetail = () => {
 
   const entryData = (existingData as { data?: Record<string, unknown> })?.data ?? existingData;
 
+  const { data: revisionsData } = useQuery({
+    queryKey: ['content-revisions', collection, id],
+    queryFn: () => listRevisions(collection!, id!),
+    enabled: isEdit && !!collection && !!id,
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: (version: number) => restoreRevision(collection!, id!, version),
+    onSuccess: () => {
+      showToast('Restored from revision', 'success');
+      queryClient.invalidateQueries({ queryKey: ['content', collection, id] });
+      queryClient.invalidateQueries({ queryKey: ['content-revisions', collection, id] });
+    },
+    onError: (error: Error) => {
+      showToast(error?.message ?? 'Restore failed', 'error');
+    },
+  });
+
   useEffect(() => {
     if (entryData && typeof entryData === 'object') {
       setFormData({ ...entryData });
@@ -43,7 +67,10 @@ const ContentEntryDetail = () => {
   // Apply schema defaults and draft status for new entries
   useEffect(() => {
     if (isEdit || !collectionSchema) return;
-    const defaults: Record<string, unknown> = { status: 'draft' };
+    const defaults: Record<string, unknown> = {
+      status: 'draft',
+      locale: ENTRY_LOCALE_OPTIONS[0] ?? 'default',
+    };
     for (const [fieldName, fieldConfig] of Object.entries(collectionSchema.fields)) {
       if (fieldConfig.default !== undefined && fieldConfig.default !== null) {
         defaults[fieldName] = fieldConfig.default;
@@ -91,7 +118,15 @@ const ContentEntryDetail = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const { id: _id, ...payload } = formData;
+    const { id: _id, published_at: _pubAt, publishedAt: _pubAt2, ...rest } = formData;
+    const payload: Record<string, unknown> = { ...rest };
+    if (
+      payload.translation_group_id === '' ||
+      payload.translation_group_id === undefined ||
+      payload.translation_group_id === null
+    ) {
+      delete payload.translation_group_id;
+    }
     mutation.mutate(payload);
   };
 
@@ -184,6 +219,43 @@ const ContentEntryDetail = () => {
             )}
 
             <div className="mb-8 pt-6 border-t border-border">
+              <label className="block text-sm font-semibold text-text mb-2">Locale</label>
+              <select
+                value={(formData.locale as string) ?? ENTRY_LOCALE_OPTIONS[0] ?? 'default'}
+                onChange={(e) => setFormData((prev) => ({ ...prev, locale: e.target.value }))}
+                className="w-full max-w-xs px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text"
+              >
+                {ENTRY_LOCALE_OPTIONS.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-text-muted mt-2">
+                Link translations by reusing the translation group ID from another entry (optional).
+              </p>
+            </div>
+
+            <div className="mb-8">
+              <label className="block text-sm font-semibold text-text mb-2">
+                Translation group ID
+              </label>
+              <input
+                type="text"
+                value={(formData.translation_group_id as string) ?? ''}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    translation_group_id: e.target.value.trim() || undefined,
+                  }))
+                }
+                readOnly={isEdit}
+                placeholder={isEdit ? '' : 'Paste UUID from an existing entry to pair locales'}
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text font-mono text-sm read-only:bg-background/70 read-only:cursor-not-allowed"
+              />
+            </div>
+
+            <div className="mb-8 pt-6 border-t border-border">
               <label className="block text-sm font-semibold text-text mb-2">Status</label>
               <select
                 value={status}
@@ -223,6 +295,52 @@ const ContentEntryDetail = () => {
             </div>
           </form>
         </div>
+
+        {isEdit && revisionsData?.data && revisionsData.data.length > 0 && (
+          <div className="max-w-3xl mx-auto mt-10 bg-surface p-8 rounded-2xl shadow-lg border border-border">
+            <h2 className="text-xl font-bold text-text mb-2">Revision history</h2>
+            <p className="text-sm text-text-muted mb-6">
+              Each update saves a snapshot. Restoring rolls content back and keeps the prior state
+              in history.
+            </p>
+            <ul className="divide-y divide-border border border-border rounded-lg overflow-hidden">
+              {revisionsData.data.map((r) => (
+                <li
+                  key={r.version}
+                  className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-background"
+                >
+                  <div className="text-sm">
+                    <span className="font-mono font-semibold text-text">v{r.version}</span>
+                    <span className="text-text-muted mx-2">·</span>
+                    <span className="text-text-muted">
+                      {new Date(r.createdAt).toLocaleString()}
+                    </span>
+                    <span className="text-text-muted mx-2">·</span>
+                    <span className="text-text">{r.locale}</span>
+                    <span className="text-text-muted mx-2">·</span>
+                    <span className="capitalize">{r.status}</span>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={restoreMutation.isPending}
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          `Restore version ${r.version}? Current content will be snapshotted first.`
+                        )
+                      ) {
+                        restoreMutation.mutate(r.version);
+                      }
+                    }}
+                    className="text-sm px-3 py-1.5 rounded-lg border border-border text-text hover:bg-surface disabled:opacity-50"
+                  >
+                    Restore
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

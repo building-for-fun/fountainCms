@@ -138,5 +138,10 @@ describe('content-query.util', () => {
       );
       expect(q.populate).toEqual(['authorId']);
     });
+
+    it('parses locale filter', () => {
+      const q = parseContentListQuery({ locale: 'en' }, schemaFields);
+      expect(q.localeFilter).toBe('en');
+    });
   });
 });

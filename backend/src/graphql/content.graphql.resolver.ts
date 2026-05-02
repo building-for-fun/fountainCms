@@ -28,6 +28,7 @@ export class ContentGraphqlResolver {
     @Args('collection', { description: 'Content type name (e.g. posts)' })
     collection: string,
     @Args('status', { nullable: true }) status?: string,
+    @Args('locale', { nullable: true }) locale?: string,
     @Args('limit', { nullable: true, type: () => Int }) limit?: number,
     @Args('offset', { nullable: true, type: () => Int }) offset?: number,
     @Args('sort', { nullable: true }) sort?: string,
@@ -41,6 +42,7 @@ export class ContentGraphqlResolver {
     const publishedOnly = anon ? true : status === 'published';
     const query = gqlListArgsToQueryRecord({
       status,
+      locale,
       limit,
       offset,
       sort,
@@ -93,12 +95,15 @@ export class ContentGraphqlResolver {
   @Mutation(() => GraphQLJSONObject, { name: 'updateCollectionItem' })
   @RequireContentOperation('update')
   async updateCollectionItem(
+    @Context() ctx: { req: FountainAuthRequest },
     @Args('collection') collection: string,
     @Args('id') id: string,
     @Args('data', { type: () => GraphQLJSONObject })
     data: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    const res = await this.content.update(collection, id, data);
+    const res = await this.content.update(collection, id, data, {
+      editorUserId: ctx.req.user?.sub ?? null,
+    });
     return res.data as Record<string, unknown>;
   }
 

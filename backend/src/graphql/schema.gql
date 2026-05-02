@@ -39,6 +39,7 @@ type Query {
     fields: String
     filter: JSONObject
     limit: Int
+    locale: String
     offset: Int
     populate: String
     sort: String

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import type { Request } from 'express';
+import type { FountainAuthRequest } from '../auth/auth-apply.service';
 import { ContentService } from './content.service';
 import { ContentPermissionGuard } from './guards/content-permission.guard';
 import { AllowAnonymousPublishedRead } from '../auth/decorators/allow-anonymous-published.decorator';
@@ -30,6 +32,12 @@ export class ContentController {
       'Optional: limit, offset, sort (createdAt|updatedAt|publishedAt, -field or field:desc), filter (JSON object of field equals), fields (comma-separated projection). Omit limit to return all matches.',
   })
   @ApiQuery({ name: 'status', required: false, enum: ['published', 'draft'] })
+  @ApiQuery({
+    name: 'locale',
+    required: false,
+    description:
+      'Only return entries with this locale code (see CONTENT_LOCALES when set)',
+  })
   @ApiQuery({ name: 'limit', required: false, example: 20 })
   @ApiQuery({ name: 'offset', required: false, example: 0 })
   @ApiQuery({ name: 'sort', required: false, example: '-createdAt' })
@@ -64,6 +72,27 @@ export class ContentController {
     });
   }
 
+  @Get(':collection/:id/revisions')
+  listRevisions(
+    @Param('collection') collection: string,
+    @Param('id') id: string,
+  ) {
+    return this.contentService.listRevisions(collection, id);
+  }
+
+  @Patch(':collection/:id/revisions/:version/restore')
+  restoreRevision(
+    @Req() req: Request,
+    @Param('collection') collection: string,
+    @Param('id') id: string,
+    @Param('version', ParseIntPipe) version: number,
+  ) {
+    const user = (req as FountainAuthRequest).user;
+    return this.contentService.restoreRevision(collection, id, version, {
+      editorUserId: user?.sub ?? null,
+    });
+  }
+
   @Get(':collection/:id')
   @AllowAnonymousPublishedRead()
   @ApiQuery({
@@ -95,11 +124,15 @@ export class ContentController {
 
   @Patch(':collection/:id')
   update(
+    @Req() req: Request,
     @Param('collection') collection: string,
     @Param('id') id: string,
     @Body() payload: Record<string, unknown>,
   ) {
-    return this.contentService.update(collection, id, payload);
+    const user = (req as FountainAuthRequest).user;
+    return this.contentService.update(collection, id, payload, {
+      editorUserId: user?.sub ?? null,
+    });
   }
 
   @Delete(':collection/:id')

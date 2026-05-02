@@ -11,6 +11,7 @@ export function listItems(
   collection: string,
   status?: 'draft' | 'published',
   listQuery?: {
+    locale?: string;
     limit?: number;
     offset?: number;
     sort?: string;
@@ -21,6 +22,7 @@ export function listItems(
 ) {
   const sp = new URLSearchParams();
   if (status) sp.set('status', status);
+  if (listQuery?.locale) sp.set('locale', listQuery.locale);
   if (listQuery?.limit != null) sp.set('limit', String(listQuery.limit));
   if (listQuery?.offset != null) sp.set('offset', String(listQuery.offset));
   if (listQuery?.sort) sp.set('sort', listQuery.sort);
@@ -57,4 +59,25 @@ export function deleteItem(collection: string, id: string) {
   return api<{ success: boolean }>(`/content/collections/${collection}/${id}`, {
     method: 'DELETE',
   });
+}
+
+export type ContentRevisionSummary = {
+  version: number;
+  createdAt: string;
+  createdById: string | null;
+  locale: string;
+  status: string;
+};
+
+export function listRevisions(collection: string, id: string) {
+  return api<{ data: ContentRevisionSummary[] }>(
+    `/content/collections/${collection}/${id}/revisions`
+  );
+}
+
+export function restoreRevision(collection: string, id: string, version: number) {
+  return api<{ data: Record<string, unknown> }>(
+    `/content/collections/${collection}/${id}/revisions/${version}/restore`,
+    { method: 'PATCH' }
+  );
 }
