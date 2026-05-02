@@ -87,9 +87,11 @@ export class ContentController {
     @Param('id') id: string,
     @Param('version', ParseIntPipe) version: number,
   ) {
-    const user = (req as FountainAuthRequest).user;
+    const fReq = req as FountainAuthRequest;
+    const user = fReq.user;
     return this.contentService.restoreRevision(collection, id, version, {
       editorUserId: user?.sub ?? null,
+      auth: fReq,
     });
   }
 
@@ -116,10 +118,13 @@ export class ContentController {
 
   @Post(':collection')
   create(
+    @Req() req: Request,
     @Param('collection') collection: string,
     @Body() payload: Record<string, unknown>,
   ) {
-    return this.contentService.create(collection, payload);
+    return this.contentService.create(collection, payload, {
+      auth: req as FountainAuthRequest,
+    });
   }
 
   @Patch(':collection/:id')
@@ -129,9 +134,11 @@ export class ContentController {
     @Param('id') id: string,
     @Body() payload: Record<string, unknown>,
   ) {
-    const user = (req as FountainAuthRequest).user;
+    const fReq = req as FountainAuthRequest;
+    const user = fReq.user;
     return this.contentService.update(collection, id, payload, {
       editorUserId: user?.sub ?? null,
+      auth: fReq,
     });
   }
 

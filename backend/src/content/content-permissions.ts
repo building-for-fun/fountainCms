@@ -1,13 +1,18 @@
 /**
  * Content API permission format: "{collection}:{operation}"
- * Operations: create, read, update, delete
+ * Operations: create, read, update, publish, delete
  * Wildcards: "{collection}:*" (all ops for collection), "*:*" (all content)
+ *
+ * `publish` is required to set status to published when the entry was not
+ * published yet (create-as-published or draft → published). Other edits to
+ * published entries only need `update`.
  */
 
 export const CONTENT_OPERATIONS = [
   'create',
   'read',
   'update',
+  'publish',
   'delete',
 ] as const;
 export type ContentOperation = (typeof CONTENT_OPERATIONS)[number];

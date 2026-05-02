@@ -1,6 +1,7 @@
 import React from 'react';
 
-const OPERATIONS = ['create', 'read', 'update', 'delete'] as const;
+/** Includes `publish` (draft → published). Schema admin uses create/read/update/delete only. */
+const MATRIX_OPERATIONS = ['create', 'read', 'update', 'publish', 'delete'] as const;
 
 export function permissionKey(collection: string, op: string): string {
   return `${collection}:${op}`;
@@ -68,7 +69,7 @@ export function PermissionMatrix({
             >
               Content type
             </th>
-            {OPERATIONS.map((op) => (
+            {MATRIX_OPERATIONS.map((op) => (
               <th
                 key={op}
                 style={{
@@ -98,7 +99,23 @@ export function PermissionMatrix({
               >
                 {label || key}
               </td>
-              {OPERATIONS.map((op) => {
+              {MATRIX_OPERATIONS.map((op) => {
+                if (key === 'schema' && op === 'publish') {
+                  return (
+                    <td
+                      key={op}
+                      style={{
+                        padding: '0.5rem 0.75rem',
+                        borderBottom: '1px solid var(--color-border)',
+                        textAlign: 'center',
+                        color: 'var(--color-text-muted)',
+                      }}
+                      aria-label="Not applicable for schema"
+                    >
+                      —
+                    </td>
+                  );
+                }
                 const checked = hasPermission(permissions, key, op);
                 return (
                   <td
@@ -126,6 +143,18 @@ export function PermissionMatrix({
           ))}
         </tbody>
       </table>
+      <p
+        style={{
+          margin: '0.75rem 0 0',
+          fontSize: '0.8125rem',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.5,
+        }}
+      >
+        <strong>Publish</strong> is required to create an entry as published or to change status
+        from draft to published. Editing an already-published entry still uses{' '}
+        <strong>update</strong>.
+      </p>
     </div>
   );
 }

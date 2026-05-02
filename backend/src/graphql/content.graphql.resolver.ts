@@ -84,11 +84,12 @@ export class ContentGraphqlResolver {
   @Mutation(() => GraphQLJSONObject, { name: 'createCollectionItem' })
   @RequireContentOperation('create')
   async createCollectionItem(
+    @Context() ctx: { req: FountainAuthRequest },
     @Args('collection') collection: string,
     @Args('data', { type: () => GraphQLJSONObject })
     data: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    const res = await this.content.create(collection, data);
+    const res = await this.content.create(collection, data, { auth: ctx.req });
     return res.data;
   }
 
@@ -103,6 +104,7 @@ export class ContentGraphqlResolver {
   ): Promise<Record<string, unknown>> {
     const res = await this.content.update(collection, id, data, {
       editorUserId: ctx.req.user?.sub ?? null,
+      auth: ctx.req,
     });
     return res.data;
   }

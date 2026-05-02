@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -16,6 +17,8 @@ import {
   pickContentFields,
   firstQueryValue,
 } from './content-query.util';
+import type { FountainAuthRequest } from '../auth/auth-apply.service';
+import { ContentAuthorizationService } from './content-authorization.service';
 import { WebhookDispatchService } from '../webhooks/webhook-dispatch.service';
 
 const SYSTEM_KEYS = [
@@ -78,6 +81,7 @@ export class ContentService {
     private readonly contentRepository: ContentRepository,
     private readonly schemaService: SchemaService,
     private readonly webhookDispatch: WebhookDispatchService,
+    private readonly contentAuthorization: ContentAuthorizationService,
   ) {}
 
   /** Schema is loaded at app startup via APP_INITIALIZER; first use is after that. */
@@ -104,6 +108,56 @@ export class ContentService {
         `locale must be one of: ${[...allowed].sort().join(', ')}`,
       );
     }
+  }
+
+  private isSuperAdminPrincipal(auth?: FountainAuthRequest): boolean {
+    return auth?.user?.role === 'Super Admin';
+  }
+
+  private assertWritablePayloadKeys(
+    payloadKeys: string[],
+    fields: Record<string, FieldSchema>,
+    auth?: FountainAuthRequest,
+  ): void {
+    if (this.isSuperAdminPrincipal(auth)) return;
+    for (const key of payloadKeys) {
+      const fs = fields[key];
+      if (fs?.readonly) {
+        throw new ForbiddenException(
+          `Field '${key}' is read-only for your role`,
+        );
+      }
+    }
+  }
+
+  private preserveReadonlyFields(
+    validated: Record<string, unknown>,
+    existingData: Record<string, unknown>,
+    fields: Record<string, FieldSchema>,
+  ): Record<string, unknown> {
+    const out = { ...validated };
+    for (const [name, fs] of Object.entries(fields)) {
+      if (!fs.readonly) continue;
+      if (Object.prototype.hasOwnProperty.call(existingData, name)) {
+        out[name] = existingData[name];
+      }
+    }
+    return out;
+  }
+
+  private async ensurePublishTransitionAllowed(
+    auth: FountainAuthRequest | undefined,
+    collection: string,
+    wasPublished: boolean,
+    willBePublished: boolean,
+  ): Promise<void> {
+    if (wasPublished || !willBePublished) return;
+    if (!auth) {
+      throw new ForbiddenException(
+        'Publishing requires request authentication context',
+      );
+    }
+    await this.contentAuthorization.ensureAccess(auth, collection, 'publish');
   }
 
   private toItemResponse(item: {
@@ -316,7 +370,11 @@ export class ContentService {
     }
   }
 
-  async create(collection: string, payload: Record<string, unknown>) {
+  async create(
+    collection: string,
+    payload: Record<string, unknown>,
+    opts?: { auth?: FountainAuthRequest },
+  ) {
     const collectionSchema = this.schema.collections[collection];
 
     if (!collectionSchema) {
@@ -353,7 +411,20 @@ export class ContentService {
     }
 
     const status = parseStatus(payload.status) ?? 'draft';
+    await this.ensurePublishTransitionAllowed(
+      opts?.auth,
+      collection,
+      false,
+      status === 'published',
+    );
+
     const payloadWithoutSystem = stripSystemFields(payload);
+    this.assertWritablePayloadKeys(
+      Object.keys(payloadWithoutSystem),
+      collectionSchema.fields,
+      opts?.auth,
+    );
+
     const validated = validatePayload(
       payloadWithoutSystem,
       collectionSchema.fields,
@@ -436,7 +507,7 @@ export class ContentService {
     collection: string,
     id: string,
     payload: Record<string, unknown>,
-    opts?: { editorUserId?: string | null },
+    opts?: { editorUserId?: string | null; auth?: FountainAuthRequest },
   ) {
     const collectionSchema = this.schema.collections[collection];
 
@@ -512,6 +583,13 @@ export class ContentService {
 
     const incomingStatus = parseStatus(payload.status);
     const status = incomingStatus ?? (existing.status as ContentStatus);
+    await this.ensurePublishTransitionAllowed(
+      opts?.auth,
+      collection,
+      existing.status === 'published',
+      status === 'published',
+    );
+
     let publishedAt: Date | null = existing.publishedAt;
     if (status === 'published' && !existing.publishedAt) {
       publishedAt = new Date();
@@ -520,6 +598,11 @@ export class ContentService {
     }
 
     const payloadWithoutSystem = stripSystemFields(payload);
+    this.assertWritablePayloadKeys(
+      Object.keys(payloadWithoutSystem),
+      collectionSchema.fields,
+      opts?.auth,
+    );
     const existingData = assertObject(existing.data);
     const merged = {
       ...existingData,
@@ -609,7 +692,7 @@ export class ContentService {
     collection: string,
     id: string,
     version: number,
-    opts?: { editorUserId?: string | null },
+    opts?: { editorUserId?: string | null; auth?: FountainAuthRequest },
   ) {
     const collectionSchema = this.schema.collections[collection];
 
@@ -635,10 +718,25 @@ export class ContentService {
       throw new NotFoundException('Revision not found');
     }
 
-    const validated = validatePayload(
+    await this.ensurePublishTransitionAllowed(
+      opts?.auth,
+      collection,
+      existing.status === 'published',
+      revision.status === 'published',
+    );
+
+    let validated = validatePayload(
       assertObject(revision.data),
       collectionSchema.fields,
     ) as Prisma.InputJsonValue;
+
+    if (!this.isSuperAdminPrincipal(opts?.auth)) {
+      validated = this.preserveReadonlyFields(
+        validated as Record<string, unknown>,
+        assertObject(existing.data),
+        collectionSchema.fields,
+      ) as Prisma.InputJsonValue;
+    }
 
     await this.validateMediaReferences(
       validated as Record<string, unknown>,

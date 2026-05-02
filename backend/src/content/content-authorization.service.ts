@@ -13,12 +13,28 @@ import {
 
 const SUPER_ADMIN_ROLE = 'Super Admin';
 
-const HTTP_METHOD_FOR_OPERATION: Record<ContentOperation, string> = {
+const HTTP_METHOD_FOR_OPERATION: Record<
+  Exclude<ContentOperation, 'publish'>,
+  string
+> = {
   read: 'GET',
   create: 'POST',
   update: 'PATCH',
   delete: 'DELETE',
 };
+
+function formatMissingContentPermission(
+  collection: string,
+  operation: ContentOperation,
+): string {
+  if (operation === 'publish') {
+    return `${collection}:publish`;
+  }
+  return getRequiredContentPermission(
+    collection,
+    HTTP_METHOD_FOR_OPERATION[operation],
+  );
+}
 
 @Injectable()
 export class ContentAuthorizationService {
@@ -55,10 +71,7 @@ export class ContentAuthorizationService {
       ) {
         return;
       }
-      const required = getRequiredContentPermission(
-        collection,
-        HTTP_METHOD_FOR_OPERATION[operation],
-      );
+      const required = formatMissingContentPermission(collection, operation);
       throw new ForbiddenException(`Permission denied: missing ${required}`);
     }
 
@@ -87,10 +100,7 @@ export class ContentAuthorizationService {
       return;
     }
 
-    const required = getRequiredContentPermission(
-      collection,
-      HTTP_METHOD_FOR_OPERATION[operation],
-    );
+    const required = formatMissingContentPermission(collection, operation);
     throw new ForbiddenException(`Permission denied: missing ${required}`);
   }
 }

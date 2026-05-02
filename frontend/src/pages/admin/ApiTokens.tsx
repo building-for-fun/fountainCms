@@ -31,7 +31,7 @@ export default function ApiTokens() {
   const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
-  const [newPermissions, setNewPermissions] = useState('posts:read\nposts:create');
+  const [newPermissions, setNewPermissions] = useState('posts:read\nposts:create\nposts:publish');
   const [newExpiresAt, setNewExpiresAt] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [revealedSecret, setRevealedSecret] = useState<{
@@ -80,7 +80,7 @@ export default function ApiTokens() {
       setRevealedSecret({ token: res.token, meta: res.meta });
       setShowCreate(false);
       setNewName('');
-      setNewPermissions('posts:read\nposts:create');
+      setNewPermissions('posts:read\nposts:create\nposts:publish');
       setNewExpiresAt('');
       showToast('API token created.', 'success');
     } catch {
@@ -183,11 +183,11 @@ export default function ApiTokens() {
               }}
               value={newPermissions}
               onChange={(ev) => setNewPermissions(ev.target.value)}
-              placeholder={'posts:read\nposts:create'}
+              placeholder={'posts:read\nposts:create\nposts:publish'}
             />
             <p style={{ margin: '0 0 1rem', fontSize: 12, color: 'var(--color-text-muted)' }}>
               Same format as roles: <code>collection:operation</code> (create, read, update,
-              delete), wildcards <code>posts:*</code> or <code>*:*</code>.
+              publish, delete), wildcards <code>posts:*</code> or <code>*:*</code>.
             </p>
             <label style={{ display: 'block', marginBottom: '0.35rem', fontWeight: 600 }}>
               Expires (optional)
