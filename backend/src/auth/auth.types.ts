@@ -18,6 +18,8 @@ export interface JwtPayload {
   role: string | null;
   iat?: number;
   exp?: number;
+  /** When present, authorisation uses these instead of the user's role (API token auth). */
+  apiTokenPermissions?: string[];
 }
 
 export interface AuthConfigResponse {

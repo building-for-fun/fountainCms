@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SchemaModule } from './schema/schema.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { MediaModule } from './media/media.module';
+import { ApiTokensModule } from './api-tokens/api-tokens.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MediaModule } from './media/media.module';
     }),
     PrismaModule,
     AuthModule,
+    ApiTokensModule,
     ContentModule,
     RolesModule,
     UserModule,

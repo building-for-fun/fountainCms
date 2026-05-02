@@ -3,6 +3,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import UsersList from '../../pages/admin/UsersList';
+import { api } from '../../api/client';
+
+vi.mock('../../api/client', () => ({
+  api: vi.fn(),
+}));
+
+const mockApi = vi.mocked(api);
 
 // Mock the AdminLayout component
 vi.mock('../../components/Layouts/AdminLayout', () => ({
@@ -56,10 +63,15 @@ const mockUsers = [
   },
 ];
 
+/** UsersList loads `/user` and `/roles` on mount; tests must satisfy both. */
+function mockUserAndRolesRoutes(impl: (path: string) => Promise<unknown>): void {
+  mockApi.mockImplementation((path: string) => impl(path));
+}
+
 describe('UsersList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
+    mockApi.mockReset();
   });
 
   const renderWithRouter = (component: React.ReactElement) => {
@@ -67,7 +79,7 @@ describe('UsersList', () => {
   };
 
   it('should show loading state initially', () => {
-    (global.fetch as any).mockImplementation(
+    mockApi.mockImplementation(
       () =>
         new Promise(() => {
           /* never resolves */
@@ -80,9 +92,10 @@ describe('UsersList', () => {
   });
 
   it('should display users when fetch is successful', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: mockUsers }),
+    mockUserAndRolesRoutes(async (path) => {
+      if (path === '/roles') return { data: [] };
+      if (path === '/user') return { data: mockUsers };
+      throw new Error(`unexpected path: ${path}`);
     });
 
     renderWithRouter(<UsersList />);
@@ -97,7 +110,11 @@ describe('UsersList', () => {
   });
 
   it('should show error state when fetch fails', async () => {
-    (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+    mockUserAndRolesRoutes(async (path) => {
+      if (path === '/roles') return { data: [] };
+      if (path === '/user') throw new Error('Network error');
+      throw new Error(`unexpected path: ${path}`);
+    });
 
     renderWithRouter(<UsersList />);
 
@@ -109,9 +126,10 @@ describe('UsersList', () => {
   });
 
   it('should show empty state when no users exist', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: [] }),
+    mockUserAndRolesRoutes(async (path) => {
+      if (path === '/roles') return { data: [] };
+      if (path === '/user') return { data: [] };
+      throw new Error(`unexpected path: ${path}`);
     });
 
     renderWithRouter(<UsersList />);
@@ -125,20 +143,22 @@ describe('UsersList', () => {
 
   it('should retry fetch when retry button is clicked', async () => {
     const user = userEvent.setup();
+    let userCalls = 0;
 
-    // First call fails
-    (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+    mockApi.mockImplementation(async (path: string) => {
+      if (path === '/roles') return { data: [] };
+      if (path === '/user') {
+        userCalls += 1;
+        if (userCalls === 1) throw new Error('Network error');
+        return { data: mockUsers };
+      }
+      throw new Error(`unexpected path: ${path}`);
+    });
 
     renderWithRouter(<UsersList />);
 
     await waitFor(() => {
       expect(screen.getByTestId('error')).toBeInTheDocument();
-    });
-
-    // Second call succeeds
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: mockUsers }),
     });
 
     const retryButton = screen.getByRole('button', { name: /retry/i });
@@ -150,10 +170,10 @@ describe('UsersList', () => {
   });
 
   it('should handle HTTP error responses', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error',
+    mockUserAndRolesRoutes(async (path) => {
+      if (path === '/roles') return { data: [] };
+      if (path === '/user') throw { message: 'Internal Server Error', statusCode: 500 };
+      throw new Error(`unexpected path: ${path}`);
     });
 
     renderWithRouter(<UsersList />);
@@ -164,9 +184,10 @@ describe('UsersList', () => {
   });
 
   it('should render user links correctly', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: mockUsers }),
+    mockUserAndRolesRoutes(async (path) => {
+      if (path === '/roles') return { data: [] };
+      if (path === '/user') return { data: mockUsers };
+      throw new Error(`unexpected path: ${path}`);
     });
 
     renderWithRouter(<UsersList />);
@@ -188,9 +209,10 @@ describe('UsersList', () => {
       permissions: [],
     };
 
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: [incompleteUser] }),
+    mockUserAndRolesRoutes(async (path) => {
+      if (path === '/roles') return { data: [] };
+      if (path === '/user') return { data: [incompleteUser] };
+      throw new Error(`unexpected path: ${path}`);
     });
 
     renderWithRouter(<UsersList />);

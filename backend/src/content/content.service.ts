@@ -123,7 +123,11 @@ export class ContentService {
     };
   }
 
-  async findOne(collection: string, id: string) {
+  async findOne(
+    collection: string,
+    id: string,
+    opts?: { anonymous?: boolean },
+  ) {
     const collectionSchema = this.schema.collections[collection];
 
     if (!collectionSchema) {
@@ -133,6 +137,10 @@ export class ContentService {
     const item = await this.contentRepository.findById(collection, id);
 
     if (!item) {
+      throw new NotFoundException('Content item not found');
+    }
+
+    if (opts?.anonymous && item.status !== 'published') {
       throw new NotFoundException('Content item not found');
     }
 

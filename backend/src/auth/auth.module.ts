@@ -9,11 +9,13 @@ import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { OAuth2Service } from './oauth2.service';
 import { SamlService } from './saml.service';
+import { ApiTokensModule } from '../api-tokens/api-tokens.module';
 
 const config = getAuthConfig();
 
 @Module({
   imports: [
+    ApiTokensModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: config.jwt.secret,

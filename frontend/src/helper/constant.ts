@@ -15,7 +15,8 @@ export const SETUP_STEPS_TEXT = [
 
 export const GETTING_STARTED = `
 FountainCMS lets you manage content via REST APIs for JAMstack and modern web apps.
-Content is exposed under /api/content/collections/:collection — use your content type name (e.g. posts, pages) as the collection. All content APIs require JWT authentication.
+Content is exposed under /api/content/collections/:collection — use your content type name (e.g. posts, pages) as the collection.
+Unauthenticated GET requests return published entries only. Authenticated users (JWT cookie or Bearer) and optional API tokens (Bearer or X-Api-Key, created in Admin → API tokens) can read drafts and mutate content according to permissions.
 `;
 
 export const INSTALLATION_STEPS = [

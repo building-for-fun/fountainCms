@@ -105,3 +105,16 @@ model AuditLog {
   @@index([userId])
   @@index([createdAt])
 }
+
+/// Opaque machine credentials for the Content API (same permission strings as roles, e.g. posts:read, *:*).
+model ApiToken {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String    @db.VarChar(255)
+  tokenHash   String    @unique @db.VarChar(128)
+  permissions String[]
+  expiresAt   DateTime? @db.Timestamp(6)
+  createdAt   DateTime  @default(now())
+
+  @@index([expiresAt])
+  @@map("api_tokens")
+}

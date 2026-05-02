@@ -20,6 +20,7 @@ import { Navigate } from 'react-router-dom';
 import ProfilePage from './pages/admin/ProfilePage';
 import Home from './pages/admin/Home';
 import UserDetails from './pages/admin/UserDetails';
+import ApiTokens from './pages/admin/ApiTokens';
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
               <Route path="media" element={<MediaLibrary />} />
               <Route path="settings" element={<Settings />} />
               <Route path="roles" element={<Roles />} />
+              <Route path="api-tokens" element={<ApiTokens />} />
               <Route path="logs" element={<AuditLogs />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="content/:collection" element={<ContentEntries />} />

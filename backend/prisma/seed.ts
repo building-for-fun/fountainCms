@@ -133,6 +133,6 @@ async function main() {
   await prisma.$disconnect();
 }
 
-main().catch(async (e) => {
+main().catch(async (e: Error) => {
   await prisma.$disconnect();
 });

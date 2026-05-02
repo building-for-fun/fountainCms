@@ -10,6 +10,7 @@ const adminNavItems = [
   { to: '/admin/media', icon: '🖼️', label: 'Media' },
   { to: '/admin/settings', icon: '⚙️', label: 'Settings' },
   { to: '/admin/roles', icon: '🔑', label: 'Roles' },
+  { to: '/admin/api-tokens', icon: '🔐', label: 'API tokens' },
   { to: '/admin/logs', icon: '📜', label: 'Logs' },
   { to: '/admin/profile', icon: '🙍‍♂️', label: 'Profile' },
 ];
