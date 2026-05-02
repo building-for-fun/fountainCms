@@ -26,7 +26,7 @@
     "seed": "ts-node --project tsconfig.json prisma/seed.ts"
   },
   "dependencies": {
-    "@apollo/server": "^4.13.0",
+    "@apollo/server": "^5.5.0",
     "@nestjs/apollo": "^13.4.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
