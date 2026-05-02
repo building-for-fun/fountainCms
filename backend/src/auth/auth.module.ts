@@ -10,6 +10,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { OAuth2Service } from './oauth2.service';
 import { SamlService } from './saml.service';
 import { ApiTokensModule } from '../api-tokens/api-tokens.module';
+import { AuthApplyService } from './auth-apply.service';
 
 const config = getAuthConfig();
 
@@ -25,11 +26,12 @@ const config = getAuthConfig();
   controllers: [AuthController],
   providers: [
     AuthService,
+    AuthApplyService,
     JwtStrategy,
     OAuth2Service,
     SamlService,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, AuthApplyService, JwtModule],
 })
 export class AuthModule {}

@@ -26,9 +26,12 @@
     "seed": "ts-node --project tsconfig.json prisma/seed.ts"
   },
   "dependencies": {
+    "@apollo/server": "^4.13.0",
+    "@nestjs/apollo": "^13.4.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/graphql": "^13.4.0",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
@@ -40,6 +43,8 @@
     "class-validator": "^0.14.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
+    "graphql": "^16.13.2",
+    "graphql-scalars": "^1.25.0",
     "nest-winston": "^1.10.2",
     "openid-client": "^6.8.2",
     "passport": "^0.7.0",

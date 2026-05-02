@@ -11,6 +11,7 @@ import { SchemaModule } from './schema/schema.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { MediaModule } from './media/media.module';
 import { ApiTokensModule } from './api-tokens/api-tokens.module';
+import { FountainGraphqlModule } from './graphql/graphql.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ApiTokensModule } from './api-tokens/api-tokens.module';
     AuthModule,
     ApiTokensModule,
     ContentModule,
+    FountainGraphqlModule,
     RolesModule,
     UserModule,
     SchemaModule,
