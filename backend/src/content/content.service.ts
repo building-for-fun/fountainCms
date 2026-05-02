@@ -16,6 +16,7 @@ import {
   pickContentFields,
   firstQueryValue,
 } from './content-query.util';
+import { WebhookDispatchService } from '../webhooks/webhook-dispatch.service';
 
 const SYSTEM_KEYS = [
   'status',
@@ -76,6 +77,7 @@ export class ContentService {
     private readonly prisma: PrismaService,
     private readonly contentRepository: ContentRepository,
     private readonly schemaService: SchemaService,
+    private readonly webhookDispatch: WebhookDispatchService,
   ) {}
 
   /** Schema is loaded at app startup via APP_INITIALIZER; first use is after that. */
@@ -377,8 +379,11 @@ export class ContentService {
       translationGroupId,
     );
 
+    const data = this.toItemResponse(item) as Record<string, unknown>;
+    this.webhookDispatch.emitContentEntryCreated(collection, data);
+
     return {
-      data: this.toItemResponse(item),
+      data,
     };
   }
 
@@ -570,8 +575,11 @@ export class ContentService {
       });
     });
 
+    const data = this.toItemResponse(updated) as Record<string, unknown>;
+    this.webhookDispatch.emitContentEntryUpdated(collection, data);
+
     return {
-      data: this.toItemResponse(updated),
+      data,
     };
   }
 
@@ -676,8 +684,11 @@ export class ContentService {
       });
     });
 
+    const data = this.toItemResponse(updated) as Record<string, unknown>;
+    this.webhookDispatch.emitContentEntryUpdated(collection, data);
+
     return {
-      data: this.toItemResponse(updated),
+      data,
     };
   }
 
@@ -688,11 +699,21 @@ export class ContentService {
       throw new NotFoundException('Collection not found');
     }
 
+    const existing = await this.contentRepository.findById(collection, id);
+
+    if (!existing) {
+      throw new NotFoundException('Content item not found');
+    }
+
+    const snapshot = this.toItemResponse(existing) as Record<string, unknown>;
+
     const result = await this.contentRepository.delete(collection, id);
 
     if (result.count === 0) {
       throw new NotFoundException('Content item not found');
     }
+
+    this.webhookDispatch.emitContentEntryDeleted(collection, snapshot);
 
     return {
       success: true,

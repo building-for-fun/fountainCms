@@ -21,6 +21,7 @@ import ProfilePage from './pages/admin/ProfilePage';
 import Home from './pages/admin/Home';
 import UserDetails from './pages/admin/UserDetails';
 import ApiTokens from './pages/admin/ApiTokens';
+import Webhooks from './pages/admin/Webhooks';
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
               <Route path="settings" element={<Settings />} />
               <Route path="roles" element={<Roles />} />
               <Route path="api-tokens" element={<ApiTokens />} />
+              <Route path="webhooks" element={<Webhooks />} />
               <Route path="logs" element={<AuditLogs />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="content/:collection" element={<ContentEntries />} />

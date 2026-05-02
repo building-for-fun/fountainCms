@@ -41,7 +41,7 @@ export class MediaServeAuthGuard implements CanActivate {
     }
 
     const query = req.query as Record<string, string | string[] | undefined>;
-    if (verifyMediaFileRequest(id, query, secret!)) {
+    if (verifyMediaFileRequest(id, query, secret)) {
       return true;
     }
 

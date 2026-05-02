@@ -78,7 +78,7 @@ export class ContentGraphqlResolver {
       anonymous: anon,
       query,
     });
-    return res.data as Record<string, unknown>;
+    return res.data;
   }
 
   @Mutation(() => GraphQLJSONObject, { name: 'createCollectionItem' })
@@ -89,7 +89,7 @@ export class ContentGraphqlResolver {
     data: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
     const res = await this.content.create(collection, data);
-    return res.data as Record<string, unknown>;
+    return res.data;
   }
 
   @Mutation(() => GraphQLJSONObject, { name: 'updateCollectionItem' })
@@ -104,7 +104,7 @@ export class ContentGraphqlResolver {
     const res = await this.content.update(collection, id, data, {
       editorUserId: ctx.req.user?.sub ?? null,
     });
-    return res.data as Record<string, unknown>;
+    return res.data;
   }
 
   @Mutation(() => DeleteContentResultGql, { name: 'deleteCollectionItem' })

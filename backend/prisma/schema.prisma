@@ -161,3 +161,19 @@ model ApiToken {
   @@index([expiresAt])
   @@map("api_tokens")
 }
+
+/// Outbound HTTP hooks (Super Admin–managed). Secret is stored for HMAC signing of delivered payloads.
+model WebhookSubscription {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @db.VarChar(255)
+  url         String   @db.VarChar(2048)
+  secret      String   @db.VarChar(255)
+  events      String[]
+  collections String[] @default([])
+  headers     Json?
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("webhook_subscriptions")
+}

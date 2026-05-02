@@ -6,9 +6,10 @@ import { ContentPermissionGuard } from './guards/content-permission.guard';
 import { ContentAuthorizationService } from './content-authorization.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { SchemaModule } from '../schema/schema.module';
+import { WebhooksModule } from '../webhooks/webhooks.module';
 
 @Module({
-  imports: [PrismaModule, SchemaModule],
+  imports: [PrismaModule, SchemaModule, WebhooksModule],
   controllers: [ContentController],
   providers: [
     ContentService,

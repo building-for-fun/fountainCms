@@ -11,6 +11,7 @@ const adminNavItems = [
   { to: '/admin/settings', icon: '⚙️', label: 'Settings' },
   { to: '/admin/roles', icon: '🔑', label: 'Roles' },
   { to: '/admin/api-tokens', icon: '🔐', label: 'API tokens' },
+  { to: '/admin/webhooks', icon: '⚡', label: 'Webhooks' },
   { to: '/admin/logs', icon: '📜', label: 'Logs' },
   { to: '/admin/profile', icon: '🙍‍♂️', label: 'Profile' },
 ];
