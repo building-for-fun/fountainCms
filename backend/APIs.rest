@@ -12,11 +12,11 @@ GET http://localhost:4000/api/user
 
 #### swagger ui
 
-Swagger UI URL: http://localhost:4000/api
+Swagger UI URL: http://localhost:4000/api/docs
 
 ###
 
-GET http://localhost:4000/api/content/collection/{{collection}}
+GET http://localhost:4000/api/content/collections/{{collection}}
 accept: */*
 
 ###

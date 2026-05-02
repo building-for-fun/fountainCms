@@ -44,10 +44,13 @@ Create a client
 ```typescript
 import { FountainClient } from '@fountaincms/sdk';
 
+// Include `/api` — paths match Nest’s global prefix (see backend main.ts).
 const client = new FountainClient({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'http://localhost:4000/api',
 });
 ```
+
+OpenAPI UI when developing locally: `http://localhost:4000/api/docs`.
 
 🔐 Authentication
 Login
@@ -105,16 +108,27 @@ await client.content.remove('posts', 'post-id');
 
 ```typescript
 const client = new FountainClient({
-  baseURL: 'https://api.mycms.com',
+  baseURL: 'https://api.mycms.com/api',
   token: 'optional-static-token',
+  // apiKey: 'fcm_…', // alternative to Bearer
+  // withCredentials: true, // default; use HttpOnly cookie auth from browser
 });
 ```
 
-|         |        |                            |
-| ------- | ------ | -------------------------- |
-| Option  | Type   | Description                |
-| baseURL | string | FountainCMS API base URL   |
-| token   | string | Optional static auth token |
+| Option | Type | Description |
+| ------ | ---- | ----------- |
+| `baseURL` | string | Origin + `/api` (all SDK paths are under this). |
+| `token` | string | `Authorization: Bearer` (JWT or `fcm_*` API token). |
+| `apiKey` | string | Same token via `X-Api-Key`. |
+| `withCredentials` | boolean | Send cookies (default `true`; needed for browser login). |
+
+### GraphQL
+
+```typescript
+const { data, errors } = await client.graphql.request({
+  query: `query { contentCollection(collection: "posts") { data { id } } } }`,
+});
+```
 
 🧠 Design Philosophy
 

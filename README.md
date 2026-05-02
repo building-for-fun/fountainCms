@@ -311,10 +311,10 @@ npm run dev:backend
 
 ## 📚 API Documentation (Swagger)
 
-Once the backend is running:
+Once the backend is running (global prefix `api`, Swagger path `docs`):
 
 ```
-http://localhost:4000/api-docs
+http://localhost:4000/api/docs
 ```
 
 ---

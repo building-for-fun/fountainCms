@@ -10,9 +10,14 @@ The project follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Initial SDK architecture
-- Client abstraction design
-- Release roadmap
+- Content `create`, `update`, `remove`, `listRevisions`, `restoreRevision`
+- `graphql.request` for `POST /graphql`
+- `ContentListParams` with object `filter` JSON serialization
+- `withCredentials` option (default `true`) for cookie-based auth
+
+### Fixed
+
+- Documentation: `baseURL` must include `/api`; OpenAPI UI at `/api/docs`
 
 ---
 
