@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client';
 import type { FieldSchema } from '../schema/schema.types';
+import { normalizeDatetimeToIso } from '../utils/content.util';
 
 export const MAX_LIMIT = 100;
 
@@ -14,6 +15,8 @@ export interface ParsedListQuery {
   filterAnd: Prisma.ContentItemWhereInput[];
   /** Null = full payload; otherwise only these schema field keys (plus id, status, published_at). */
   fieldPick: string[] | null;
+  /** Relation field names to expand (`*` / `all` = every relation field). */
+  populate: string[] | null;
 }
 
 export function firstQueryValue(
@@ -138,12 +141,7 @@ function coerceFilterValue(
     }
 
     case 'datetime':
-      if (typeof value !== 'string' || !value.trim()) {
-        throw new BadRequestException(
-          `Filter for '${fieldName}' must be a non-empty string (e.g. ISO-8601)`,
-        );
-      }
-      return value;
+      return normalizeDatetimeToIso(value, fieldName);
 
     default:
       throw new BadRequestException(
@@ -189,6 +187,33 @@ export function buildJsonFilterConditions(
   return conditions;
 }
 
+export function parsePopulate(
+  raw: string | undefined,
+  schemaFields: Record<string, FieldSchema>,
+): string[] | null {
+  if (!raw?.trim()) return null;
+  const s = raw.trim().toLowerCase();
+  if (s === '*' || s === 'all') {
+    return Object.entries(schemaFields)
+      .filter(([, f]) => f.type === 'relation')
+      .map(([name]) => name);
+  }
+  const names = raw
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean);
+  if (names.length === 0) return null;
+  for (const n of names) {
+    const f = schemaFields[n];
+    if (!f || f.type !== 'relation') {
+      throw new BadRequestException(
+        `populate: '${n}' is not a relation field on this collection`,
+      );
+    }
+  }
+  return names;
+}
+
 export function parseFieldsList(
   raw: string | undefined,
   schemaFields: Record<string, FieldSchema>,
@@ -222,8 +247,12 @@ export function parseContentListQuery(
     firstQueryValue(raw, 'fields'),
     schemaFields,
   );
+  const populate = parsePopulate(
+    firstQueryValue(raw, 'populate'),
+    schemaFields,
+  );
 
-  return { limit, offset, sort, filterAnd, fieldPick };
+  return { limit, offset, sort, filterAnd, fieldPick, populate };
 }
 
 export function pickContentFields(

@@ -43,6 +43,12 @@ export class ContentController {
     required: false,
     description: 'Comma-separated schema fields to include in each item',
   })
+  @ApiQuery({
+    name: 'populate',
+    required: false,
+    description:
+      'Comma-separated relation field names to expand, or * / all for every relation field',
+  })
   getMany(
     @Req() req: Request,
     @Param('collection') collection: string,
@@ -53,19 +59,30 @@ export class ContentController {
     const publishedOnly = anon ? true : statusVal === 'published';
     return this.contentService.findMany(collection, {
       publishedOnly,
+      anonymous: anon,
       query,
     });
   }
 
   @Get(':collection/:id')
   @AllowAnonymousPublishedRead()
+  @ApiQuery({
+    name: 'populate',
+    required: false,
+    description:
+      'Comma-separated relation field names to expand, or * / all for every relation field',
+  })
   getOne(
     @Req() req: Request,
     @Param('collection') collection: string,
     @Param('id') id: string,
+    @Query() query: Record<string, string | string[] | undefined>,
   ) {
     const anon = req.anonymousContentRead === true;
-    return this.contentService.findOne(collection, id, { anonymous: anon });
+    return this.contentService.findOne(collection, id, {
+      anonymous: anon,
+      query,
+    });
   }
 
   @Post(':collection')

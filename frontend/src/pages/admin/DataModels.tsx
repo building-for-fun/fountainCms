@@ -167,6 +167,11 @@ const DataModels = () => {
     },
   });
 
+  const collectionKeys = useMemo(
+    () => (schema ? Object.keys(schema.collections).sort() : []),
+    [schema]
+  );
+
   const collections = useMemo(() => {
     if (!schema) return [];
     let list = Object.entries((schema as AppSchema).collections).map(([key, col]) => ({
@@ -220,6 +225,7 @@ const DataModels = () => {
         required: f.required,
         default: f.default,
         options: f.options,
+        relationCollection: f.relationCollection,
         readonly: f.readonly,
       })),
     });
@@ -228,24 +234,37 @@ const DataModels = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const normalizedFields = form.fields
+      .filter((f) => f.name.trim())
+      .map((f) => {
+        const name = f.name.trim();
+        const base: ContentTypeFieldInput = {
+          name,
+          type: f.type,
+          required: f.required,
+          default: f.default,
+          options: f.options,
+          readonly: f.readonly,
+        };
+        if (f.type === 'relation' && f.relationCollection?.trim()) {
+          base.relationCollection = f.relationCollection.trim();
+        }
+        return base;
+      });
+
     if (modalMode === 'create') {
       createMutation.mutate({
         ...form,
         name: form.name.trim(),
         label: form.label?.trim() || undefined,
-        fields: form.fields.filter((f) => f.name.trim()),
+        fields: normalizedFields,
       });
     } else if (modalMode === 'edit' && editingKey) {
       updateMutation.mutate({
         name: editingKey,
         data: {
           label: form.label?.trim() || undefined,
-          fields: form.fields
-            .filter((f) => f.name.trim())
-            .map((f) => ({
-              ...f,
-              name: f.name.trim(),
-            })),
+          fields: normalizedFields,
         },
       });
     }
@@ -440,42 +459,73 @@ const DataModels = () => {
                   {form.fields.map((field, idx) => (
                     <div
                       key={idx}
-                      className="flex flex-wrap items-start gap-2 p-3 border border-border rounded-lg bg-background"
+                      className="p-3 border border-border rounded-lg bg-background space-y-2"
                     >
-                      <input
-                        type="text"
-                        placeholder="Field name"
-                        value={field.name}
-                        onChange={(e) => updateField(idx, { name: e.target.value })}
-                        className="flex-1 min-w-[100px] px-3 py-2 border border-border rounded text-sm font-mono"
-                      />
-                      <select
-                        value={field.type}
-                        onChange={(e) => updateField(idx, { type: e.target.value as FieldType })}
-                        className="px-3 py-2 border border-border rounded text-sm"
-                      >
-                        {FIELD_TYPES.map((t) => (
-                          <option key={t} value={t}>
-                            {t}
-                          </option>
-                        ))}
-                      </select>
-                      <label className="flex items-center gap-1 text-sm text-text-muted whitespace-nowrap">
+                      <div className="flex flex-wrap items-start gap-2">
                         <input
-                          type="checkbox"
-                          checked={field.required ?? false}
-                          onChange={(e) => updateField(idx, { required: e.target.checked })}
+                          type="text"
+                          placeholder="Field name"
+                          value={field.name}
+                          onChange={(e) => updateField(idx, { name: e.target.value })}
+                          className="flex-1 min-w-[100px] px-3 py-2 border border-border rounded text-sm font-mono"
                         />
-                        Required
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => removeField(idx)}
-                        className="text-error text-sm"
-                        aria-label="Remove field"
-                      >
-                        Remove
-                      </button>
+                        <select
+                          value={field.type}
+                          onChange={(e) => {
+                            const type = e.target.value as FieldType;
+                            updateField(idx, {
+                              type,
+                              ...(type === 'relation' ? {} : { relationCollection: undefined }),
+                            });
+                          }}
+                          className="px-3 py-2 border border-border rounded text-sm"
+                        >
+                          {FIELD_TYPES.map((t) => (
+                            <option key={t} value={t}>
+                              {t}
+                            </option>
+                          ))}
+                        </select>
+                        <label className="flex items-center gap-1 text-sm text-text-muted whitespace-nowrap">
+                          <input
+                            type="checkbox"
+                            checked={field.required ?? false}
+                            onChange={(e) => updateField(idx, { required: e.target.checked })}
+                          />
+                          Required
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => removeField(idx)}
+                          className="text-error text-sm"
+                          aria-label="Remove field"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      {field.type === 'relation' && (
+                        <div>
+                          <label className="block text-xs font-medium text-text-muted mb-1">
+                            Related collection
+                          </label>
+                          <select
+                            value={field.relationCollection ?? ''}
+                            onChange={(e) =>
+                              updateField(idx, {
+                                relationCollection: e.target.value || undefined,
+                              })
+                            }
+                            className="w-full max-w-md px-3 py-2 border border-border rounded text-sm font-mono bg-background text-text"
+                          >
+                            <option value="">Select target collection…</option>
+                            {collectionKeys.map((k) => (
+                              <option key={k} value={k}>
+                                {k}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

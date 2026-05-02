@@ -21,6 +21,8 @@ export interface ContentTypeFieldInput {
   required?: boolean;
   default?: unknown;
   options?: string[];
+  /** Target collection API key when type is `relation` */
+  relationCollection?: string;
   readonly?: boolean;
 }
 

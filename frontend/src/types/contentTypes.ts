@@ -2,6 +2,9 @@ type FieldSchema = {
   type: string;
   required?: boolean;
   default?: unknown;
+  options?: string[];
+  relationCollection?: string;
+  readonly?: boolean;
 };
 
 type CollectionSchema = {

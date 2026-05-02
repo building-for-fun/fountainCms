@@ -32,22 +32,25 @@ export class ContentGraphqlResolver {
     @Args('offset', { nullable: true, type: () => Int }) offset?: number,
     @Args('sort', { nullable: true }) sort?: string,
     @Args('fields', { nullable: true }) fields?: string,
+    @Args('populate', { nullable: true }) populate?: string,
     @Args('filter', { type: () => GraphQLJSONObject, nullable: true })
     filter?: Record<string, unknown>,
   ): Promise<ContentCollectionResultGql> {
     const req = ctx.req;
-    const publishedOnly =
-      req.anonymousContentRead === true ? true : status === 'published';
+    const anon = req.anonymousContentRead === true;
+    const publishedOnly = anon ? true : status === 'published';
     const query = gqlListArgsToQueryRecord({
       status,
       limit,
       offset,
       sort,
       fields,
+      populate,
       filter,
     });
     return this.content.findMany(collection, {
       publishedOnly,
+      anonymous: anon,
       query,
     }) as Promise<ContentCollectionResultGql>;
   }
@@ -61,10 +64,18 @@ export class ContentGraphqlResolver {
     @Context() ctx: { req: FountainAuthRequest },
     @Args('collection') collection: string,
     @Args('id') id: string,
+    @Args('populate', { nullable: true }) populate?: string,
   ): Promise<Record<string, unknown>> {
     const req = ctx.req;
     const anon = req.anonymousContentRead === true;
-    const res = await this.content.findOne(collection, id, { anonymous: anon });
+    const query =
+      populate != null && populate !== ''
+        ? ({ populate } as Record<string, string | string[] | undefined>)
+        : undefined;
+    const res = await this.content.findOne(collection, id, {
+      anonymous: anon,
+      query,
+    });
     return res.data as Record<string, unknown>;
   }
 

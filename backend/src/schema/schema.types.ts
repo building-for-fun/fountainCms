@@ -12,7 +12,10 @@ export interface FieldSchema {
   type: FieldType;
   required?: boolean;
   default?: any;
+  /** Enum choices when `type` is `enum`. */
   options?: string[];
+  /** Target content type name when `type` is `relation` (stored in DB options JSON). */
+  relationCollection?: string;
   readonly?: boolean;
 }
 

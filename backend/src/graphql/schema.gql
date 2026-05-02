@@ -40,10 +40,11 @@ type Query {
     filter: JSONObject
     limit: Int
     offset: Int
+    populate: String
     sort: String
     status: String
   ): ContentCollectionResultGql!
 
   """Single entry by id"""
-  contentItem(collection: String!, id: String!): JSONObject!
+  contentItem(collection: String!, id: String!, populate: String): JSONObject!
 }

@@ -10,6 +10,24 @@ export function assertObject(value: Prisma.JsonValue): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+export function normalizeDatetimeToIso(
+  value: unknown,
+  fieldName: string,
+): string {
+  if (typeof value !== 'string' || !value.trim()) {
+    throw new BadRequestException(
+      `Field '${fieldName}' must be a non-empty ISO-8601 datetime string`,
+    );
+  }
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) {
+    throw new BadRequestException(
+      `Field '${fieldName}' must be a valid datetime string`,
+    );
+  }
+  return d.toISOString();
+}
+
 export function validatePayload(
   payload: Record<string, unknown>,
   fields: Record<string, FieldSchema>,
@@ -91,6 +109,20 @@ export function validatePayload(
             );
           }
           // Existence check is done in ContentService (needs Prisma)
+        }
+        break;
+
+      case 'datetime':
+        result[fieldName] = normalizeDatetimeToIso(value, fieldName);
+        continue;
+
+      case 'relation':
+        if (value !== null && value !== undefined) {
+          if (typeof value !== 'string' || !value.trim()) {
+            throw new BadRequestException(
+              `Field '${fieldName}' must be a related entry ID (string) or null`,
+            );
+          }
         }
         break;
     }

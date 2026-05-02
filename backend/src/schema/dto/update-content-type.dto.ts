@@ -6,6 +6,9 @@ import {
   MaxLength,
   IsBoolean,
   IsIn,
+  ValidateIf,
+  IsNotEmpty,
+  Matches,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { FieldType } from '../schema.types';
@@ -40,6 +43,16 @@ export class UpdateContentTypeFieldDto {
   @IsArray()
   @IsString({ each: true })
   options?: string[];
+
+  @ValidateIf((o: UpdateContentTypeFieldDto) => o.type === 'relation')
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^[a-z][a-z0-9_]*$/, {
+    message:
+      'relationCollection must start with a letter and use lowercase letters, numbers, underscores',
+  })
+  @MaxLength(255)
+  relationCollection?: string;
 
   @IsOptional()
   @IsBoolean()

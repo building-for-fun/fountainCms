@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import {
   parseContentListQuery,
+  parsePopulate,
   parseSort,
   buildJsonFilterConditions,
   MAX_LIMIT,
@@ -13,6 +14,14 @@ const schemaFields = {
   tag: {
     type: 'enum' as const,
     options: ['a', 'b'],
+  },
+};
+
+const relationSchemaFields = {
+  ...schemaFields,
+  authorId: {
+    type: 'relation' as const,
+    relationCollection: 'authors',
   },
 };
 
@@ -65,6 +74,41 @@ describe('content-query.util', () => {
         buildJsonFilterConditions(JSON.stringify({ unknown: 1 }), schemaFields),
       ).toThrow(BadRequestException);
     });
+
+    it('normalizes datetime filter values to ISO', () => {
+      const cond = buildJsonFilterConditions(
+        JSON.stringify({ created: '2024-01-15T00:00:00.000Z' }),
+        {
+          created: { type: 'datetime' as const },
+        },
+      );
+      expect(cond).toHaveLength(1);
+      expect(cond[0]).toMatchObject({
+        data: { path: ['created'], equals: '2024-01-15T00:00:00.000Z' },
+      });
+    });
+  });
+
+  describe('parsePopulate', () => {
+    it('returns null when unset', () => {
+      expect(parsePopulate(undefined, relationSchemaFields)).toBeNull();
+    });
+
+    it('expands * to all relation fields', () => {
+      expect(parsePopulate('*', relationSchemaFields)).toEqual(['authorId']);
+    });
+
+    it('parses comma-separated relation names', () => {
+      expect(parsePopulate('authorId', relationSchemaFields)).toEqual([
+        'authorId',
+      ]);
+    });
+
+    it('rejects non-relation field name', () => {
+      expect(() => parsePopulate('title', relationSchemaFields)).toThrow(
+        BadRequestException,
+      );
+    });
   });
 
   describe('parseContentListQuery', () => {
@@ -79,11 +123,20 @@ describe('content-query.util', () => {
     it('omits limit when not passed', () => {
       const q = parseContentListQuery({}, schemaFields);
       expect(q.limit).toBeUndefined();
+      expect(q.populate).toBeNull();
     });
 
     it('parses fields list', () => {
       const q = parseContentListQuery({ fields: 'title,count' }, schemaFields);
       expect(q.fieldPick).toEqual(['title', 'count']);
+    });
+
+    it('parses populate', () => {
+      const q = parseContentListQuery(
+        { populate: 'authorId' },
+        relationSchemaFields,
+      );
+      expect(q.populate).toEqual(['authorId']);
     });
   });
 });

@@ -8,7 +8,13 @@ import { ContentRepository, type ContentStatus } from './content.repository';
 import { SchemaService } from '../schema/schema.service';
 import { Prisma } from '../generated/prisma/client';
 import { assertObject, validatePayload } from '../utils/content.util';
-import { parseContentListQuery, pickContentFields } from './content-query.util';
+import type { FieldSchema } from '../schema/schema.types';
+import {
+  parseContentListQuery,
+  parsePopulate,
+  pickContentFields,
+  firstQueryValue,
+} from './content-query.util';
 
 const SYSTEM_KEYS = ['status', 'published_at', 'publishedAt'];
 
@@ -57,6 +63,8 @@ export class ContentService {
     collection: string,
     options: {
       publishedOnly: boolean;
+      /** Request is unauthenticated published-only read */
+      anonymous: boolean;
       query: Record<string, string | string[] | undefined>;
     },
   ) {
@@ -102,8 +110,15 @@ export class ContentService {
       return pickContentFields(row, parsed.fieldPick);
     });
 
+    const populated = await this.applyPopulate(
+      rows,
+      collectionSchema.fields,
+      parsed.populate,
+      { anonymous: options.anonymous },
+    );
+
     return {
-      data: rows,
+      data: populated,
       meta: {
         total,
         limit: parsed.limit ?? null,
@@ -111,6 +126,102 @@ export class ContentService {
         sort: `${parsed.sort.field}:${parsed.sort.direction}`,
       },
     };
+  }
+
+  private async validateRelationReferences(
+    data: Record<string, unknown>,
+    fields: Record<string, FieldSchema>,
+  ): Promise<void> {
+    for (const [fieldName, fieldSchema] of Object.entries(fields)) {
+      if (fieldSchema.type !== 'relation') continue;
+      const value = data[fieldName];
+      if (value === null || value === undefined) continue;
+      const targetCollection = fieldSchema.relationCollection?.trim();
+      if (!targetCollection) {
+        throw new BadRequestException(
+          `Schema misconfigured: relation field '${fieldName}' is missing relationCollection`,
+        );
+      }
+      if (!this.schema.collections[targetCollection]) {
+        throw new BadRequestException(
+          `Relation target '${targetCollection}' for field '${fieldName}' is not a defined collection`,
+        );
+      }
+      const rid = String(value).trim();
+      const related = await this.contentRepository.findById(
+        targetCollection,
+        rid,
+      );
+      if (!related) {
+        throw new BadRequestException(
+          `Field '${fieldName}' references missing '${targetCollection}' entry`,
+        );
+      }
+    }
+  }
+
+  private async applyPopulate(
+    rows: Record<string, unknown>[],
+    fields: Record<string, FieldSchema>,
+    populateNames: string[] | null,
+    visibility: { anonymous: boolean },
+  ): Promise<Record<string, unknown>[]> {
+    if (!populateNames?.length) return rows;
+
+    const targets = new Map<string, Set<string>>();
+
+    for (const row of rows) {
+      for (const name of populateNames) {
+        const raw = row[name];
+        if (typeof raw !== 'string' || !raw.trim()) continue;
+        const fs = fields[name];
+        if (fs?.type !== 'relation') continue;
+        const coll = fs.relationCollection?.trim();
+        if (!coll) continue;
+        if (!targets.has(coll)) targets.set(coll, new Set());
+        targets.get(coll)!.add(raw.trim());
+      }
+    }
+
+    const cache = new Map<string, Record<string, unknown> | null>();
+
+    for (const [coll, ids] of targets) {
+      const idList = [...ids];
+      const found = await this.prisma.contentItem.findMany({
+        where: { collection: coll, id: { in: idList } },
+      });
+      const byId = new Map(found.map((i) => [i.id, i]));
+      for (const rid of idList) {
+        const key = `${coll}:${rid}`;
+        const item = byId.get(rid);
+        if (!item) {
+          cache.set(key, null);
+          continue;
+        }
+        if (visibility.anonymous && item.status !== 'published') {
+          cache.set(key, null);
+          continue;
+        }
+        cache.set(key, this.toItemResponse(item) as Record<string, unknown>);
+      }
+    }
+
+    return rows.map((row) => {
+      const out = { ...row };
+      for (const name of populateNames) {
+        const raw = out[name];
+        if (typeof raw !== 'string' || !raw.trim()) continue;
+        const fs = fields[name];
+        if (fs?.type !== 'relation') continue;
+        const coll = fs.relationCollection?.trim();
+        if (!coll) continue;
+        const expanded = cache.get(`${coll}:${raw.trim()}`);
+        if (expanded) {
+          out[name] = expanded;
+        }
+      }
+      return out;
+    });
   }
 
   private async validateMediaReferences(
@@ -150,6 +261,11 @@ export class ContentService {
       collectionSchema.fields,
     );
 
+    await this.validateRelationReferences(
+      validated as Record<string, unknown>,
+      collectionSchema.fields,
+    );
+
     const publishedAt = status === 'published' ? new Date() : null;
     const item = await this.contentRepository.create(
       collection,
@@ -166,7 +282,10 @@ export class ContentService {
   async findOne(
     collection: string,
     id: string,
-    opts?: { anonymous?: boolean },
+    opts?: {
+      anonymous?: boolean;
+      query?: Record<string, string | string[] | undefined>;
+    },
   ) {
     const collectionSchema = this.schema.collections[collection];
 
@@ -184,8 +303,24 @@ export class ContentService {
       throw new NotFoundException('Content item not found');
     }
 
+    const populate = opts?.query
+      ? parsePopulate(
+          firstQueryValue(opts.query, 'populate'),
+          collectionSchema.fields,
+        )
+      : null;
+
+    let data = this.toItemResponse(item) as Record<string, unknown>;
+    const [expanded] = await this.applyPopulate(
+      [data],
+      collectionSchema.fields,
+      populate,
+      { anonymous: !!opts?.anonymous },
+    );
+    data = expanded;
+
     return {
-      data: this.toItemResponse(item),
+      data,
     };
   }
 
@@ -232,6 +367,11 @@ export class ContentService {
     ) as Prisma.InputJsonValue;
 
     await this.validateMediaReferences(
+      validated as Record<string, unknown>,
+      collectionSchema.fields,
+    );
+
+    await this.validateRelationReferences(
       validated as Record<string, unknown>,
       collectionSchema.fields,
     );

@@ -7,6 +7,7 @@ export function gqlListArgsToQueryRecord(args: {
   offset?: number;
   sort?: string;
   fields?: string;
+  populate?: string;
   filter?: Record<string, unknown>;
 }): Record<string, string | string[] | undefined> {
   const q: Record<string, string | string[] | undefined> = {};
@@ -15,6 +16,7 @@ export function gqlListArgsToQueryRecord(args: {
   if (args.offset != null) q.offset = String(args.offset);
   if (args.sort != null && args.sort !== '') q.sort = args.sort;
   if (args.fields != null && args.fields !== '') q.fields = args.fields;
+  if (args.populate != null && args.populate !== '') q.populate = args.populate;
   if (
     args.filter != null &&
     typeof args.filter === 'object' &&

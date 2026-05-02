@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -8,7 +9,9 @@ import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppSchema, FieldSchema } from './schema.types';
 import { CreateContentTypeDto } from './dto/create-content-type.dto';
+import type { CreateContentTypeFieldDto } from './dto/create-content-type.dto';
 import { UpdateContentTypeDto } from './dto/update-content-type.dto';
+import type { UpdateContentTypeFieldDto } from './dto/update-content-type.dto';
 
 @Injectable()
 export class SchemaService implements OnModuleInit {
@@ -48,7 +51,7 @@ export class SchemaService implements OnModuleInit {
               f.default !== undefined
                 ? (f.default as Prisma.InputJsonValue)
                 : undefined,
-            options: f.options as Prisma.InputJsonValue | undefined,
+            options: this.buildStoredOptions(f),
             readonly: f.readonly ?? false,
           })),
         },
@@ -90,7 +93,7 @@ export class SchemaService implements OnModuleInit {
               f.default !== undefined
                 ? (f.default as Prisma.InputJsonValue)
                 : undefined,
-            options: f.options as Prisma.InputJsonValue | undefined,
+            options: this.buildStoredOptions(f),
             readonly: f.readonly ?? false,
           })),
         });
@@ -98,6 +101,52 @@ export class SchemaService implements OnModuleInit {
     }
     await this.loadSchema();
     return { name };
+  }
+
+  private buildStoredOptions(
+    f: CreateContentTypeFieldDto | UpdateContentTypeFieldDto,
+  ): Prisma.InputJsonValue | undefined {
+    if (f.type === 'relation') {
+      const rc = f.relationCollection?.trim();
+      if (!rc) {
+        throw new BadRequestException(
+          `Field '${f.name}': relationCollection is required for relation type`,
+        );
+      }
+      return { relationCollection: rc };
+    }
+    if (f.options?.length) {
+      return f.options as unknown as Prisma.InputJsonValue;
+    }
+    return undefined;
+  }
+
+  private mapStoredOptionsToFieldSchema(
+    raw: unknown,
+  ): Pick<FieldSchema, 'options' | 'relationCollection'> {
+    if (raw == null) return {};
+    if (Array.isArray(raw)) {
+      const opts = raw.filter((x): x is string => typeof x === 'string');
+      return opts.length ? { options: opts } : {};
+    }
+    if (typeof raw === 'object' && !Array.isArray(raw)) {
+      const o = raw as Record<string, unknown>;
+      const out: Pick<FieldSchema, 'options' | 'relationCollection'> = {};
+      if (
+        typeof o.relationCollection === 'string' &&
+        o.relationCollection.trim()
+      ) {
+        out.relationCollection = o.relationCollection.trim();
+      }
+      if (Array.isArray(o.enumValues)) {
+        const opts = o.enumValues.filter(
+          (x): x is string => typeof x === 'string',
+        );
+        if (opts.length) out.options = opts;
+      }
+      return out;
+    }
+    return {};
   }
 
   async deleteContentType(name: string): Promise<{ name: string }> {
@@ -131,12 +180,13 @@ export class SchemaService implements OnModuleInit {
     for (const def of definitions) {
       const fields: Record<string, FieldSchema> = {};
       for (const f of def.fields) {
+        const optMap = this.mapStoredOptionsToFieldSchema(f.options);
         fields[f.name] = {
           type: f.type as FieldSchema['type'],
           required: f.required,
           default: f.defaultValue as FieldSchema['default'],
-          options: f.options as string[] | undefined,
           readonly: f.readonly ?? undefined,
+          ...optMap,
         };
       }
       collections[def.name] = {
