@@ -97,17 +97,33 @@ model ContentItemRevision {
   @@map("content_item_revisions")
 }
 
+model MediaFolder {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String        @db.VarChar(255)
+  parentId  String?       @db.Uuid
+  parent    MediaFolder?  @relation("MediaFolderChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children  MediaFolder[] @relation("MediaFolderChildren")
+  media     Media[]
+  createdAt DateTime      @default(now())
+
+  @@index([parentId])
+  @@map("media_folders")
+}
+
 model Media {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  filename     String   @db.VarChar(512)
-  originalName String   @db.VarChar(512)
-  mimeType     String   @db.VarChar(255)
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  folderId     String?      @db.Uuid
+  folder       MediaFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  filename     String       @db.VarChar(512)
+  originalName String       @db.VarChar(512)
+  mimeType     String       @db.VarChar(255)
   size         Int
-  path         String   @db.VarChar(1024)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  path         String       @db.VarChar(1024)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   @@index([createdAt])
+  @@index([folderId])
   @@map("media")
 }
 

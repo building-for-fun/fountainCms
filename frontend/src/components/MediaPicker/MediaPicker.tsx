@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { listMedia, getMediaFullUrl, getMedia, type MediaItem } from '../../api/media';
+import {
+  listMedia,
+  getMediaFullUrl,
+  getMediaImageThumbnailUrl,
+  getMedia,
+  type MediaItem,
+} from '../../api/media';
 
 interface MediaPickerProps {
   value: string | null | undefined;
@@ -60,9 +66,13 @@ export function MediaPicker({ value, onChange, disabled, className = '' }: Media
         <div className="flex items-center gap-4 p-3 border border-border rounded-lg bg-background">
           {isImage(selectedItem) ? (
             <img
-              src={getMediaFullUrl(selectedItem.url)}
-              alt={selectedItem.originalName}
-              className="h-14 w-14 object-cover rounded"
+              key={selectedItem.id}
+              src={getMediaImageThumbnailUrl(selectedItem.url)}
+              alt=""
+              className="h-14 w-14 object-cover rounded bg-background"
+              onError={(e) => {
+                e.currentTarget.src = getMediaFullUrl(selectedItem.url);
+              }}
             />
           ) : isVideo(selectedItem) ? (
             <video
@@ -71,7 +81,7 @@ export function MediaPicker({ value, onChange, disabled, className = '' }: Media
               muted
             />
           ) : (
-            <div className="h-14 w-14 rounded bg-gray-100 flex items-center justify-center text-gray-500 text-xs">
+            <div className="h-14 w-14 rounded bg-background border border-border flex items-center justify-center text-text-muted text-xs">
               File
             </div>
           )}
@@ -150,9 +160,12 @@ export function MediaPicker({ value, onChange, disabled, className = '' }: Media
                     >
                       {isImage(item) ? (
                         <img
-                          src={getMediaFullUrl(item.url)}
-                          alt={item.originalName}
-                          className="h-20 w-full object-cover rounded mb-1"
+                          src={getMediaImageThumbnailUrl(item.url)}
+                          alt=""
+                          className="h-20 w-full object-cover rounded mb-1 bg-background"
+                          onError={(e) => {
+                            e.currentTarget.src = getMediaFullUrl(item.url);
+                          }}
                         />
                       ) : isVideo(item) ? (
                         <video
@@ -161,7 +174,7 @@ export function MediaPicker({ value, onChange, disabled, className = '' }: Media
                           muted
                         />
                       ) : (
-                        <div className="h-20 w-full rounded mb-1 bg-gray-100 flex items-center justify-center text-gray-500 text-xs">
+                        <div className="h-20 w-full rounded mb-1 bg-background border border-border flex items-center justify-center text-text-muted text-xs">
                           File
                         </div>
                       )}
