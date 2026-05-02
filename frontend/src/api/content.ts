@@ -1,13 +1,38 @@
 import { api } from './client';
 
-export function listItems(collection: string, status?: 'draft' | 'published') {
-  const qs = status ? `?status=${status}` : '';
+export type ContentListMeta = {
+  total: number;
+  limit: number | null;
+  offset: number;
+  sort: string;
+};
+
+export function listItems(
+  collection: string,
+  status?: 'draft' | 'published',
+  listQuery?: {
+    limit?: number;
+    offset?: number;
+    sort?: string;
+    /** JSON.stringify(filterObject) */
+    filter?: string;
+    fields?: string;
+  }
+) {
+  const sp = new URLSearchParams();
+  if (status) sp.set('status', status);
+  if (listQuery?.limit != null) sp.set('limit', String(listQuery.limit));
+  if (listQuery?.offset != null) sp.set('offset', String(listQuery.offset));
+  if (listQuery?.sort) sp.set('sort', listQuery.sort);
+  if (listQuery?.filter) sp.set('filter', listQuery.filter);
+  if (listQuery?.fields) sp.set('fields', listQuery.fields);
+  const qs = sp.toString();
   return api<{
     data: Array<
       { id: string; status?: string; published_at?: string | null } & Record<string, unknown>
     >;
-    meta: { total: number };
-  }>(`/content/collections/${collection}${qs}`);
+    meta: ContentListMeta;
+  }>(`/content/collections/${collection}${qs ? `?${qs}` : ''}`);
 }
 
 export function getItem(collection: string, id: string) {

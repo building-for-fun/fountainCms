@@ -33,7 +33,11 @@ export class FountainClient {
   };
 
   content = {
-    getMany: async (collection: string, params?: Record<string, unknown>) => {
+    /** Query params: status, limit, offset, sort, filter (JSON string), fields */
+    getMany: async (
+      collection: string,
+      params?: Record<string, string | number | boolean | null | undefined>,
+    ) => {
       const res = await this.http.get(`/content/collections/${collection}`, {
         params,
       });

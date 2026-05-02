@@ -8,6 +8,7 @@ import { ContentRepository, type ContentStatus } from './content.repository';
 import { SchemaService } from '../schema/schema.service';
 import { Prisma } from '../generated/prisma/client';
 import { assertObject, validatePayload } from '../utils/content.util';
+import { parseContentListQuery, pickContentFields } from './content-query.util';
 
 const SYSTEM_KEYS = ['status', 'published_at', 'publishedAt'];
 
@@ -52,24 +53,63 @@ export class ContentService {
     };
   }
 
-  async findMany(collection: string, publishedOnly?: boolean) {
+  async findMany(
+    collection: string,
+    options: {
+      publishedOnly: boolean;
+      query: Record<string, string | string[] | undefined>;
+    },
+  ) {
     const collectionSchema = this.schema.collections[collection];
 
     if (!collectionSchema) {
       throw new NotFoundException('Collection not found');
     }
 
-    const statusFilter = publishedOnly
+    const parsed = parseContentListQuery(
+      options.query,
+      collectionSchema.fields,
+    );
+
+    const statusFilter = options.publishedOnly
       ? ('published' as ContentStatus)
       : undefined;
+
+    const orderBy = {
+      [parsed.sort.field]: parsed.sort.direction,
+    } as const;
+
+    const dataAnd = parsed.filterAnd.length > 0 ? parsed.filterAnd : undefined;
+
     const [items, total] = await Promise.all([
-      this.contentRepository.findMany(collection, statusFilter),
-      this.contentRepository.count(collection, statusFilter),
+      this.contentRepository.findMany({
+        collection,
+        status: statusFilter,
+        skip: parsed.offset,
+        take: parsed.limit,
+        orderBy,
+        dataFilterAnd: dataAnd,
+      }),
+      this.contentRepository.count({
+        collection,
+        status: statusFilter,
+        dataFilterAnd: dataAnd,
+      }),
     ]);
 
+    const rows = items.map((item) => {
+      const row = this.toItemResponse(item) as Record<string, unknown>;
+      return pickContentFields(row, parsed.fieldPick);
+    });
+
     return {
-      data: items.map((item) => this.toItemResponse(item)),
-      meta: { total },
+      data: rows,
+      meta: {
+        total,
+        limit: parsed.limit ?? null,
+        offset: parsed.offset,
+        sort: `${parsed.sort.field}:${parsed.sort.direction}`,
+      },
     };
   }
 

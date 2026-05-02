@@ -4,9 +4,38 @@ import { Prisma } from '../generated/prisma/client';
 
 export type ContentStatus = 'draft' | 'published';
 
+export interface FindManyContentParams {
+  collection: string;
+  status?: ContentStatus;
+  skip: number;
+  /** Omit or undefined = no limit (all rows after skip). */
+  take?: number;
+  orderBy: Prisma.ContentItemOrderByWithRelationInput;
+  dataFilterAnd?: Prisma.ContentItemWhereInput[];
+}
+
+export interface CountContentParams {
+  collection: string;
+  status?: ContentStatus;
+  dataFilterAnd?: Prisma.ContentItemWhereInput[];
+}
+
 @Injectable()
 export class ContentRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  private buildWhere(
+    collection: string,
+    status?: ContentStatus,
+    dataFilterAnd?: Prisma.ContentItemWhereInput[],
+  ): Prisma.ContentItemWhereInput {
+    const where: Prisma.ContentItemWhereInput = { collection };
+    if (status) where.status = status;
+    if (dataFilterAnd?.length) {
+      where.AND = dataFilterAnd;
+    }
+    return where;
+  }
 
   async create(
     collection: string,
@@ -24,18 +53,26 @@ export class ContentRepository {
     });
   }
 
-  async findMany(collection: string, status?: ContentStatus) {
-    const where: Prisma.ContentItemWhereInput = { collection };
-    if (status) where.status = status;
+  async findMany(params: FindManyContentParams) {
+    const where = this.buildWhere(
+      params.collection,
+      params.status,
+      params.dataFilterAnd,
+    );
     return this.prisma.contentItem.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: params.orderBy,
+      skip: params.skip,
+      ...(params.take !== undefined ? { take: params.take } : {}),
     });
   }
 
-  async count(collection: string, status?: ContentStatus) {
-    const where: Prisma.ContentItemWhereInput = { collection };
-    if (status) where.status = status;
+  async count(params: CountContentParams) {
+    const where = this.buildWhere(
+      params.collection,
+      params.status,
+      params.dataFilterAnd,
+    );
     return this.prisma.contentItem.count({ where });
   }
 

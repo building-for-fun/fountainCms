@@ -250,7 +250,10 @@ const ContentEntries = () => {
             </select>
           </div>
           <div className="text-sm text-text-muted">
-            Showing {filteredEntries.length} of {data?.data.length ?? 0} entries
+            Showing {filteredEntries.length} of {data?.data.length ?? 0} loaded
+            {data?.meta?.total != null && (
+              <span className="text-text-muted"> · {data.meta.total} total</span>
+            )}
           </div>
         </div>
 

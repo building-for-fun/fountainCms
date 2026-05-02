@@ -30,7 +30,8 @@ export const API_REFERENCES = [
   {
     method: 'GET',
     endpoint: '/api/content/collections/:collection',
-    description: 'List entries for a content type (e.g. posts, pages)',
+    description:
+      'List entries (optional: status, limit, offset, sort, filter as JSON, fields for projection). Omit limit to fetch all.',
   },
   {
     method: 'GET',

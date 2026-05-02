@@ -10,10 +10,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ContentService } from './content.service';
 import { ContentPermissionGuard } from './guards/content-permission.guard';
 import { AllowAnonymousPublishedRead } from '../auth/decorators/allow-anonymous-published.decorator';
+import { firstQueryValue } from './content-query.util';
 
 @Controller('content/collections')
 @UseGuards(ContentPermissionGuard)
@@ -22,14 +24,37 @@ export class ContentController {
 
   @Get(':collection')
   @AllowAnonymousPublishedRead()
+  @ApiOperation({
+    summary: 'List content entries',
+    description:
+      'Optional: limit, offset, sort (createdAt|updatedAt|publishedAt, -field or field:desc), filter (JSON object of field equals), fields (comma-separated projection). Omit limit to return all matches.',
+  })
+  @ApiQuery({ name: 'status', required: false, enum: ['published', 'draft'] })
+  @ApiQuery({ name: 'limit', required: false, example: 20 })
+  @ApiQuery({ name: 'offset', required: false, example: 0 })
+  @ApiQuery({ name: 'sort', required: false, example: '-createdAt' })
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    description: 'JSON object, e.g. {"title":"Hello"}',
+  })
+  @ApiQuery({
+    name: 'fields',
+    required: false,
+    description: 'Comma-separated schema fields to include in each item',
+  })
   getMany(
     @Req() req: Request,
     @Param('collection') collection: string,
-    @Query('status') status?: string,
+    @Query() query: Record<string, string | string[] | undefined>,
   ) {
     const anon = req.anonymousContentRead === true;
-    const publishedOnly = anon ? true : status === 'published';
-    return this.contentService.findMany(collection, publishedOnly);
+    const statusVal = firstQueryValue(query, 'status');
+    const publishedOnly = anon ? true : statusVal === 'published';
+    return this.contentService.findMany(collection, {
+      publishedOnly,
+      query,
+    });
   }
 
   @Get(':collection/:id')
