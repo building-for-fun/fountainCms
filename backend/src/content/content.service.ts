@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ContentRepository, type ContentStatus } from './content.repository';
@@ -19,6 +20,7 @@ import {
 } from './content-query.util';
 import type { FountainAuthRequest } from '../auth/auth-apply.service';
 import { ContentAuthorizationService } from './content-authorization.service';
+import { ExtensionHooksRegistry } from '../extensions/extension-hooks.registry';
 import { WebhookDispatchService } from '../webhooks/webhook-dispatch.service';
 
 const SYSTEM_KEYS = [
@@ -82,6 +84,7 @@ export class ContentService {
     private readonly schemaService: SchemaService,
     private readonly webhookDispatch: WebhookDispatchService,
     private readonly contentAuthorization: ContentAuthorizationService,
+    @Optional() private readonly extensionHooks?: ExtensionHooksRegistry,
   ) {}
 
   /** Schema is loaded at app startup via APP_INITIALIZER; first use is after that. */
@@ -158,6 +161,17 @@ export class ContentService {
       );
     }
     await this.contentAuthorization.ensureAccess(auth, collection, 'publish');
+  }
+
+  /** Gap 9: optional extension hooks (first transition to published only). */
+  private notifyFirstContentPublish(
+    collection: string,
+    entryId: string,
+    wasPublished: boolean,
+    nowPublished: boolean,
+  ): void {
+    if (wasPublished || !nowPublished) return;
+    void this.extensionHooks?.notifyContentPublished({ collection, entryId });
   }
 
   private toItemResponse(item: {
@@ -452,6 +466,12 @@ export class ContentService {
 
     const data = this.toItemResponse(item) as Record<string, unknown>;
     this.webhookDispatch.emitContentEntryCreated(collection, data);
+    this.notifyFirstContentPublish(
+      collection,
+      item.id,
+      false,
+      status === 'published',
+    );
 
     return {
       data,
@@ -660,6 +680,12 @@ export class ContentService {
 
     const data = this.toItemResponse(updated) as Record<string, unknown>;
     this.webhookDispatch.emitContentEntryUpdated(collection, data);
+    this.notifyFirstContentPublish(
+      collection,
+      existing.id,
+      existing.status === 'published',
+      status === 'published',
+    );
 
     return {
       data,
@@ -784,6 +810,12 @@ export class ContentService {
 
     const data = this.toItemResponse(updated) as Record<string, unknown>;
     this.webhookDispatch.emitContentEntryUpdated(collection, data);
+    this.notifyFirstContentPublish(
+      collection,
+      existing.id,
+      existing.status === 'published',
+      revision.status === 'published',
+    );
 
     return {
       data,

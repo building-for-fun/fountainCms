@@ -1,0 +1,1 @@
+export const ENABLED_EXTENSION_IDS = Symbol('ENABLED_EXTENSION_IDS');

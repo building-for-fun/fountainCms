@@ -12,12 +12,21 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { MediaModule } from './media/media.module';
 import { ApiTokensModule } from './api-tokens/api-tokens.module';
 import { FountainGraphqlModule } from './graphql/graphql.module';
+import { ExtensionsCoreModule } from './extensions/extensions-core.module';
+import { resolveExtensionModules } from './extensions/extension-catalog';
+
+const ENABLED_EXTENSION_IDS_FROM_ENV = (process.env.EXTENSIONS_ENABLED ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ExtensionsCoreModule.forRoot(ENABLED_EXTENSION_IDS_FROM_ENV),
+    ...resolveExtensionModules(ENABLED_EXTENSION_IDS_FROM_ENV),
     PrismaModule,
     AuthModule,
     ApiTokensModule,
